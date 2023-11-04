@@ -9,7 +9,7 @@ from db.user import User
 
 
 class Result(Base):
-    __tablename__ = 'response'
+    __tablename__ = 'result'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     week: Mapped[Week] = relationship(back_populates='result')

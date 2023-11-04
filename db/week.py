@@ -8,8 +8,8 @@ from db.result import Result
 from db.response import Response
 
 
-class Response(Base):
-    __tablename__ = 'response'
+class Week(Base):
+    __tablename__ = 'week'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     responses: Mapped[List[Response]] = relationship(back_populates='week')
