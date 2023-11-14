@@ -1,18 +1,21 @@
 <template>
   <div class="container">
     <h2>Survey</h2>
-    <form class="row form-horizontal justify-content-center" @submit.prevent="submitSurvey">
+    <form class="row form-horizontal justify-content-center" id="surveyForm" @submit.prevent="submitSurvey">
       <!-- Name -->
-      <div class="row">
+      <div class="row" id="nameCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-          <div class="card px-0 mb-4">
+          <div class="card px-0 mb-4" :class="{ 'invalid': !nameValid }">
             <div class="card-header">
               Who ye be?
+              <div v-if="!nameValid">
+                <i class="bi bi-exclamation-circle"></i> Please tell us your name
+              </div>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col col-8 offset-2">
-                  <input class="form-control" id="nameInput" v-model="userName" required>
+                  <input class="form-control" id="nameInput" v-model="userName">
                 </div>
               </div>
             </div>
@@ -20,11 +23,14 @@
         </div>
       </div>
       <!-- Pick your top 2 -->
-      <div class="row">
+      <div class="row" id="voteCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-          <div class="card px-0 mb-4">
+          <div class="card px-0 mb-4" :class="{ 'invalid': !voteValid }">
             <div class="card-header">
               Pick your top 2
+              <div v-if="!voteValid">
+                <i class="bi bi-exclamation-circle"></i> Please pick 2 songs
+              </div>
             </div>
             <div class="card-body">
               <ul class="list-group list-group-flush text-start" v-for="song in songs">
@@ -51,16 +57,19 @@
         </div>
       </div>
       <!-- Match user with song -->
-      <div class="row">
+      <div class="row" id="matchCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-          <div class="card px-0 mb-4">
-            <div class="card-header">
+          <div class="card px-0 mb-4" :class="{ 'match-invalid': !matchValid }">
+            <div class="card-header" :class="{ 'invalid': !matchValid }">
               Matching
+              <div v-if="!matchValid">
+                <i class="bi bi-exclamation-circle"></i> Please match every person with a song
+              </div>
             </div>
             <div class="card-body">
               <ul class="list-group-flush text-start" v-for="matchedSong in matchedUserSongs">
                 <li class="list-group-item">
-                  <h5 class="card-title">{{ matchedSong.song.name }}</h5>
+                  <h5 class="card-title" :class="{ 'match-item-invalid': matchedSong.error }">{{ matchedSong.song.name }}</h5>
                 </li>
                 <li class="list-group-item dropdown">
                   <button 
@@ -82,16 +91,19 @@
         </div>
       </div>
       <!-- Submit song link -->
-      <div class="row">
+      <div class="row" id="songCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-          <div class="card px-0 mb-4">
+          <div class="card px-0 mb-4" :class="{ 'invalid': !songValid }">
             <div class="card-header">
-              Submit next song
+              Submit next song (Spotify link)
+              <div v-if="!songValid">
+                <i class="bi bi-exclamation-circle"></i> Please submit a valid Spotify link
+              </div>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col col-8 offset-2">
-                  <input class="form-control" id="songInput" v-model="nextSong" required>
+                  <input class="form-control" id="songInput" v-model="nextSong">
                 </div>
               </div>
             </div>
@@ -109,7 +121,9 @@
 </template>
 
 <script>
-  export default {
+import axios from 'axios';
+
+export default {
   name: 'Survey',
   props: {
     sotwId: String
@@ -122,6 +136,10 @@
       pickedSongs: [],
       matchedUserSongs: [],
       nextSong: "",
+      nameValid: true,
+      voteValid: true,
+      matchValid: true,
+      songValid: true,
     };
   },
   computed: {
@@ -145,6 +163,7 @@
         id: e.id,
         user: undefined,
         song: e,
+        error: false,
       })
     });
   },
@@ -164,16 +183,65 @@
       song.user = user;
       song.user.matched = true;
     },
-    submitSurvey() {
+    async submitSurvey() {
       const vm = this;
-      //TODO validation and form object creation
-      let formData = {
-        userName: vm.userName,
-        pickedSongs: vm.pickedSongs,
-        matchedUserSongs: vm.matchedUserSongs,
-        nextSong: vm.nextSong,
+      // validate spotify link
+      if (vm.nextSong.length > 0) {
+        // parse out the track id
+        const trackId = vm.nextSong.split('/').pop().split('?')[0]
+        // TODO send track id to API endpoint to validate the track on the back end
+        vm.songValid = true;
+      } else {
+        vm.songValid = false;
+        location.href = '#songCard';
       }
-      console.log(formData);
+      
+      // validate song matching
+      let errCount = 0;
+      vm.matchedUserSongs.forEach(e => {
+        if (e.user === undefined) {
+          e.error = true;
+          errCount ++;
+          console.log(errCount);
+        } else {
+          e.error = false;
+        }
+      });
+      if (errCount !== 0) {
+        vm.matchValid = false;
+        location.href = '#matchCard';
+      } else {
+        console.log(errCount);
+        vm.matchValid = true;
+      }
+      
+      // validate voting
+      if (vm.pickedSongs.length != 2) {
+        vm.voteValid = false;
+        location.href = '#voteCard'
+      } else {
+        vm.voteValid = true;
+      }
+      
+      // validate name
+      if (vm.userName.length <= 0) {
+        vm.nameValid = false;
+        location.href = '#nameCard';
+      } else {
+        vm.nameValid = true;
+      }
+
+      // send form data to back end
+      if (vm.nameValid && vm.voteValid && vm.matchValid && vm.songValid) {
+        let formData = {
+          userName: vm.userName,
+          pickedSongs: vm.pickedSongs,
+          matchedUserSongs: vm.matchedUserSongs,
+          nextSong: vm.nextSong,
+        }
+        // TODO send valid form data to back end to evaluate form and add to database
+        console.log(formData);
+      }
     }
   },
 }
@@ -181,5 +249,14 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
+.invalid {
+  color: #d91313;
+  border-color: #d91313;
+}
+.match-invalid {
+  border-color: #d91313;
+}
+.match-item-invalid {
+  color: #d91313;
+}
 </style>
