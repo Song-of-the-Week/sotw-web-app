@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@canvasjs/vue-charts": "^1.0.1",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.6.1",
     "bootstrap": "^5.3.2",

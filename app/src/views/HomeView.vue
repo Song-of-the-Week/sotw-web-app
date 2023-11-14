@@ -5,7 +5,8 @@
     <!-- <h3>The survey will be released in:</h3>
     <br/> -->
     <!-- <Countdown/> -->
-    <Survey/>
+    <!-- <Survey/> -->
+    <Results/>
     <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
   </div>
 </template>
@@ -14,12 +15,14 @@
 // @ is an alias to /src
 import Countdown from '@/components/Countdown.vue'
 import Survey from '@/components/Survey.vue'
+import Results from '@/components/Results.vue'
 
 export default {
   name: 'HomeView',
   components: {
     Countdown,
     Survey,
+    Results,
   },
   data() {
     return {

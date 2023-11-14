@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="coontainer">
     <p>{{ timeLeft.days }} days {{ timeLeft.hours }} hours {{ timeLeft.minutes }} minutes {{ timeLeft.seconds }} seconds</p>
   </div>
 </template>
@@ -25,7 +25,7 @@
     release: function() {
       const vm = this;
       // TODO get the sotw survey release time (expect it as a datetime object froom the back end)
-      let release = new Date(2023, 10, 10, 21, 0, 0, 0);
+      let release = new Date(2023, 10, 14, 21, 0, 0, 0);
       return release;
     }
   },
@@ -38,7 +38,6 @@
     getTimeRemaining() {
       const vm = this;
       let time = Date.parse(vm.release) - Date.parse(new Date());
-      console.log('hey');
 
       if (time >= 0) {
         vm.timeLeft.days = Math.floor(time / (1000 * 60 * 60 * 24));
@@ -55,7 +54,8 @@
       if (vm.timeLeft.days > 0 || vm.timeLeft.hours > 0 || vm.timeLeft.minutes > 0 || vm.timeLeft.seconds > 0) {
         vm.getTimeRemaining();
       } else {
-        console.log('bang')
+        // emit to parent that the countdown is over
+        vm.$emit('countedDown');
         clearInterval(vm.countdownInterval);
       }
     },
