@@ -1,5 +1,5 @@
 <template>
-  <div class="hello-world">
+  <div>
     <p>{{ timeLeft.days }} days {{ timeLeft.hours }} hours {{ timeLeft.minutes }} minutes {{ timeLeft.seconds }} seconds</p>
   </div>
 </template>
@@ -25,7 +25,7 @@
     release: function() {
       const vm = this;
       // TODO get the sotw survey release time (expect it as a datetime object froom the back end)
-      let release = new Date(2023, 10, 8, 21, 0, 0, 0);
+      let release = new Date(2023, 10, 10, 21, 0, 0, 0);
       return release;
     }
   },
