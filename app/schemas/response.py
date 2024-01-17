@@ -46,4 +46,7 @@ class ResponseInDB(ResponseInDBBase):
 
 # additional properties to return via API
 class Response(ResponseInDBBase):
-    ...
+    submitter_id: int
+    user_song_match: List[int]
+    num_correct_guesses: int
+    votes: List[int]

@@ -29,7 +29,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db_object = User(**create_data)
         db_object.password = get_password_hash(object_in.password)
         # TODO fill in spotify api stuff to create a playlist for this new user and add the link to the new object
-        db_object.playlist_link = ''
+        db_object.playlist_link = 'http://localhost:3000'
         session.add(db_object)
         session.commit()
 

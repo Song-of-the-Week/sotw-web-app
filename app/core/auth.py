@@ -25,7 +25,7 @@ def authenticate(*, email: str, password: str, session: Session) -> Optional[Use
     :session: a database session
     """
     user = session.query(User).filter(User.email == email).first()
-    if not user or not verify_password(password, user.hashed_password):
+    if not user or not verify_password(password, user.password):
         return None
     
     return user

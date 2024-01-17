@@ -1,3 +1,4 @@
+from curses import use_default_colors
 import time
 import logging
 import uvicorn
@@ -49,19 +50,27 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+@app.on_event("startup")
+async def startup_event():
+    # configure uvicorn logging
+    logger = logging.getLogger("uvicorn.access")
+    handler = logging.StreamHandler()
+    handler.setFormatter(uvicorn.logging.ColourizedFormatter(
+        "{asctime} | {levelprefix} {message}",
+        style="{", use_colors=True
+    ))
+    logger.addHandler(handler)
+
+
 app.include_router(api_router, prefix=cfg.API_V1_STR)
 app.include_router(root_router)
 
 
 def main() -> None:
-    # get logger config
-    with open(cfg.LOGGING_CONFIG, 'r') as file:
-        log_config = yaml.safe_load(file)
     uvicorn.run(
         f'{__name__}:app',
         host=cfg.SERVER_BIND,
         port=cfg.SERVER_PORT,
-        log_config=log_config,
         log_level=cfg.LOGGER_LEVEL,
         access_log=False,
         reload=cfg.DEBUG,

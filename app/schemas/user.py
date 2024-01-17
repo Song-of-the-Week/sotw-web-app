@@ -37,6 +37,6 @@ class UserInDB(UserInDBBase):
 
 # additional properties to return via API
 class User(UserInDBBase):
-    playlist_link: HttpUrl
+    # playlist_link: Optional[HttpUrl]
     sotw_list: List[int]
     responses: List[int]

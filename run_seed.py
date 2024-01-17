@@ -1,8 +1,6 @@
 import sys
 
-from app.main import main
-
+from app.db.init_db import main
 
 if __name__ == '__main__':
-    print(sys.path)
     sys.exit(main())

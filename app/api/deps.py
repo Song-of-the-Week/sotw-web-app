@@ -9,8 +9,8 @@ from fastapi import Depends, HTTPException, status
 from jose import jwt, JWTError
 from sqlalchemy.orm.session import Session
 
-from app.models import SessionLocal
-from app.models import AsyncSessionLocal
+from app.db.session import SessionLocal
+from app.db.session import AsyncSessionLocal
 from app.models.user import User
 from app.core.auth import oauth2_scheme
 from app.shared.config import cfg
@@ -21,7 +21,7 @@ class TokenData(BaseModel):
 
 
 # synchronous orm session
-def get_session() -> Generator:
+def get_session() -> Generator[Session, None, None]:
     session = SessionLocal()
     try:
         yield session
