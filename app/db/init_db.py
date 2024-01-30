@@ -16,7 +16,7 @@ def init_db(session: Session):
             email='admin@admin.admin',
             name='admin',
             is_superuser=True,
-            password='admin'
+            password='password'
         )
         user = crud.user.create(session, object_in=user_in)
     else:

@@ -1,8 +1,15 @@
 from typing import List, Optional
+from pydantic import ConfigDict
 from pydantic import EmailStr
 from pydantic import HttpUrl
 
 from app.schemas.base import Base
+
+
+class UserLoginRequest(Base):
+    username: str
+    password: str
+
 
 class UserBase(Base):
     email: Optional[EmailStr]
@@ -13,9 +20,11 @@ class UserBase(Base):
 # properties to receive via API creation
 class UserCreate(UserBase):
     email: EmailStr
+    name: str
     password: str
     sotw_list: Optional[List[int]] = []
     responses: Optional[List[int]] = []
+
 
 # properties to receive via API update
 class UserUpdate(UserBase):
@@ -30,13 +39,19 @@ class UserInDBBase(UserBase):
         orm_mode = True
 
 
-# additional properties stored in DB bt not returned by API
+# additional properties stored in DB but not returned by API
 class UserInDB(UserInDBBase):
     password: str
 
 
 # additional properties to return via API
 class User(UserInDBBase):
-    # playlist_link: Optional[HttpUrl]
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    email: EmailStr
+    name: str
+    is_superuser: bool
+    playlist_link: Optional[HttpUrl]
     sotw_list: List[int]
     responses: List[int]

@@ -24,6 +24,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         :session: a SQLAlchemy Session object that is connected to the database
         :object_in: a pydantic model UserCreate object
         """
+        
         create_data = object_in.model_dump()
         create_data.pop('password')
         db_object = User(**create_data)
@@ -32,6 +33,8 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db_object.playlist_link = 'http://localhost:3000'
         session.add(db_object)
         session.commit()
+
+        return self.get_by_email(session=session, email=db_object.email)
 
     def add_user_to_sotw(self, session: Session, *, db_object: User, object_in: UserUpdate) -> User:
         """

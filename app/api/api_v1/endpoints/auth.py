@@ -1,4 +1,4 @@
-import logging
+from ast import Str
 from typing import Any
 
 from fastapi import APIRouter
@@ -6,7 +6,9 @@ from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 from sqlalchemy.orm.session import Session
+from loguru import logger
 
 from app import crud
 from app  import schemas
@@ -19,25 +21,24 @@ from app.models.user import User
 from app.shared.config import cfg
 
 
-logger = logging.getLogger(__name__)
-
-
 router = APIRouter()
 
 
 @router.post("/login")
 def login(
+    *,
     session: Session = Depends(deps.get_session),
-    form_data: OAuth2PasswordRequestForm = Depends()
+    form_data: schemas.UserLoginRequest,
 ) -> Any:
     """
     Get the JWT for a user from OAuth2 request body
     """
     user = authenticate(email=form_data.username, password=form_data.password, session=session)
     if not user:
-        raise HTTPException(status_code=400, detail='Incorrect username or password')
+        raise HTTPException(status_code=400, detail='Incorrect username or password.')
     
     return {
+        'user': schemas.User.model_validate(user),
         'access_token': create_access_token(sub=user.id),
         'token_type': 'bearer',
     }
@@ -61,17 +62,17 @@ def register(
     session: Session = Depends(deps.get_session),
     # email_client: EmailClient = Depends(deps.get_email_client),
     # background_tasks: BackgroundTasks,
-    user_in: schemas.user.UserCreate,
+    user_in: schemas.UserCreate,
 ) -> Any:
     """
     Register a new user
     """
-
     user = crud.user.get_by_email(session, email=user_in.email)
+
     if user:
         raise HTTPException(
             status_code=400,
-            detail="A user with this email already exists",
+            detail="A user with this email already exists.",
         )
     user = crud.user.create(session=session, object_in=user_in)
 

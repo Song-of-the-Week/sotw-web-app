@@ -8,7 +8,11 @@ DB_DEV_PASS := clarice
 
 
 # development automation
-dev-backend-up: build-db build-db-data
+dev-backend-up:
+	@echo "Starting up backend"
+	. venv/bin/activate && ./venv/bin/python run_dev.py
+
+dev-backend-full-up: build-db build-db-data
 	@echo "Starting up backend"
 	. venv/bin/activate && ./venv/bin/python run_dev.py
 

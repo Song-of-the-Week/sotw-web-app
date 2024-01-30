@@ -1,8 +1,6 @@
 from curses import use_default_colors
 import time
-import logging
 import uvicorn
-import yaml
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import FastAPI
@@ -11,11 +9,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.shared.config import cfg
+from app.shared.config import setup_app_logging
 from app.api import deps
 from app.api.api_v1 import api_router
 
-logger = logging.getLogger(__name__)
 
+setup_app_logging(config=cfg)
 root_router = APIRouter()
 app = FastAPI(title="Song of the Week API", openapi_url=f'{cfg.API_V1_STR}/openapi.json')
 
@@ -23,6 +22,7 @@ if cfg.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[str(origin) for origin in cfg.BACKEND_CORS_ORIGINS],
+        allow_origin_regex=cfg.BACKEND_CORS_ORIGIN_REGEX,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -37,7 +37,6 @@ def root(
     """
     Root GET
     """
-    logger.error(request)
     return { 'hello': 'world' }
 
 
@@ -50,16 +49,16 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@app.on_event("startup")
-async def startup_event():
-    # configure uvicorn logging
-    logger = logging.getLogger("uvicorn.access")
-    handler = logging.StreamHandler()
-    handler.setFormatter(uvicorn.logging.ColourizedFormatter(
-        "{asctime} | {levelprefix} {message}",
-        style="{", use_colors=True
-    ))
-    logger.addHandler(handler)
+# @app.on_event("startup")
+# async def startup_event():
+#     # configure uvicorn logging
+#     logger = logging.getLogger("uvicorn.access")
+#     handler = logging.StreamHandler()
+#     handler.setFormatter(uvicorn.logging.ColourizedFormatter(
+#         "{asctime} | {levelprefix} {message}",
+#         style="{", use_colors=True
+#     ))
+#     logger.addHandler(handler)
 
 
 app.include_router(api_router, prefix=cfg.API_V1_STR)
@@ -72,7 +71,5 @@ def main() -> None:
         host=cfg.SERVER_BIND,
         port=cfg.SERVER_PORT,
         log_level=cfg.LOGGER_LEVEL,
-        access_log=False,
         reload=cfg.DEBUG,
-        use_colors=True,
     )
