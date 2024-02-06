@@ -42,6 +42,14 @@ const routes = [
     },
   },
   {
+    path: "/user",
+    name: "user",
+    component: () => import(/* webpackChunkName: "user" */ "../views/UserView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "404",
     component: () => import("../views/404View.vue"),
@@ -53,22 +61,17 @@ const router = createRouter({
   routes,
 });
 
-// Handle routes with `requiresAuth` meta key
-router.beforeEach((to, _, next) => {
+router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
+    // Handle routes with `requiresAuth` meta key
     if (store.getters.isAuthenticated) {
       next();
       return;
     }
-    next("/403");
-  } else {
-    next();
-  }
-});
-
-// Handle routes with `guest` meta key
-router.beforeEach((to, _, next) => {
-  if (to.matched.some((record) => record.meta.guest)) {
+    sessionStorage.setItem("last_requested_path", to.path);
+    next("/login");
+  } else if (to.matched.some((record) => record.meta.guest)) {
+    // Handle routes with `guest` meta key
     if (store.getters.isAuthenticated) {
       next("/");
       return;

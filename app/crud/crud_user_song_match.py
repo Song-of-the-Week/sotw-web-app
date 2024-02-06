@@ -8,8 +8,9 @@ from app.schemas.user_song_match import UserSongMatchCreate
 from app.schemas.user_song_match import UserSongMatchUpdate
 
 
-class CRUDUserSongMatch(CRUDBase[UserSongMatch, UserSongMatchCreate, UserSongMatchUpdate]):
-    ...
+class CRUDUserSongMatch(
+    CRUDBase[UserSongMatch, UserSongMatchCreate, UserSongMatchUpdate]
+): ...
 
 
 user_song_match = CRUDUserSongMatch(UserSongMatch)

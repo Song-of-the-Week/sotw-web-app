@@ -101,7 +101,7 @@
             </p>
           </form>
           <!-- Login -->
-          <form v-else>
+          <form v-else id="login-form">
             <div class="mb-3">
               <label for="loginEmail" class="form-label" :class="{ invalid: !loginEmailValid }">Email Address</label>
               <input
@@ -172,14 +172,19 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import api from "@/shared/api";
 import PasswordInput from "@/components/PasswordInput.vue";
+import store from "@/store/index";
 export default {
   name: "LoginRegisterModal",
   components: {
     PasswordInput,
   },
   props: {
+    loginRegisterModal: {
+      default: null,
+    },
     registering: {
       type: Boolean,
       default: false,
@@ -214,8 +219,12 @@ export default {
   mounted() {
     const vm = this;
 
-    document.getElementById("loginModal").addEventListener("hide.bs.modal", function (event) {
-      vm.$router.replace("/");
+    // clean up modal form data on modal close
+    document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (event) {
+      if (!vm.isLoggedIn) {
+        sessionStorage.setItem("last_requested_path", "/");
+      }
+      vm.$router.push(sessionStorage.getItem("last_requested_path"));
       vm.loginForm = {
         email: "",
         password: "",
@@ -237,8 +246,25 @@ export default {
       vm.registerResponse400 = null;
       vm.registerResponse500 = false;
     });
+
+    // submit form on enter key hit
+    $(document).keypress(function (e) {
+      if ($("#loginModal").hasClass("show") && (e.keycode == 13 || e.which == 13)) {
+        if (vm.registering) {
+          vm.submitRegister();
+        } else {
+          vm.submitLogin();
+        }
+      }
+    });
+  },
+  computed: {
+    isLoggedIn: () => {
+      return store.getters.isAuthenticated;
+    },
   },
   methods: {
+    ...mapActions(["getCurrentUser"]),
     validatePassword() {
       const vm = this;
       // password validation
@@ -280,25 +306,7 @@ export default {
 
       if (vm.loginEmailValid && vm.loginPasswordValid) {
         // send login request
-
-        api.methods
-          .apiPostLogin({ username: vm.loginForm.email, password: vm.loginForm.password })
-          .then((res) => {
-            vm.loading = false;
-            // set the user
-            console.log("response", res);
-          })
-          .catch((err) => {
-            vm.loading = false;
-            // error handling
-            if (err.response.status == 400) {
-              vm.loginResponse400 = err.response.data.detail;
-            } else if (err.response.status == 500) {
-              vm.loginResponse500 = true;
-            } else {
-              console.error("ERROR:", err);
-            }
-          });
+        await vm.login(vm.loginForm);
       } else {
         vm.loading = false;
       }
@@ -331,18 +339,15 @@ export default {
         vm.registerPasswordConfirmValid
       ) {
         // send register request
-        api.methods
+        await api.methods
           .apiPostRegister(vm.registerForm)
-          .then((res) => {
-            vm.loading = false;
-            // set the user
-            console.log("response", res);
+          .then(async (res) => {
+            await vm.login(vm.registerForm);
           })
           .catch((err) => {
             vm.loading = false;
             // error handling
             if (err.response.status == 400) {
-              console.log(err);
               vm.registerResponse400 = err.response.data.detail;
             } else if (err.response.status == 500) {
               vm.registerResponse500 = true;
@@ -353,6 +358,31 @@ export default {
       } else {
         vm.loading = false;
       }
+    },
+    async login(form) {
+      const vm = this;
+      let loginForm = new FormData();
+      loginForm.append("username", form.email);
+      loginForm.append("password", form.password);
+      await api.methods
+        .apiPostLogin(loginForm)
+        .then(async (res) => {
+          vm.loading = false;
+          // set the user
+          await vm.getCurrentUser();
+          vm.loginRegisterModal.hide();
+        })
+        .catch((err) => {
+          vm.loading = false;
+          // error handling
+          if (err.response.status == 400) {
+            vm.loginResponse400 = err.response.data.detail;
+          } else if (err.response.status == 500) {
+            vm.loginResponse500 = true;
+          } else {
+            console.error("ERROR:", err);
+          }
+        });
     },
   },
   watch: {

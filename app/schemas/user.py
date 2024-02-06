@@ -22,13 +22,16 @@ class UserCreate(UserBase):
     email: EmailStr
     name: str
     password: str
+    playlists: Optional[List[int]] = []
     sotw_list: Optional[List[int]] = []
     responses: Optional[List[int]] = []
 
 
 # properties to receive via API update
 class UserUpdate(UserBase):
-    sotw_id: Optional[int]
+    name: Optional[str] = None
+    email: Optional[str] = None
+    sotw_list: Optional[List[int]] = None
 
 
 # properties shared by models stored in DB
@@ -47,11 +50,11 @@ class UserInDB(UserInDBBase):
 # additional properties to return via API
 class User(UserInDBBase):
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: int
     email: EmailStr
     name: str
     is_superuser: bool
-    playlist_link: Optional[HttpUrl]
+    playlists: Optional[List[int]]
     sotw_list: List[int]
     responses: List[int]

@@ -3,15 +3,16 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from app.crud.crud_base import CRUDBase
-from app.crud.crud_song import song
-from app.models.response import Response
-from app.schemas.response import ResponseCreate
-from app.schemas.response import ResponseUpdate
+from app.models.user_playlist import UserPlaylist
+from app.schemas.user_playlist import UserPlaylistCreate
+from app.schemas.user_playlist import UserPlaylistUpdate
 
 
-class CRUDResponse(CRUDBase[Response, ResponseCreate, ResponseUpdate]):
+class CRUDUserPlaylist(CRUDBase[UserPlaylist, UserPlaylistCreate, UserPlaylistUpdate]):
 
-    def create(self, session: Session, *, object_in: ResponseCreate) -> Response:
+    def create(
+        self, session: Session, *, object_in: UserPlaylistCreate
+    ) -> UserPlaylist:
         """
         Creates a Response in the database
         :session: a SQLAlchemy Session object that is connected to the database
@@ -20,8 +21,12 @@ class CRUDResponse(CRUDBase[Response, ResponseCreate, ResponseUpdate]):
         # TODO once we know what the data coming from the api endpoint looks like
 
     def update(
-        self, session: Session, *, db_object: Response, object_in: ResponseUpdate
-    ) -> Response:
+        self,
+        session: Session,
+        *,
+        db_object: UserPlaylist,
+        object_in: UserPlaylistUpdate
+    ) -> UserPlaylist:
         """
         Updates an object in the database
         :session: a SQLAlchemy Session object that is connected to the database
@@ -31,4 +36,4 @@ class CRUDResponse(CRUDBase[Response, ResponseCreate, ResponseUpdate]):
         # TODO once we know what the data coming from the api endpoint looks like
 
 
-response = CRUDResponse(Response)
+user_playlist = CRUDUserPlaylist(UserPlaylist)

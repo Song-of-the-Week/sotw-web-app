@@ -16,7 +16,9 @@ from app.api.api_v1 import api_router
 
 setup_app_logging(config=cfg)
 root_router = APIRouter()
-app = FastAPI(title="Song of the Week API", openapi_url=f'{cfg.API_V1_STR}/openapi.json')
+app = FastAPI(
+    title="Song of the Week API", openapi_url=f"{cfg.API_V1_STR}/openapi.json"
+)
 
 if cfg.BACKEND_CORS_ORIGINS:
     app.add_middleware(
@@ -37,7 +39,7 @@ def root(
     """
     Root GET
     """
-    return { 'hello': 'world' }
+    return {"hello": "world"}
 
 
 @app.middleware("http")
@@ -49,25 +51,13 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-# @app.on_event("startup")
-# async def startup_event():
-#     # configure uvicorn logging
-#     logger = logging.getLogger("uvicorn.access")
-#     handler = logging.StreamHandler()
-#     handler.setFormatter(uvicorn.logging.ColourizedFormatter(
-#         "{asctime} | {levelprefix} {message}",
-#         style="{", use_colors=True
-#     ))
-#     logger.addHandler(handler)
-
-
 app.include_router(api_router, prefix=cfg.API_V1_STR)
 app.include_router(root_router)
 
 
 def main() -> None:
     uvicorn.run(
-        f'{__name__}:app',
+        f"{__name__}:app",
         host=cfg.SERVER_BIND,
         port=cfg.SERVER_PORT,
         log_level=cfg.LOGGER_LEVEL,

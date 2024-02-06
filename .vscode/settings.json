@@ -1,5 +1,9 @@
 {
     "python.analysis.typeCheckingMode": "off",
     "python.analysis.autoImportCompletions": true,
-    "prettier.printWidth": 160
+    "prettier.printWidth": 160,
+    "[python]": {
+      "editor.insertSpaces": true,
+      "editor.tabSize": 4  
+    }
 }

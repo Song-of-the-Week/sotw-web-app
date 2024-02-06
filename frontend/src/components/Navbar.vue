@@ -64,12 +64,15 @@
             </li> -->
           </ul>
           <div class="navbar-nav d-flex">
+            <div class="nav-item" v-if="isLoggedIn">
+              <router-link class="nav-link" :to="`/user`">My Profile</router-link>
+            </div>
             <div class="nav-item">
               <router-link v-if="isLoggedIn" :to="`/`">
-                <button class="btn btn-outline-success" @click="logout()">Logout</button>
+                <button class="btn btn-outline-success" @click="logoutUser()">Logout</button>
               </router-link>
               <router-link v-else :to="`/login`">
-                <button class="btn btn-outline-success">Login</button>
+                <button class="btn btn-outline-success" @click="login()">Login</button>
               </router-link>
             </div>
           </div>
@@ -77,12 +80,12 @@
       </div>
     </div>
   </nav>
-  <LoginRegisterModal :registering="loginRegistering" />
+  <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal" />
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
 import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
-import api from "@/shared/api";
 import store from "@/store/index.js";
 export default {
   name: "Navbar",
@@ -102,6 +105,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({ user: "getUser" }),
     isLoggedIn: () => {
       return store.getters.isAuthenticated;
     },
@@ -112,8 +116,19 @@ export default {
     vm.loginRegisterModal = new bootstrap.Modal("#loginModal");
   },
   methods: {
-    logout() {
-      console.log("whaaaaat");
+    ...mapActions(["logout"]),
+    login() {
+      const vm = this;
+      if (!vm.loginRegisterModal._isShown) {
+        vm.loginRegisterModal.show();
+      }
+    },
+    logoutUser() {
+      const vm = this;
+      vm.logout().then(() => {
+        this.$router.replace("/");
+        vm.registering = false;
+      });
     },
   },
   watch: {

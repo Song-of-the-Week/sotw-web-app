@@ -17,26 +17,26 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         :email: the email of the object being sought after
         """
         return session.query(User).filter(User.email == email).first()
-    
+
     def create(self, session: Session, *, object_in: UserCreate) -> User:
         """
         Creates a User in the database and creates a spotify playlist for the user
         :session: a SQLAlchemy Session object that is connected to the database
         :object_in: a pydantic model UserCreate object
         """
-        
+
         create_data = object_in.model_dump()
-        create_data.pop('password')
+        create_data.pop("password")
         db_object = User(**create_data)
         db_object.password = get_password_hash(object_in.password)
-        # TODO fill in spotify api stuff to create a playlist for this new user and add the link to the new object
-        db_object.playlist_link = 'http://localhost:3000'
         session.add(db_object)
         session.commit()
 
         return self.get_by_email(session=session, email=db_object.email)
 
-    def add_user_to_sotw(self, session: Session, *, db_object: User, object_in: UserUpdate) -> User:
+    def add_user_to_sotw(
+        self, session: Session, *, db_object: User, object_in: UserUpdate
+    ) -> User:
         """
         Adds the sotw to the user (and vice versa via model relationship)
         :session: a SQLAlchemy Session object that is connected to the database
