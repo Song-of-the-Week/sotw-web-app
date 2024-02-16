@@ -68,7 +68,7 @@
           </div>
           <div v-if="editingPassword" class="row mt-3">
             <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="currentPassword" class="form-label" :class="{ invalid: !currentPasswordValid }"
+              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword403.length > 0 }"
                 >Current Password</label
               >
               <PasswordInput
@@ -79,7 +79,7 @@
                   }
                 "
               />
-              <p v-if="!currentPasswordValid" class="invalid">Incorrect password.</p>
+              <p v-if="changePassword403" class="invalid">{{ changePassword403 }}</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
               <label for="newPassword" class="form-label" :class="{ invalid: !newPasswordValid }">New Password</label>
@@ -123,6 +123,11 @@
               <button class="btn btn-outline-warning" @click="editingPassword = true">Change Password</button>
             </div>
           </div>
+          <div class="row mt-2">
+            <div class="col">
+              <p v-if="response500" class="invalid">Sorry! Something went wrong... Please contact an administrator.</p>
+            </div>
+          </div>
         </div>
       </div>
       <div class="row mt-3">
@@ -145,8 +150,8 @@ export default {
   },
   data() {
     return {
-      userName: null,
-      userEmail: null,
+      userName: "",
+      userEmail: "",
       currentPassword: "",
       newPassword: "",
       newPasswordConfirm: "",
@@ -156,9 +161,10 @@ export default {
       loadingName: false,
       loadingEmail: false,
       loadingPassword: false,
-      currentPasswordValid: true,
       newPasswordValid: true,
       newPasswordConfirmValid: true,
+      changePassword403: "",
+      response500: false,
     };
   },
   computed: {
@@ -176,32 +182,52 @@ export default {
       const vm = this;
       vm.loadingName = true;
       vm.updateUser({ name: vm.userName })
-        .then((res) => {
-          vm.editingName = vm.loadingName = false;
-        })
         .catch((err) => {
+          if (err.response.status == 500) {
+            vm.response500 = true;
+          } else {
+            console.log("ERROR", err);
+          }
+        })
+        .finally(() => {
           vm.editingName = vm.loadingName = false;
-          console.error(err);
+          vm.userName = "";
         });
     },
     changeEmail() {
       const vm = this;
       vm.loadingEmail = true;
       vm.updateUser({ email: vm.userEmail })
-        .then((res) => {
-          vm.editingEmail = vm.loadingEmail = false;
-        })
         .catch((err) => {
+          if (err.response.status == 500) {
+            vm.response500 = true;
+          } else {
+            console.log("ERROR", err);
+          }
+        })
+        .finally(() => {
           vm.editingEmail = vm.loadingEmail = false;
-          console.error(err);
+          vm.userEmail = "";
         });
     },
     changePassword() {
       const vm = this;
       vm.loadingPassword = true;
-      setTimeout(() => {
-        vm.editingPassword = vm.loadingPassword = false;
-      }, 1000);
+      vm.updateUser({ current_password: vm.currentPassword, new_password: vm.newPassword })
+        .then((res) => {
+          vm.currentPassword = vm.newPassword = vm.newPasswordConfirm = "";
+          vm.editingPassword = false;
+        })
+        .catch((err) => {
+          if (err.response.status == 403) {
+            vm.changePassword403 = err.response.data.detail;
+          } else if (err.response.status == 500) {
+            vm.response500 = true;
+          }
+        })
+        .finally(() => {
+          vm.loadingPassword = false;
+        });
     },
     validateNewPassword() {
       const vm = this;

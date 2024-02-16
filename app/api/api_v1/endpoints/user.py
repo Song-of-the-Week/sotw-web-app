@@ -9,7 +9,8 @@ from loguru import logger
 from app import crud
 from app import schemas
 from app.api import deps
-
+from app.core.auth import authenticate
+from app.core.security import get_password_hash
 from app.models.user import User
 
 
@@ -28,11 +29,17 @@ async def update_user(
     Fetch the current logged in user
     """
     if user_id != current_user.id or not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail=f"Not authorized to update")
+        raise HTTPException(status_code=403, detail=f"Not authorized to update.")
 
-    user = crud.user.get(session=session, id=user_id)
+    if payload.current_password is not None and payload.new_password is not None:
+        if authenticate(
+            email=current_user.email, password=payload.current_password, session=session
+        ):
+            payload = {"password": get_password_hash(payload.new_password)}
+        else:
+            raise HTTPException(status_code=403, detail=f"Incorrect password.")
 
-    return crud.user.update(session=session, db_object=user, object_in=payload)
+    return crud.user.update(session=session, db_object=current_user, object_in=payload)
 
 
 @router.delete(

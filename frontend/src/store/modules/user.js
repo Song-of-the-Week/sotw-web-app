@@ -20,7 +20,7 @@ export default {
           await commit("setUser", res.data);
         })
         .catch((err) => {
-          console.error(err);
+          throw err;
         });
     },
     async logout({ commit }) {
@@ -30,7 +30,7 @@ export default {
           await commit("setUser", null);
         })
         .catch((err) => {
-          console.error(err);
+          throw err;
         });
     },
     async updateUser({ commit, state }, payload) {
@@ -40,7 +40,7 @@ export default {
           await commit("setUser", res.data);
         })
         .catch((err) => {
-          console.error(err);
+          throw err;
         });
     },
   },

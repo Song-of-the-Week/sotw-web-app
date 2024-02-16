@@ -25,7 +25,7 @@ class Config(BaseSettings):
     SEND_REGISTRATION_EMAILS: bool = False
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  # 8 days
-    SESSION_COOKIE_EXPIRE_SECONDS: int = 1800  # 30 minutes
+    SESSION_COOKIE_EXPIRE_SECONDS: int = 86400  # 30 minutes
     JWT_SECRET: str = (
         "7f0a187153e8c67cd0ef1a27552803e61b0a7051b9d981c8bf41a031b72a74d1"  # use `openssl rand -hex 32` to generate
     )

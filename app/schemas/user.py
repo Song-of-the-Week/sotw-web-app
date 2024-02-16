@@ -32,6 +32,8 @@ class UserUpdate(UserBase):
     name: Optional[str] = None
     email: Optional[str] = None
     sotw_list: Optional[List[int]] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
 
 
 # properties shared by models stored in DB
