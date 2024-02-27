@@ -1,12 +1,10 @@
 <template>
-  <Navbar
-    :sotwName="sotwName"
-  />
-  <router-view/>
+  <Navbar :sotwName="sotwName" />
+  <router-view />
 </template>
 
 <script>
-import Navbar from "./components/Navbar.vue"
+import Navbar from "./components/Navbar.vue";
 
 export default {
   name: "App",
@@ -18,7 +16,7 @@ export default {
       sotwName: "Song of the Week",
       sotwId: 0,
     };
-  }
+  },
 };
 </script>
 

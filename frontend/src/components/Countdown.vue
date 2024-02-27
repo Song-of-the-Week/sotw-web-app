@@ -1,8 +1,7 @@
 <template>
   <div class="container">
     <p>
-      {{ timeLeft.days }} days {{ timeLeft.hours }} hours
-      {{ timeLeft.minutes }} minutes {{ timeLeft.seconds }} seconds
+      {{ timeLeft.days }} days {{ timeLeft.hours }} hours {{ timeLeft.minutes }} minutes {{ timeLeft.seconds }} seconds
     </p>
   </div>
 </template>
@@ -48,22 +47,13 @@ export default {
         vm.timeLeft.minutes = Math.floor((time / 1000 / 60) % 60);
         vm.timeLeft.seconds = Math.floor((time / 1000) % 60);
       } else {
-        vm.timeLeft.days =
-          vm.timeLeft.hours =
-          vm.timeLeft.minutes =
-          vm.timeLeft.seconds =
-            0;
+        vm.timeLeft.days = vm.timeLeft.hours = vm.timeLeft.minutes = vm.timeLeft.seconds = 0;
       }
     },
     updateTimer() {
       const vm = this;
 
-      if (
-        vm.timeLeft.days > 0 ||
-        vm.timeLeft.hours > 0 ||
-        vm.timeLeft.minutes > 0 ||
-        vm.timeLeft.seconds > 0
-      ) {
+      if (vm.timeLeft.days > 0 || vm.timeLeft.hours > 0 || vm.timeLeft.minutes > 0 || vm.timeLeft.seconds > 0) {
         vm.getTimeRemaining();
       } else {
         // emit to parent that the countdown is over

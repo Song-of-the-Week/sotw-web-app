@@ -15,4 +15,6 @@ class Sotw(Base):
     name: Mapped[str]
     playlist_link: Mapped[str]
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.utcnow())
-    user_list = relationship('User', secondary=sotw_user_association_table, back_populates='sotw_list')
+    user_list = relationship(
+        "User", secondary=sotw_user_association_table, back_populates="sotw_list"
+    )

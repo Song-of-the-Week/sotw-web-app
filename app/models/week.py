@@ -14,7 +14,7 @@ class Week(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     week_num: Mapped[int]
     playlist_link: Mapped[str]
-    sotw_id: Mapped[int] = mapped_column(ForeignKey('sotw.id'))
+    sotw_id: Mapped[int] = mapped_column(ForeignKey("sotw.id"))
     survey_release: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
     results_release: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
-    responses: Mapped[List[Response]] = relationship(back_populates='week')
+    responses: Mapped[List[Response]] = relationship(back_populates="week")

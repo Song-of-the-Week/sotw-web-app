@@ -64,7 +64,7 @@
             </li> -->
           </ul>
           <div class="navbar-nav d-flex">
-            <div class="nav-item" v-if="isLoggedIn">
+            <div class="nav-item mb-2 mb-md-0 me-md-2" v-if="isLoggedIn">
               <router-link class="nav-link" :to="`/user`">My Profile</router-link>
             </div>
             <div class="nav-item">

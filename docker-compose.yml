@@ -1,16 +1,17 @@
 services:
-  # app:
-  #   image: sotw:latest
-  #   restart: always
-  #   environment:
-  #     CAT: clarice
+  redis:
+    image: redis:7.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+  
   db:
     image: postgres:15.4-bullseye
     ports:
       - 5432:5432
     restart: always
     env_file:
-      .env # database credentials stored here
+      .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 1s
@@ -18,3 +19,82 @@ services:
       retries: 10
     volumes:
       - ./postgres:/var/lib/postgresql/data
+  
+  api:
+    build:
+      context: ./app
+      dockerfile: ./app/Dockerfile
+    image: sotw-api:latest
+    restart: always
+    command: /start_api.sh
+    env_file:
+      .env
+    volumes:
+      - ./app:/app
+    depends_on:
+      - db
+      - redis
+  
+  celery_worker:
+    build:
+      context: ./app
+      dockerfile: ./app/Dockerfile
+    image: sotw-api:latest
+    restart: always
+    command: /start_celery_worker.sh
+    env_file:
+      .env
+    volumes:
+      - ./app:/app
+    depends_on:
+      - db
+      - redis
+  
+  celery_beat:
+    build:
+      context: ./app
+      dockerfile: ./app/Dockerfile
+    image: sotw-api:latest
+    restart: always
+    command: /start_celery_beat.sh
+    env_file:
+      .env
+    volumes:
+      - ./app:/app
+    depends_on:
+      - db
+      - redis
+  
+  celery_flower:
+    build:
+      context: ./app
+      dockerfile: ./app/Dockerfile
+    image: sotw-api:latest
+    restart: always
+    command: /start_celery_flower.sh
+    env_file:
+      .env
+    ports:
+      - 5557:5555
+    volumes:
+      - ./app:/app
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./frontend/Dockerfile
+    image: sotw-frontend:latest
+    command: npm ruun serve
+    ports:
+      - "80:8080"
+    volumes:
+      - ./frontend:/frontend
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
