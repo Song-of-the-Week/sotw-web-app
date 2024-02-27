@@ -3,3 +3,5 @@ client_secrets.json
 .env
 .vscode/
 postgres/
+venv/
+*/__pychache__/
