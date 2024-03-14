@@ -27,7 +27,9 @@ export default {
       await api.methods
         .apiGetLogout()
         .then(async (res) => {
-          await commit("setUser", null);
+          if (res.status == 200) {
+            await commit("setUser", null);
+          }
         })
         .catch((err) => {
           throw err;

@@ -26,7 +26,7 @@ class UserPlaylistInDBBase(UserPlaylistBase):
     id: int = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # additional properties stored in DB but not returned by API

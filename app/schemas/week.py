@@ -20,8 +20,7 @@ class WeekCreate(WeekBase):
 
 
 # properties to receive via API update
-class WeekUpdate(WeekBase):
-    ...
+class WeekUpdate(WeekBase): ...
 
 
 # properties shared by models stored in DB
@@ -29,12 +28,11 @@ class WeekInDBBase(WeekBase):
     id: int = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # additional properties stored in DB bt not returned by API
-class WeekInDB(WeekInDBBase):
-    ...
+class WeekInDB(WeekInDBBase): ...
 
 
 # additional properties to return via API

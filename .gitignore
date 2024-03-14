@@ -5,3 +5,8 @@ client_secrets.json
 postgres/
 venv/
 */__pychache__/
+./app/alembic/versions/__pycache__
+./app/api/api_v1/__pycache__
+./app/api/api_v1/endpoints/__pycache__
+./app/schemas/__pycache__
+./app/models/__pycache__

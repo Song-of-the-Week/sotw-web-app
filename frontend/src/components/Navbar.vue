@@ -113,7 +113,7 @@ export default {
   mounted() {
     const vm = this;
 
-    vm.loginRegisterModal = new bootstrap.Modal("#loginModal");
+    vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
   },
   methods: {
     ...mapActions(["logout"]),
@@ -134,7 +134,7 @@ export default {
   watch: {
     $route: {
       immediate: true,
-      handler: function (newVal, oldVal) {
+      handler: function (newVal, _) {
         const vm = this;
 
         if (vm.loginRegisterModal && newVal.meta) {

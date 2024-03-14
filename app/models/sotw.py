@@ -13,6 +13,9 @@ class Sotw(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
+    survey_datetime: Mapped[DateTime] = mapped_column(DateTime)
+    results_datetime: Mapped[DateTime] = mapped_column(DateTime)
+    share_id: Mapped[str]
     playlist_link: Mapped[str]
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.utcnow())
     user_list = relationship(

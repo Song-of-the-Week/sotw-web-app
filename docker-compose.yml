@@ -87,7 +87,7 @@ services:
       context: ./frontend
       dockerfile: ./frontend/Dockerfile
     image: sotw-frontend:latest
-    command: npm ruun serve
+    command: npm run serve
     ports:
       - "80:8080"
     volumes:

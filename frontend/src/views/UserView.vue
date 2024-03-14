@@ -135,18 +135,39 @@
           <h3>Sotws:</h3>
         </div>
       </div>
+      <div v-if="user.sotw_list.length == 0" class="row mt-3">
+        <div class="col">
+          <p>
+            Looks like you're not a part of any Song of the Week competitions. Create a new competition or join an
+            existing one to participate!
+          </p>
+        </div>
+      </div>
+      <div v-for="sotw in user.sotw_list" class="row mt-3">
+        <div class="col">
+          <h3>{{ sotw.name }}</h3>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col">
+          <button class="btn btn-outline-success" @click="create()">Create</button>
+        </div>
+      </div>
     </div>
   </div>
+  <SotwCreationModal :sotw-creation-modal="sotwCreationModal" />
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
 import PasswordInput from "@/components/PasswordInput.vue";
+import SotwCreationModal from "@/components/SotwCreationModal.vue";
 
 export default {
   name: "UserView",
   components: {
     PasswordInput,
+    SotwCreationModal,
   },
   data() {
     return {
@@ -165,6 +186,7 @@ export default {
       newPasswordConfirmValid: true,
       changePassword403: "",
       response500: false,
+      sotwCreationModal: null,
     };
   },
   computed: {
@@ -175,6 +197,8 @@ export default {
 
     vm.userName = vm.user.name;
     vm.userEmail = vm.user.email;
+
+    vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
   },
   methods: {
     ...mapActions(["updateUser"]),
@@ -215,8 +239,12 @@ export default {
       vm.loadingPassword = true;
       vm.updateUser({ current_password: vm.currentPassword, new_password: vm.newPassword })
         .then((res) => {
-          vm.currentPassword = vm.newPassword = vm.newPasswordConfirm = "";
-          vm.editingPassword = false;
+          if (res.status == 200) {
+            vm.currentPassword = vm.newPassword = vm.newPasswordConfirm = "";
+            vm.editingPassword = false;
+          } else {
+            console.error("Error: ", res);
+          }
         })
         .catch((err) => {
           if (err.response.status == 403) {
@@ -246,6 +274,12 @@ export default {
         vm.newPasswordConfirmValid = false;
       } else {
         vm.newPasswordConfirmValid = true;
+      }
+    },
+    create() {
+      const vm = this;
+      if (!vm.sotwCreationModal._isShown) {
+        vm.sotwCreationModal.show();
       }
     },
   },

@@ -3,6 +3,7 @@ from pydantic import HttpUrl
 
 from app.schemas.base import Base
 
+
 class SongBase(Base):
     spotify_link: HttpUrl
 
@@ -16,8 +17,7 @@ class SongCreate(SongBase):
 
 
 # properties to receive via API update
-class SongUpdate(SongBase):
-    ...
+class SongUpdate(SongBase): ...
 
 
 # properties shared by models stored in DB
@@ -25,14 +25,12 @@ class SongInDBBase(SongBase):
     id: int = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # additional properties stored in DB bt not returned by API
-class SongInDB(SongInDBBase):
-    ...
+class SongInDB(SongInDBBase): ...
 
 
 # additional properties to return via API
-class Song(SongInDBBase):
-    ...
+class Song(SongInDBBase): ...

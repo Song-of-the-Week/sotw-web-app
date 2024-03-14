@@ -36,12 +36,11 @@ class ResponseInDBBase(ResponseBase):
     id: int = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # additional properties stored in DB bt not returned by API
-class ResponseInDB(ResponseInDBBase):
-    ...
+class ResponseInDB(ResponseInDBBase): ...
 
 
 # additional properties to return via API

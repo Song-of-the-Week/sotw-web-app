@@ -4,6 +4,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import Navbar from "./components/Navbar.vue";
 
 export default {
@@ -16,6 +17,18 @@ export default {
       sotwName: "Song of the Week",
       sotwId: 0,
     };
+  },
+  mounted() {
+    const vm = this;
+
+    // see if an active sotw has been set already
+    const activeSotwId = localStorage.getItem("activeSotwId");
+    if (activeSotwId !== null) {
+      vm.getSotw(activeSotwId);
+    }
+  },
+  methods: {
+    ...mapActions(["getSotw"]),
   },
 };
 </script>
@@ -39,3 +52,4 @@ nav {
   }
 }
 </style>
+./components/NavbarComponent.vue./components/Navbar.vue

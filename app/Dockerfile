@@ -33,6 +33,9 @@ RUN chmod +x /start_celery_beat.sh
 COPY ./docker/start_celery_flower.sh /start_celery_flower.sh
 RUN chmod +x /start_celery_flower.sh
 
+COPY ./docker/start_db.sh /start_db.sh
+RUN chmod +x /start_db.sh
+
 WORKDIR /app
 
 COPY . .

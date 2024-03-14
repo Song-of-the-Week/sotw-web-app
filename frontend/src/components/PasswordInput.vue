@@ -37,7 +37,7 @@ export default {
   },
   mounted() {
     const vm = this;
-    document.getElementById("loginModal").addEventListener("hide.bs.modal", function (event) {
+    document.getElementById("loginModal").addEventListener("hide.bs.modal", function (_) {
       vm.password = "";
       vm.showPassword = "";
     });

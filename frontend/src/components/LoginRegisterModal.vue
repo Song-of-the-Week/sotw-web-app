@@ -220,7 +220,7 @@ export default {
     const vm = this;
 
     // clean up modal form data on modal close
-    document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (event) {
+    document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
       if (!vm.isLoggedIn) {
         sessionStorage.setItem("last_requested_path", "/");
       }
@@ -248,8 +248,9 @@ export default {
     });
 
     // submit form on enter key hit
-    $(document).keypress(function (e) {
+    $(document).on("keypress", function (e) {
       if ($("#loginModal").hasClass("show") && (e.keycode == 13 || e.which == 13)) {
+        e.preventDefault();
         if (vm.registering) {
           vm.submitRegister();
         } else {
@@ -342,7 +343,9 @@ export default {
         await api.methods
           .apiPostRegister(vm.registerForm)
           .then(async (res) => {
-            await vm.login(vm.registerForm);
+            if (res.status == 200) {
+              await vm.login(vm.registerForm);
+            }
           })
           .catch((err) => {
             vm.loading = false;
@@ -367,10 +370,12 @@ export default {
       await api.methods
         .apiPostLogin(loginForm)
         .then(async (res) => {
-          vm.loading = false;
-          // set the user
-          await vm.getCurrentUser();
-          vm.loginRegisterModal.hide();
+          if (res.status == 200) {
+            vm.loading = false;
+            // set the user
+            await vm.getCurrentUser();
+            vm.loginRegisterModal.hide();
+          }
         })
         .catch((err) => {
           vm.loading = false;
@@ -386,10 +391,10 @@ export default {
     },
   },
   watch: {
-    registering: () => {
+    registering: function () {
       setTimeout(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+        [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
       }, 0);
     },
   },

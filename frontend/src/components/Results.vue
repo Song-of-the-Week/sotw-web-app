@@ -9,7 +9,7 @@
         </h2>
         <h2 v-else-if="firstPlace.length > 2">
           Tied for first place with {{ firstPlaceVotes }} votes each, we have
-          <span v-for="(song, index) in firstPlace"
+          <span v-for="(song, index) in firstPlace" :key="index"
             >{{ song }}<span v-if="index === firstPlace.length - 1">!</span
             ><span v-else-if="index === firstPlace.length - 2">, and </span><span v-else>, </span></span
           >
@@ -22,7 +22,7 @@
           </h3>
           <h3 v-else-if="secondPlace.length > 2">
             Tied for second place with {{ secondPlaceVotes }} votes each, we have
-            <span v-for="(song, index) in secondPlace"
+            <span v-for="(song, index) in secondPlace" :key="index"
               >{{ song }}<span v-if="index === secondPlace.length - 1">!</span
               ><span v-else-if="index === secondPlace.length - 2">, and </span><span v-else>, </span></span
             >
@@ -45,16 +45,17 @@
               <tr>
                 <th scope="col">Who ye be</th>
                 <th scope="col">Number of Correct Guesses</th>
-                <th scope="col" v-for="song in allSongs">{{ song.song }}</th>
+                <th scope="col" v-for="song in allSongs" :key="song.id">{{ song.song }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="guesser in guessingData">
+              <tr v-for="guesser in guessingData" :key="guesser.id">
                 <th scope="row">{{ guesser.name }}</th>
                 <td>{{ guesser.numCorrectGuesses }}</td>
                 <td
                   v-for="guess in guesser.guesses"
                   :class="{ 'correct-guess': guess.submitterGuess === guess.submitterReal }"
+                  :key="guess.submitterReal"
                 >
                   {{ guess.submitterGuess }}
                 </td>
@@ -95,13 +96,14 @@ export default {
     vm.secondPlace = ["Sample1", "Sample2", "Sample3"];
 
     vm.allSongs = [
-      { song: "sample1", voters: ["Dan", "Jan"], submitter: "Sam" },
-      { song: "sample2", voters: ["Sam", "Dan"], submitter: "Jan" },
-      { song: "sample3", voters: ["Jan", "Sam"], submitter: "Dan" },
+      { id: 0, song: "sample1", voters: ["Dan", "Jan"], submitter: "Sam" },
+      { id: 1, song: "sample2", voters: ["Sam", "Dan"], submitter: "Jan" },
+      { id: 2, song: "sample3", voters: ["Jan", "Sam"], submitter: "Dan" },
     ];
 
     vm.guessingData = [
       {
+        id: 0,
         name: "Dan",
         guesses: [
           { song: "sample1", submitterGuess: "Jan", submitterReal: "Sam" },
@@ -112,6 +114,7 @@ export default {
         votes: ["sample1", "sample2"],
       },
       {
+        id: 1,
         name: "Sam",
         guesses: [
           { song: "sample1", submitterGuess: "Sam", submitterReal: "Sam" },
@@ -122,6 +125,7 @@ export default {
         votes: ["sample2", "sample3"],
       },
       {
+        id: 2,
         name: "Jan",
         guesses: [
           { song: "sample1", submitterGuess: "Dan", submitterReal: "Sam" },

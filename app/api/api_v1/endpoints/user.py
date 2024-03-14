@@ -26,7 +26,19 @@ async def update_user(
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """
-    Fetch the current logged in user
+    Update the user object in the db.
+
+    Args:
+        user_id (int): ID of the user to update
+        payload (schemas.UserUpdate): Data to update user with
+        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+    Raises:
+        HTTPException: 403 for unauthorized users or for incorrect password
+
+    Returns:
+        Any: the uupdated user object
     """
     if user_id != current_user.id or not current_user.is_superuser:
         raise HTTPException(status_code=403, detail=f"Not authorized to update.")
@@ -52,6 +64,20 @@ async def delete_user(
     user_id: int,
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
+    """
+    Delete specified user
+
+    Args:
+        user_id (int): ID of the user to  delete
+        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+    Raises:
+        HTTPException: 403 for unauthorized users
+
+    Returns:
+        Any: The deleted object
+    """
     if user_id != current_user.id or not current_user.is_superuser:
         raise HTTPException(status_code=403, detail=f"Not authorized to delete")
 

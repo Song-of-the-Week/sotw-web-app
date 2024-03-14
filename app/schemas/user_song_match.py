@@ -5,6 +5,7 @@ from pydantic import HttpUrl
 from app.schemas.base import Base
 from app.models.response import Response
 
+
 class UserSongMatchBase(Base):
     user_id: int
     song_id: int
@@ -17,8 +18,7 @@ class UserSongMatchCreate(UserSongMatchBase):
 
 
 # properties to receive via API update
-class UserSongMatchUpdate(UserSongMatchBase):
-    ...
+class UserSongMatchUpdate(UserSongMatchBase): ...
 
 
 # properties shared by models stored in DB
@@ -26,7 +26,7 @@ class UserSongMatchInDBBase(UserSongMatchBase):
     id: int = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # additional properties stored in DB bt not returned by API

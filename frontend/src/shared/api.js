@@ -1,4 +1,5 @@
 import axios from "axios";
+import config from "./config";
 
 export default {
   methods: {
@@ -19,6 +20,12 @@ export default {
     },
     apiUpdateUser(id, payload) {
       return axios.put(config.BASE_API_V1_URL + "user/" + id, payload);
+    },
+    apiPostSotw(payload) {
+      return axios.post(config.BASE_API_V1_URL + "sotw", payload);
+    },
+    apiGetSotw(id) {
+      return axios.get(config.BASE_API_V1_URL + "sotw/" + id);
     },
   },
 };

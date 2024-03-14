@@ -11,7 +11,7 @@
               <div v-if="!voteValid"><i class="bi bi-exclamation-circle"></i> Please pick 2 songs</div>
             </div>
             <div class="card-body">
-              <ul class="list-group list-group-flush text-start" v-for="song in songs">
+              <ul class="list-group list-group-flush text-start" v-for="song in songs" :key="song.id">
                 <li class="list-group-item">
                   <div class="row">
                     <div class="col col-1 align-self-center">
@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="card-body">
-              <ul class="list-group-flush text-start" v-for="matchedSong in matchedUserSongs">
+              <ul class="list-group-flush text-start" v-for="matchedSong in matchedUserSongs" :key="matchedSong.id">
                 <li class="list-group-item">
                   <h5 class="card-title" :class="{ 'match-item-invalid': matchedSong.error }">
                     {{ matchedSong.song.name }}
@@ -63,7 +63,7 @@
                     ><span v-else>{{ matchedSong.user.name }}</span>
                   </button>
                   <ul class="dropdown-menu" :aria-labelledby="'match-' + matchedSong.id">
-                    <li v-for="user in users">
+                    <li v-for="user in users" :key="user.id">
                       <a
                         class="dropdown-item"
                         :class="{ 'text-muted': user.matched }"
@@ -169,6 +169,7 @@ export default {
       if (vm.nextSong.length > 0) {
         // parse out the track id
         const trackId = vm.nextSong.split("/").pop().split("?")[0];
+        console.log(trackId);
         // TODO send track id to API endpoint to validate the track on the back end
         vm.songValid = true;
       } else {
