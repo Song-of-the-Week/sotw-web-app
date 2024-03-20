@@ -128,6 +128,7 @@ export default {
       vm.logout().then(() => {
         this.$router.replace("/");
         vm.registering = false;
+        sessionStorage.setItem("last_requested_path", "/");
       });
     },
   },

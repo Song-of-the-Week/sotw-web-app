@@ -1,13 +1,11 @@
 from typing import List, Optional
 from pydantic import ConfigDict
-from pydantic import EmailStr
-from pydantic import HttpUrl
 
 from app.schemas.base import Base
 
 
 class UserPlaylistBase(Base):
-    playlist_link: HttpUrl
+    playlist_link: str
 
 
 # properties to receive via API creation
@@ -18,7 +16,7 @@ class UserPlaylistCreate(UserPlaylistBase):
 
 # properties to receive via API update
 class UserPlaylistUpdate(UserPlaylistBase):
-    playlist_link: Optional[HttpUrl]
+    playlist_link: Optional[str]
 
 
 # properties shared by models stored in DB
@@ -37,4 +35,4 @@ class UserPlaylistInDB(UserPlaylistInDBBase): ...
 class UserPlaylist(UserPlaylistInDBBase):
     model_config = ConfigDict(from_attributes=True)
 
-    playlist_link: List[HttpUrl]
+    playlist_link: List[str]

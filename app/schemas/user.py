@@ -1,9 +1,10 @@
 from typing import List, Optional
 from pydantic import ConfigDict
 from pydantic import EmailStr
-from pydantic import HttpUrl
 
+from app.models.response import Response
 from app.schemas.base import Base
+from app.schemas import Sotw
 
 
 class UserLoginRequest(Base):
@@ -31,7 +32,7 @@ class UserCreate(UserBase):
 class UserUpdate(UserBase):
     name: Optional[str] = None
     email: Optional[str] = None
-    sotw_list: Optional[List[int]] = None
+    sotw: Optional[int] = None
     current_password: Optional[str] = None
     new_password: Optional[str] = None
 
@@ -58,5 +59,5 @@ class User(UserInDBBase):
     name: str
     is_superuser: bool
     playlists: Optional[List[int]]
-    sotw_list: List[int]
-    responses: List[int]
+    sotw_list: List[Sotw]
+    responses: List[Response]

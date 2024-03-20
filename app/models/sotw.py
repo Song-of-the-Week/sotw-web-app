@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+
 from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column

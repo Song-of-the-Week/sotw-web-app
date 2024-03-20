@@ -1,13 +1,12 @@
 from datetime import datetime
 from typing import List
-from pydantic import HttpUrl
 
 from app.schemas.base import Base
 
 
 class WeekBase(Base):
     week_num: int
-    playlist_link: HttpUrl
+    playlist_link: str
     sotw_id: int
 
 

@@ -1,16 +1,15 @@
 from datetime import datetime
-from pydantic import HttpUrl
 
 from app.schemas.base import Base
 
 
 class SongBase(Base):
-    spotify_link: HttpUrl
+    spotify_link: str
 
 
 # properties to receive via API creation
 class SongCreate(SongBase):
-    spotify_link: HttpUrl
+    spotify_link: str
     submitter_id: int
     response_id: int
     week_id: datetime

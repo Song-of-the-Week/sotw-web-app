@@ -142,7 +142,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["createSotw"]),
+    ...mapActions(["createSotw", "getCurrentUser"]),
     submitCreate() {
       const vm = this;
 
@@ -156,6 +156,9 @@ export default {
         };
         // TODO: add api call here and update sotw.js in store
         vm.createSotw(payload)
+          .then((res) => {
+            localStorage.setItem("activeSotwId", vm.sotw.id);
+          })
           .catch((err) => {
             if (err.response.status == 500) {
               vm.response500 = true;
@@ -164,7 +167,8 @@ export default {
             }
           })
           .finally(() => {
-            localStorage.setItem("activeSotwId", vm.sotw.id);
+            // refresh the user to get the new sotw in the user
+            vm.getCurrentUser();
           });
       }
     },

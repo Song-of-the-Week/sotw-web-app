@@ -29,7 +29,7 @@
           </div>
           <div v-else class="row mt-3">
             <div class="col-3">Name:</div>
-            <div class="col-6 col-md-5">
+            <div class="col-6 col-md-5 overflow-auto">
               {{ user.name }}
             </div>
             <div class="col-2 col-md-3">
@@ -59,7 +59,7 @@
           </div>
           <div v-else class="row mt-3">
             <div class="col-3">Email:</div>
-            <div class="col-6 col-md-5">
+            <div class="col-6 col-md-5 overflow-auto">
               {{ user.email }}
             </div>
             <div class="col-2">
@@ -143,12 +143,12 @@
           </p>
         </div>
       </div>
-      <div v-for="sotw in user.sotw_list" class="row mt-3">
+      <div class="row mt-3">
         <div class="col">
-          <h3>{{ sotw.name }}</h3>
+          <SotwTable :sotwList="sotwList"></SotwTable>
         </div>
       </div>
-      <div class="row mt-3">
+      <div class="row mt-3 mb-3">
         <div class="col">
           <button class="btn btn-outline-success" @click="create()">Create</button>
         </div>
@@ -160,14 +160,17 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import config from "@/shared/config";
 import PasswordInput from "@/components/PasswordInput.vue";
 import SotwCreationModal from "@/components/SotwCreationModal.vue";
+import SotwTable from "@/components/SotwTable.vue";
 
 export default {
   name: "UserView",
   components: {
     PasswordInput,
     SotwCreationModal,
+    SotwTable,
   },
   data() {
     return {
@@ -184,6 +187,7 @@ export default {
       loadingPassword: false,
       newPasswordValid: true,
       newPasswordConfirmValid: true,
+      sotwList: [],
       changePassword403: "",
       response500: false,
       sotwCreationModal: null,
@@ -197,6 +201,22 @@ export default {
 
     vm.userName = vm.user.name;
     vm.userEmail = vm.user.email;
+
+    // set sotwList for rendering
+    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    vm.user.sotw_list.forEach((sotw) => {
+      const results = new Date(sotw.results_datetime);
+      const survey = new Date(sotw.survey_datetime);
+      vm.sotwList.push({
+        name: sotw.name,
+        playlist_link: sotw.playlist_link,
+        share_link: window.config.HOSTNAME() + sotw.share_id,
+        results:
+          weekday[results.getDay()] + " at " + results.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        survey:
+          weekday[survey.getDay()] + " at " + survey.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      });
+    });
 
     vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
   },

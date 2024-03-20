@@ -1,20 +1,18 @@
 from datetime import datetime
-from typing import List
-from pydantic import HttpUrl
 
 from app.schemas.base import Base
 
 
 class SotwBase(Base):
-    name: str
-    playlist_link: HttpUrl = "https://www.spotify.com/"
-    survey_datetime: datetime
-    results_datetime: datetime
+    playlist_link: str = "https://www.spotify.com/"
 
 
 # properties to receive via API creation
 class SotwCreate(SotwBase):
+    name: str
     created_at: datetime = datetime.now()
+    survey_datetime: datetime
+    results_datetime: datetime
 
 
 # properties to receive via API update
@@ -30,9 +28,13 @@ class SotwInDBBase(SotwBase):
 
 
 # additional properties stored in DB bt not returned by API
-class SotwInDB(SotwInDBBase):
-    user_list: List[int]
+class SotwInDB(SotwInDBBase): ...
 
 
 # additional properties to return via API
-class Sotw(SotwInDBBase): ...
+class Sotw(SotwInDBBase):
+    name: str
+    created_at: datetime
+    survey_datetime: datetime
+    results_datetime: datetime
+    share_id: str

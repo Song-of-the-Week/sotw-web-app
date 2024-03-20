@@ -1,7 +1,3 @@
-from typing import List, Optional
-from pydantic import EmailStr
-from pydantic import HttpUrl
-
 from app.schemas.base import Base
 from app.models.response import Response
 
