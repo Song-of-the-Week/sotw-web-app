@@ -172,7 +172,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import api from "@/shared/api";
 import PasswordInput from "@/components/PasswordInput.vue";
 import store from "@/store/index";
@@ -222,7 +222,11 @@ export default {
     // clean up modal form data on modal close
     document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
       if (!vm.isLoggedIn) {
-        sessionStorage.setItem("last_requested_path", "/");
+        if (vm.sotw != null) {
+          sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id);
+        } else {
+          sessionStorage.setItem("last_requested_path", "/");
+        }
       }
       vm.$router.push(sessionStorage.getItem("last_requested_path"));
       vm.loginForm = {
@@ -260,6 +264,7 @@ export default {
     });
   },
   computed: {
+    ...mapGetters({ sotw: "getActiveSotw" }),
     isLoggedIn: () => {
       return store.getters.isAuthenticated;
     },

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 import HomeView from "@/views/HomeView.vue";
 import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
+import InviteModal from "@/components/InviteModal.vue";
 
 const routes = [
   {
@@ -28,7 +29,24 @@ const routes = [
           guest: true,
         },
       },
+      {
+        path: "invite/:shareToken",
+        props: true,
+        component: InviteModal,
+        meta: {
+          inviteModal: true,
+          requiresAuth: true,
+        },
+      },
     ],
+  },
+  {
+    path: "/sotw/:sotwId",
+    name: "sotw",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: "/about",

@@ -27,5 +27,14 @@ export default {
     apiGetSotw(id) {
       return axios.get(config.BASE_API_V1_URL + "sotw/" + id);
     },
+    apiGetSotwInviteLink(id) {
+      return axios.get(config.BASE_API_V1_URL + "sotw/" + id + "/invite");
+    },
+    apiGetSotwInvitePending(share_token) {
+      return axios.get(config.BASE_API_V1_URL + "sotw/invite/pending/" + share_token);
+    },
+    apiGetSotwInviteJoin(share_token) {
+      return axios.get(config.BASE_API_V1_URL + "sotw/invite/join/" + share_token);
+    },
   },
 };

@@ -42,7 +42,7 @@ async def login(
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password.")
 
-    token = create_access_token(sub=user.id)
+    token = create_access_token(sub=user.id, lifetime=cfg.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     response.set_cookie(
         "Authorization",

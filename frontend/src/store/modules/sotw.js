@@ -17,7 +17,7 @@ export default {
           await commit("setActiveSotw", res.data);
         })
         .catch((err) => {
-          throw err;
+          console.error(err);
         });
     },
     async createSotw({ commit }, payload) {
@@ -27,7 +27,7 @@ export default {
           await commit("setActiveSotw", res.data);
         })
         .catch((err) => {
-          throw err;
+          console.error(err);
         });
     },
   },

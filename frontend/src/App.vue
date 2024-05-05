@@ -1,10 +1,13 @@
 <template>
-  <Navbar :sotwName="sotwName" />
-  <router-view />
+  <Navbar />
+  <div class="container-fluid">
+    <router-view />
+  </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
+import store from "@/store/index.js";
 import Navbar from "./components/Navbar.vue";
 
 export default {
@@ -12,18 +15,17 @@ export default {
   components: {
     Navbar,
   },
-  data() {
-    return {
-      sotwName: "Song of the Week",
-      sotwId: 0,
-    };
+  computed: {
+    isLoggedIn: () => {
+      return store.getters.isAuthenticated;
+    },
   },
   mounted() {
     const vm = this;
 
     // see if an active sotw has been set already
     const activeSotwId = localStorage.getItem("activeSotwId");
-    if (activeSotwId !== null) {
+    if (activeSotwId !== null && vm.isLoggedIn) {
       vm.getSotw(activeSotwId);
     }
   },

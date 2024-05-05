@@ -27,7 +27,7 @@ export default {
     release: function () {
       // const vm = this;
       // TODO get the sotw survey release time (expect it as a datetime object froom the back end)
-      let release = new Date(2023, 10, 14, 21, 0, 0, 0);
+      let release = new Date(2024, 2, 25, 14, 0, 0, 0);
       return release;
     },
   },
@@ -57,7 +57,7 @@ export default {
         vm.getTimeRemaining();
       } else {
         // emit to parent that the countdown is over
-        vm.$emit("countedDown");
+        vm.$emit("counted-down");
         clearInterval(vm.countdownInterval);
       }
     },

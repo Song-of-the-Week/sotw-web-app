@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from app.schemas.base import Base
 
@@ -38,3 +39,14 @@ class Sotw(SotwInDBBase):
     survey_datetime: datetime
     results_datetime: datetime
     share_id: str
+
+
+# invite link
+class SotwInvite(Base):
+    url: str
+
+
+# info to give to invitees
+class SotwInfo(Base):
+    id: Optional[int]
+    name: Optional[str]

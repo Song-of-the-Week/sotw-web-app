@@ -145,7 +145,7 @@
       </div>
       <div class="row mt-3">
         <div class="col">
-          <SotwTable :sotwList="sotwList"></SotwTable>
+          <SotwTable :sotwList="sotwList" @build-sotw-list="buildSotwList"></SotwTable>
         </div>
       </div>
       <div class="row mt-3 mb-3">
@@ -202,21 +202,7 @@ export default {
     vm.userName = vm.user.name;
     vm.userEmail = vm.user.email;
 
-    // set sotwList for rendering
-    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    vm.user.sotw_list.forEach((sotw) => {
-      const results = new Date(sotw.results_datetime);
-      const survey = new Date(sotw.survey_datetime);
-      vm.sotwList.push({
-        name: sotw.name,
-        playlist_link: sotw.playlist_link,
-        share_link: window.config.HOSTNAME() + sotw.share_id,
-        results:
-          weekday[results.getDay()] + " at " + results.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        survey:
-          weekday[survey.getDay()] + " at " + survey.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      });
-    });
+    vm.buildSotwList();
 
     vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
   },
@@ -301,6 +287,34 @@ export default {
       if (!vm.sotwCreationModal._isShown) {
         vm.sotwCreationModal.show();
       }
+    },
+    buildSotwList() {
+      const vm = this;
+
+      // set sotwList for rendering
+      const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      vm.user.sotw_list.forEach((sotw) => {
+        const results = new Date(sotw.results_datetime);
+        const survey = new Date(sotw.survey_datetime);
+
+        // check to see if there's a share link chached
+        let shareLink = null;
+        const shareCookieName = "invite-" + sotw.id;
+        if (vm.$cookies.isKey(shareCookieName)) {
+          shareLink = vm.$cookies.get(shareCookieName);
+        }
+
+        vm.sotwList.push({
+          id: sotw.id,
+          name: sotw.name,
+          playlist_link: sotw.playlist_link,
+          share_link: shareLink,
+          results:
+            weekday[results.getDay()] + " at " + results.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          survey:
+            weekday[survey.getDay()] + " at " + survey.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        });
+      });
     },
   },
 };

@@ -34,9 +34,12 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 /* import vue-charts from canvasjs */
 import CanvasJSChart from "@canvasjs/vue-charts";
 
+/* import vue-cookies */
+import VueCookies from "vue-cookies";
+
 /* define window level variables */
 window.$ = window.jQuery = require("jquery");
 window.bootstrap = require("bootstrap/dist/js/bootstrap.bundle.js");
 window.config = config;
 
-createApp(App).use(store).use(router).use(CanvasJSChart).mount("#app");
+createApp(App).use(store).use(router).use(CanvasJSChart).use(VueCookies).mount("#app");

@@ -60,14 +60,14 @@ class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
         today = datetime.today()
         # calculate next wednesday
         wed_td = timedelta((10 - today.isoweekday()) % 7)
-        if wed_td is 0 and today > today.replace(hour=9):
+        if wed_td == 0 and today > today.replace(hour=9):
             wed_td = 7
         next_wed = (today + wed_td).replace(hour=9, minute=0, second=0, microsecond=0)
         db_object.survey_release = next_wed
 
         # calculate next friday
         fri_td = timedelta((12 - today.isoweekday()) % 7)
-        if fri_td is 0 and today > today.replace(hour=9):
+        if fri_td == 0 and today > today.replace(hour=9):
             fri_td = 7
         next_fri = (today + fri_td).replace(hour=9, minute=0, second=0, microsecond=0)
         db_object.results_release = next_fri

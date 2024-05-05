@@ -25,16 +25,6 @@ class CRUDSotw(CRUDBase[Sotw, SotwCreate, SotwUpdate]):
             Sotw: Newly created sotw object
         """
         db_object = Sotw(**object_in.model_dump())
-        # create a random share_id
-        db_object.share_id = (
-            "".join(
-                random.choices(
-                    string.ascii_uppercase + string.digits, k=cfg.SOTW_SHARE_ID_K
-                )
-            )
-            + "-"
-            + str(int(db_object.created_at.timestamp()))
-        )
 
         # TODO fill in spotify api stuff to create a playlist for this new user and add the link to the new object
 

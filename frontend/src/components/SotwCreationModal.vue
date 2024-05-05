@@ -154,9 +154,8 @@ export default {
           survey_datetime: vm.surveyDayTime,
           results_datetime: vm.resultsDayTime,
         };
-        // TODO: add api call here and update sotw.js in store
         vm.createSotw(payload)
-          .then((res) => {
+          .then((_) => {
             localStorage.setItem("activeSotwId", vm.sotw.id);
           })
           .catch((err) => {
