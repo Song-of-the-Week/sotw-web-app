@@ -30,7 +30,7 @@ const routes = [
         },
       },
       {
-        path: "invite/:shareToken",
+        path: "/sotw/invite/:shareToken",
         props: true,
         component: InviteModal,
         meta: {
@@ -66,6 +66,11 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
+  },
+  {
+    path: "/403",
+    name: "403",
+    component: () => import("../views/403View.vue"),
   },
   {
     path: "/:pathMatch(.*)*",

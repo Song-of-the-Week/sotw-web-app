@@ -5,7 +5,7 @@ from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.orm.session import Session
 from loguru import logger
-from jose import jwt
+from jose import JWTError, jwt
 
 from app import crud
 from app import schemas
@@ -112,7 +112,7 @@ async def get_sotw_invite_link(
 async def get_sotw_invite_pending(
     session: Session = Depends(deps.get_session),
     *,
-    share_token: int,
+    share_token: str,
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """
@@ -129,14 +129,20 @@ async def get_sotw_invite_pending(
     Returns:
         Any: the sotw object retreived
     """
-    # decode the token
-    payload = jwt.decode(
-        share_token,
-        cfg.JWT_SECRET,
-        algorithms=[cfg.ALGORITHM],
-        options={"verify_aud": False},
-    )
-    sotw_id: int = payload.get("sub")
+    try:
+        # decode the token
+        payload = jwt.decode(
+            share_token,
+            cfg.JWT_SECRET,
+            algorithms=[cfg.ALGORITHM],
+            options={"verify_aud": False},
+        )
+        sotw_id: int = payload.get("sub")
+    except JWTError:
+        raise HTTPException(
+            status_code=403,
+            detail=f"This token is no longer valid, please ask the person who invited you to generate a new one.",
+        )
 
     sotw = crud.sotw.get(session=session, id=sotw_id)
 
@@ -146,16 +152,16 @@ async def get_sotw_invite_pending(
         )
     # don't worry about if the user's already in the sotw
     if current_user in sotw.user_list:
-        return schemas.SotwInfo()
+        return schemas.SotwInfo(id=sotw.id, name=sotw.name, alreadyIn=True)
 
-    return schemas.SotwInfo(name=sotw.name)
+    return schemas.SotwInfo(id=sotw.id, name=sotw.name)
 
 
 @router.get("/invite/join/{share_token}", response_model=schemas.SotwInfo)
 async def get_sotw_invite_join(
     session: Session = Depends(deps.get_session),
     *,
-    share_token: int,
+    share_token: str,
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """
@@ -172,14 +178,20 @@ async def get_sotw_invite_join(
     Returns:
         Any: The id of the sotw object to be joined
     """
-    # decode the token
-    payload = jwt.decode(
-        share_token,
-        cfg.JWT_SECRET,
-        algorithms=[cfg.ALGORITHM],
-        options={"verify_aud": False},
-    )
-    sotw_id: int = payload.get("sub")
+    try:
+        # decode the token
+        payload = jwt.decode(
+            share_token,
+            cfg.JWT_SECRET,
+            algorithms=[cfg.ALGORITHM],
+            options={"verify_aud": False},
+        )
+        sotw_id: int = payload.get("sub")
+    except JWTError:
+        raise HTTPException(
+            status_code=403,
+            detail=f"This token is no longer valid, please ask the person who invited you to generate a new one.",
+        )
 
     sotw = crud.sotw.get(session=session, id=sotw_id)
 
@@ -187,9 +199,6 @@ async def get_sotw_invite_join(
         raise HTTPException(
             status_code=404, detail=f"Sotw with given id {sotw_id} not found."
         )
-    # don't worry about if the user's already in the sotw
-    if current_user in sotw.user_list:
-        schemas.SotwInfo(id=sotw.id)
 
     # add current user to the sotw
     crud.user.add_user_to_sotw(session=session, db_object=current_user, object_in=sotw)

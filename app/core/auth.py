@@ -77,7 +77,7 @@ def create_access_token(
 
 def _create_token(token_type: str, lifetime: timedelta, sub: str) -> str:
     payload = {}
-    expire = datetime.now(datetime.UTC) + lifetime
+    expire = datetime.utcnow() + lifetime
     payload["type"] = token_type
 
     # https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3
@@ -87,7 +87,7 @@ def _create_token(token_type: str, lifetime: timedelta, sub: str) -> str:
 
     # The "iat" (issued at) claim identifies the time at which the
     # JWT was issued.
-    payload["iat"] = datetime.now(datetime.UTC)
+    payload["iat"] = datetime.utcnow()
 
     # The "sub" (subject) claim identifies the principal that is the
     # subject of the JWT

@@ -385,6 +385,7 @@ export default {
         .catch((err) => {
           vm.loading = false;
           // error handling
+          console.error("ERROR:", err);
           if (err.response.status == 400) {
             vm.loginResponse400 = err.response.data.detail;
           } else if (err.response.status == 500) {

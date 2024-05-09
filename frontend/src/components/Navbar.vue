@@ -18,11 +18,12 @@
         tabindex="-1"
         id="navbarSupportedContent"
         aria-labelledby="navbarOffcanvasLgLabel"
+        data-bs-dismiss="offcanvas"
       >
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-            {{ sotwName }}
-          </h5>
+          <router-link class="offcanvas-title navbar-brand" id="offcanvasNavbarLabel" :to="sotwUrl">{{
+            sotwName
+          }}</router-link>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
@@ -78,7 +79,7 @@
     </div>
   </nav>
   <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal" />
-  <InviteModal />
+  <InviteModal :invite-modal="inviteModal" />
 </template>
 
 <script>
@@ -96,6 +97,7 @@ export default {
     return {
       loginRegisterModal: null,
       loginRegistering: false,
+      inviteModal: null,
     };
   },
   computed: {
@@ -108,6 +110,13 @@ export default {
         return store.getters.getActiveSotw.name;
       } else {
         return "Song of the Week";
+      }
+    },
+    sotwUrl: () => {
+      if (store.getters.getActiveSotw) {
+        return "/sotw/" + store.getters.getActiveSotw.id;
+      } else {
+        return "/";
       }
     },
   },

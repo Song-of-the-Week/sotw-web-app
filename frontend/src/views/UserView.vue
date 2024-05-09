@@ -109,13 +109,16 @@
               />
               <p v-if="!newPasswordConfirmValid" class="invalid">Passwords must match.</p>
             </div>
-            <div class="col-12 col-md-3 pt-md-0 pt-2rem">
+            <div class="col-12 col-md-1 pt-md-0 pt-2rem pe-0">
               <button v-if="loadingPassword" type="button" class="btn btn-outline-warning btn-spinner-password">
                 <div class="spinner-border spinner-border-sm" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </div>
               </button>
               <button v-else type="button" class="btn btn-outline-info" @click="changePassword">Save</button>
+            </div>
+            <div class="col-12 col-md-2 pt-md-0 pt-2rem ps-0">
+              <button type="button" class="btn btn-outline-warning" @click="editingPassword = false">Cancel</button>
             </div>
           </div>
           <div v-else class="row mt-3">
@@ -290,6 +293,7 @@ export default {
     },
     buildSotwList() {
       const vm = this;
+      vm.sotwList = [];
 
       // set sotwList for rendering
       const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

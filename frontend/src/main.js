@@ -19,6 +19,8 @@ axios.interceptors.response.use(undefined, function (error) {
       return router.push("/login");
     } else if (status === 404) {
       return router.push("/404");
+    } else if (status == 403) {
+      return router.push("/403");
     } else {
       return Promise.reject(error);
     }

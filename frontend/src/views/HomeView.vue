@@ -49,7 +49,7 @@
                 <router-link
                   v-for="sotw in user.sotw_list"
                   class="list-group-item list-group-item-action"
-                  :to="`/` + sotw.id"
+                  :to="`/sotw/` + sotw.id"
                   >{{ sotw.name }}</router-link
                 >
               </div>

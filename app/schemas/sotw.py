@@ -34,11 +34,11 @@ class SotwInDB(SotwInDBBase): ...
 
 # additional properties to return via API
 class Sotw(SotwInDBBase):
+    id: int
     name: str
     created_at: datetime
     survey_datetime: datetime
     results_datetime: datetime
-    share_id: str
 
 
 # invite link
@@ -48,5 +48,6 @@ class SotwInvite(Base):
 
 # info to give to invitees
 class SotwInfo(Base):
-    id: Optional[int]
-    name: Optional[str]
+    id: Optional[int] = 0
+    name: Optional[str] = ""
+    alreadyIn: Optional[bool] = False

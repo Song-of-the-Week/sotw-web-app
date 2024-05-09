@@ -17,7 +17,7 @@ export default {
           await commit("setActiveSotw", res.data);
         })
         .catch((err) => {
-          console.error(err);
+          localStorage.removeItem("activeSotwId");
         });
     },
     async createSotw({ commit }, payload) {

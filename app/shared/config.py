@@ -17,7 +17,7 @@ class Config(BaseSettings):
     ### GENERAL ###
     DEV: bool = True
     API_V1_STR: str = "/api/v1"
-    INVITE_LINK_URL: str = "/sotw/invite/"
+    INVITE_LINK_URL: str = "sotw/invite/"
     SERVER_BIND: str = "0.0.0.0"
     SERVER_PORT: int = 8000
     LOGGER_LEVEL: int = logging.INFO

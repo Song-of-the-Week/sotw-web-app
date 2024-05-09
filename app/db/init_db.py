@@ -1,28 +1,38 @@
 from datetime import datetime
-import logging
+from loguru import logger
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app import crud
 from app import schemas
 
-logger = logging.getLogger(__name__)
-
 
 def init_db(session: Session):
     # create a superuser
-    user = crud.user.get_by_email(session, email="admin@admin.admin")
-    if not user:
+    superuser = crud.user.get_by_email(session, email="admin@admin.admin")
+    if not superuser:
         user_in = schemas.UserCreate(
             email="admin@admin.admin",
             name="admin",
             is_superuser=True,
             password="password",
         )
+        superuser = crud.user.create(session, object_in=user_in)
+    else:
+        logger.warning(f"Skipping creating superuser. Superuser already exists.")
+    # create a regular user
+    user = crud.user.get_by_email(session, email="a@b.c")
+    if not user:
+        user_in = schemas.UserCreate(
+            email="a@b.c",
+            name="adam",
+            is_superuser=False,
+            password="password",
+        )
         user = crud.user.create(session, object_in=user_in)
     else:
-        logger.warning(f"Skipping creating superuser. User already exists.")
-    # create a test sotw for the user
+        logger.warning(f"Skipping creating user. User already exists.")
+    # create a test sotw
     sotw = crud.sotw.get(session, id=1)
     if not sotw:
         sotw_in = schemas.SotwCreate(
@@ -31,7 +41,7 @@ def init_db(session: Session):
             results_datetime=datetime(1907, 3, 3, 8, 0),
         )
         sotw = crud.sotw.create(session, object_in=sotw_in)
-        crud.user.add_user_to_sotw(session=session, db_object=user, object_in=sotw)
+        crud.user.add_user_to_sotw(session=session, db_object=superuser, object_in=sotw)
     else:
         logger.warning(f"Skipping creating test sotw. Test sotw already exists.")
 

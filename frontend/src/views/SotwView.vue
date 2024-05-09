@@ -39,8 +39,9 @@ export default {
   mounted() {
     const vm = this;
 
-    vm.getSotw(vm.$route.params.sotwId);
-    localStorage.setItem("activeSotwId", vm.sotw.id);
+    vm.getSotw(vm.$route.params.sotwId).then(() => {
+      localStorage.setItem("activeSotwId", vm.sotw.id);
+    });
   },
   methods: {
     ...mapActions(["getSotw"]),

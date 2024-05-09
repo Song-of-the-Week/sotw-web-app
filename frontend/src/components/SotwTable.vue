@@ -5,8 +5,8 @@
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Playlist Link</th>
-          <th scope="col">Survey Release Day and Time</th>
-          <th scope="col">Results Release Day and Time</th>
+          <th scope="col" class="text"><span>Survey Release</span></th>
+          <th scope="col" class="text"><span>Results Release</span></th>
           <th scope="col">Invite Link</th>
         </tr>
       </thead>
@@ -20,9 +20,19 @@
           </td>
           <td>{{ sotw.results }}</td>
           <td>{{ sotw.survey }}</td>
-          <td v-if="sotw.share_link != null">
-            {{ sotw.share_link }}
-            <button @click="copy(sotw.share_link, sotw.id)" class="btn btn-outline-secondary float-end">Copy</button>
+          <td v-if="sotw.share_link != null" class="text">
+            <div class="row">
+              <div class="col">
+                <span>
+                  {{ sotw.share_link }}
+                </span>
+              </div>
+              <div class="col">
+                <button @click="copy(sotw.share_link, sotw.id)" class="btn btn-outline-secondary float-start">
+                  Copy
+                </button>
+              </div>
+            </div>
           </td>
           <td v-else>
             <button v-if="loadingLink" class="btn btn-outline-secondary btn-spinner">
@@ -87,10 +97,10 @@ export default {
         .then((res) => {
           vm.$cookies.set("invite-" + sotwId, window.config.HOSTNAME() + res.data.url, "30MIN");
           vm.$emit("build-sotw-list", sotwId);
-          vm.buildSotwList();
           vm.loadingLink = false;
         })
         .catch((err) => {
+          alert("There was an error generating your share link:\n" + err.response.data.detail);
           console.error(err);
         });
     },
@@ -102,5 +112,23 @@ export default {
 .btn-spinner {
   width: 82.04px;
   height: 38px;
+}
+.table td.text {
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 100%;
+  }
+}
+.table th.text {
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 100%;
+  }
 }
 </style>

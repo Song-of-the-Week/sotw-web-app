@@ -1,9 +1,46 @@
 <template>
   <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelby="inviteModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
+      <div v-if="response400" class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">You have been invited to join {{ sotwName }}!</h5>
+          <h5 class="modal-title">Looks like the link you used is no longer valid.</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Please ask the person you got the invite link from to generate a new one for you.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+      <div v-else-if="response500" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Oops! Something went wrong.</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Please contact an administrator.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+      <div v-else-if="sotwRes.alreadyIn" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">You are already a part of {{ sotwRes.name }}!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>You may proceed to {{ sotwRes.name }} by pressing "Continue" below.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" @click="cont()">Continue</button>
+        </div>
+      </div>
+      <div v-else class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">You have been invited to join {{ sotwRes.name }}!</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -30,21 +67,40 @@ import { mapActions } from "vuex";
 import api from "@/shared/api";
 export default {
   name: "InviteModal",
-  props: {},
+  props: {
+    inviteModal: {
+      default: null,
+    },
+  },
   data() {
     return {
-      sotwName: "",
+      sotwRes: { alreadyIn: false },
       loading: false,
+      response400: false,
+      response500: false,
     };
   },
   async mounted() {
     const vm = this;
 
-    // get the sotw name
-    await vm.getSotwName();
+    document.getElementById("inviteModal").addEventListener("shown.bs.modal", async function (_) {
+      // get the sotw name
+      await vm.getSotwName();
+    });
+
+    document.getElementById("inviteModal").addEventListener("hidden.bs.modal", function (_) {
+      vm.sotwRes = { alreadyIn: false };
+      vm.loading = false;
+      vm.response400 = vm.response500 = false;
+    });
   },
   methods: {
-    ...mapActions(["getSotw"]),
+    ...mapActions(["getSotw", "getCurrentUser"]),
+    cont() {
+      const vm = this;
+      vm.inviteModal.hide();
+      vm.$router.push("/sotw/" + vm.sotwRes.id);
+    },
     async joinSotw() {
       const vm = this;
 
@@ -57,13 +113,21 @@ export default {
           let sotwId = res.data.id;
           localStorage.setItem("activeSotwId", sotwId);
           vm.getSotw(sotwId);
-          // redirect to the newly joined sotw
-          window.location.pathname = "/sotw/" + sotwId;
-          // clean up
-          vm.loading = false;
+          // update the stored user in the front end
+          vm.getCurrentUser();
+          // close modal and redirect to the newly joined sotw
+          vm.inviteModal.hide();
+          vm.$router.push("/sotw/" + localStorage.getItem("activeSotwId"));
         })
         .catch((err) => {
-          console.log(err);
+          // error handling
+          if (err.response.status == 403) {
+            vm.response400 = true;
+          } else if (err.response.status == 500) {
+            vm.response500 = true;
+          } else {
+            console.error("ERROR:", err);
+          }
         });
     },
     async getSotwName() {
@@ -72,19 +136,17 @@ export default {
       await api.methods
         .apiGetSotwInvitePending(vm.$route.params.shareToken)
         .then((res) => {
-          if ("name" in res.data) {
-            vm.sotwName = res.data.name;
-          } else {
-            const activeSotwId = window.localStorage.setItem("activeSotwId", sotwId);
-            if (activeSotwId) {
-              vm.$router.push("/sotw/" + window.localStorage.getItem("activeSotwId"));
-            } else {
-              vm.$router.push("");
-            }
-          }
+          vm.sotwRes = res.data;
         })
         .catch((err) => {
-          console.log(err);
+          // error handling
+          if (err.response.status == 403) {
+            vm.response400 = err.response.data.detail;
+          } else if (err.response.status == 500) {
+            vm.response500 = true;
+          } else {
+            console.error("ERROR:", err);
+          }
         });
     },
   },
