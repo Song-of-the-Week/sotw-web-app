@@ -16,8 +16,10 @@ docker-down:
 
 docker-build: docker-build-backend docker-build-frontend
 
+# docker-build-backend:
+# 	. venv/bin/activate && ./venv/bin/pip freeze > ./app/requirements.txt
+# 	cd app && docker build --no-cache -t sotw-api .
 docker-build-backend:
-	. venv/bin/activate && ./venv/bin/pip freeze > ./app/requirements.txt
 	cd app && docker build --no-cache -t sotw-api .
 
 docker-build-frontend:
