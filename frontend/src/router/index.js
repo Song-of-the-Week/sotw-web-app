@@ -3,6 +3,7 @@ import store from "@/store";
 import HomeView from "@/views/HomeView.vue";
 import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
 import InviteModal from "@/components/InviteModal.vue";
+import SotwCreationModal from "@/components/SotwCreationModal.vue";
 
 const routes = [
   {
@@ -14,7 +15,7 @@ const routes = [
       {
         path: "register",
         props: true,
-        component: LoginRegisterModal,
+        name: "register",
         meta: {
           registerModal: true,
           guest: true,
@@ -23,16 +24,16 @@ const routes = [
       {
         path: "login",
         props: true,
-        component: LoginRegisterModal,
+        name: "login",
         meta: {
           loginModal: true,
           guest: true,
         },
       },
       {
-        path: "/sotw/invite/:shareToken",
+        path: "sotw/invite/:shareToken",
         props: true,
-        component: InviteModal,
+        name: "invite",
         meta: {
           inviteModal: true,
           requiresAuth: true,
@@ -41,11 +42,74 @@ const routes = [
     ],
   },
   {
+    path: "/sotw/create",
+    name: "create",
+    props: true,
+    meta: {
+      createModal: true,
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/sotw/:sotwId",
     name: "sotw",
     component: () => import("../views/SotwView.vue"),
     meta: {
       requiresAuth: true,
+    },
+  },
+  {
+    path: "/sotw/:sotwId/survey",
+    name: "survey",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+      survey: true,
+    },
+  },
+  {
+    path: "/sotw/:sotwId/results",
+    name: "results_list",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+      results: true,
+    },
+  },
+  {
+    path: "/sotw/:sotwId/results/:weekNum",
+    name: "results",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+      results: true,
+    },
+  },
+  {
+    path: "/sotw/:sotwId/playlist/:weekNum",
+    name: "playlist",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+      playlist: true,
+    },
+  },
+  {
+    path: "/sotw/:sotwId/playlist/soty",
+    name: "soty",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+      playlist: true,
+    },
+  },
+  {
+    path: "/sotw/:sotwId/playlist/master",
+    name: "playlist_list",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+      playlist: true,
     },
   },
   {

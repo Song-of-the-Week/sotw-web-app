@@ -7,6 +7,23 @@ DB_DEV_USER := clarice
 DB_DEV_PASS := clarice
 
 
+# docker-compose automation
+docker-up:
+	docker-compose up -d
+
+docker-down:
+	docker-compose down
+
+docker-build: docker-build-backend docker-build-frontend
+
+docker-build-backend:
+	. venv/bin/activate && ./venv/bin/pip freeze > ./app/requirements.txt
+	cd app && docker build --no-cache -t sotw-api .
+
+docker-build-frontend:
+	cd frontend && docker build -t sotw-frontend .
+
+
 # development automation
 dev-backend-up:
 	@echo "Starting up backend"

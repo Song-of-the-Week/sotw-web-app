@@ -72,8 +72,7 @@ async def get_current_user(current_user: User = Depends(deps.get_current_user)):
     Fetch the current logged in user
     """
 
-    user = current_user
-    return user
+    return current_user
 
 
 @router.post("/register", response_model=schemas.User, status_code=201)
@@ -100,3 +99,12 @@ async def register(
     #     background_tasks.add_task(send_registration_confirmed_email, user=user, client=email_client)
 
     return user
+
+
+@router.get("/spotify-client-id")
+async def spotify_client_id():
+    """
+    Retrieve the client ID for the spotify API
+    """
+
+    return {"status": 200, "client_id": cfg.SPOTIFY_CLIENT_ID}

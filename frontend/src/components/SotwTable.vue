@@ -5,7 +5,6 @@
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Playlist Link</th>
-          <th scope="col" class="text"><span>Survey Release</span></th>
           <th scope="col" class="text"><span>Results Release</span></th>
           <th scope="col">Invite Link</th>
         </tr>
@@ -19,7 +18,6 @@
             <a :href="sotw.playlist_link" target="_blank">{{ sotw.playlist_link }}</a>
           </td>
           <td>{{ sotw.results }}</td>
-          <td>{{ sotw.survey }}</td>
           <td v-if="sotw.share_link != null" class="text">
             <div class="row">
               <div class="col">

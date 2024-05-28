@@ -31,7 +31,7 @@
             <!-- <li class="nav-item">
               <a class="nav-link" href="#">About</a>
             </li> -->
-            <li class="nav-item dropdown">
+            <!-- <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
@@ -50,8 +50,8 @@
                   <router-link class="dropdown-item" :to="`/results/...`">Previous Results</router-link>
                 </li>
               </ul>
-            </li>
-            <li class="nav-item">
+            </li> -->
+            <!-- <li class="nav-item">
               <router-link class="nav-link" :to="`/data`">Data</router-link>
             </li>
             <li class="nav-item">
@@ -59,7 +59,7 @@
             </li>
             <li class="nav-item">
               <router-link class="nav-link" :to="`/rules`">Rules</router-link>
-            </li>
+            </li> -->
           </ul>
           <div class="navbar-nav d-flex">
             <div class="nav-item mb-2 mb-md-0 me-md-2" v-if="isLoggedIn">
@@ -78,26 +78,35 @@
       </div>
     </div>
   </nav>
-  <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal" />
-  <InviteModal :invite-modal="inviteModal" />
+  <LoginRegisterModal
+    :registering="loginRegistering"
+    :login-register-modal="loginRegisterModal"
+    :initial-path="initialPath"
+  />
+  <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
+  <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
 import InviteModal from "@/components/InviteModal.vue";
+import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
+import SotwCreationModal from "@/components/SotwCreationModal.vue";
 import store from "@/store/index.js";
 export default {
   name: "Navbar",
   components: {
-    LoginRegisterModal,
     InviteModal,
+    LoginRegisterModal,
+    SotwCreationModal,
   },
   data: () => {
     return {
+      inviteModal: null,
       loginRegisterModal: null,
       loginRegistering: false,
-      inviteModal: null,
+      sotwCreationModal: null,
+      initialPath: "/",
     };
   },
   computed: {
@@ -124,7 +133,10 @@ export default {
     const vm = this;
 
     vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
-    vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
+    if (vm.isLoggedIn) {
+      vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
+      vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+    }
   },
   methods: {
     ...mapActions(["logout"]),
@@ -142,12 +154,22 @@ export default {
         sessionStorage.setItem("last_requested_path", "/");
       });
     },
+    create() {
+      const vm = this;
+      if (!vm.sotwCreationModal._isShown) {
+        vm.sotwCreationModal.show();
+      }
+    },
   },
   watch: {
     $route: {
       immediate: true,
-      handler: function (newVal, _) {
+      handler: function (newVal, oldVal) {
         const vm = this;
+
+        if (oldVal && oldVal.path != "/login" && oldVal.path != "/register" && oldVal.path != "/sotw/create") {
+          vm.initialPath = oldVal.path;
+        }
 
         if (newVal.meta) {
           if (vm.loginRegisterModal) {
@@ -170,6 +192,11 @@ export default {
           if (vm.inviteModal && newVal.meta.inviteModal) {
             if (!vm.inviteModal._isShown) {
               vm.inviteModal.show();
+            }
+          }
+          if (vm.sotwCreationModal && newVal.meta.createModal) {
+            if (!vm.sotwCreationModal._isShown) {
+              vm.sotwCreationModal.show();
             }
           }
         }

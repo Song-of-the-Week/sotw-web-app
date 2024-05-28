@@ -7,30 +7,30 @@
         <p>
           Song of the Week is meant to be a friendly competition where you and your friends can finally determine who
           has the best music taste through democracy! I guess this also allows you to introduce your friends to new
-          music and learn more about them as you go along, creating a deeper understanding and connection between you
-          forming a bond that will last lifetimes, but it's mostly about winning.
+          music and learn more about them as you go along, creating a deeper understanding and connection between you,
+          forming a bond that will last lifetimes or something, but it's mostly about winning.
         </p>
         <h3>How does the competition work?</h3>
         <p>
-          Every week, you and whoever else is a part of your Song of the Week competition submit a song anonymously.
-          Once everyone has submitted a song, a Spotify playlist composed of everyone's submission is created and made
-          available to everyone in the competition. Over the course of the next week, you and your friends will listen
-          to the playlist until the next survey is released on a scheduled day and time. The survey will have you pick
-          your favorite two songs from the playlist that week (votes for your own song are not counted for that song),
-          match each of the players in the competition with one of the songs in the playlist, and submit a new song for
-          next week's playlist. The results of the survey will be shown on a scheduled day and time once everyone has
-          submitted a response and it will show everyone which song(s) got the most votes, which players got the most
-          and least correct matches, and a breakdown of who voted for which song and who made each guess. The top voted
-          songs will be added to a Song of the Year playlist available to everyone. The next playlist will also be
-          released along with the results of the previous week's survey and thus, the circle of Song of the Week
-          continues.
+          Every week, you and whoever else is a part of your Song of the Week competition submit a song anonymously in a
+          survey. Once everyone has submitted a song, a Spotify playlist composed of everyone's submission is created
+          and made available to everyone in the competition. Over the course of the next week, you and your friends will
+          listen to the playlist and fill out the next survey before the week ends. Each survey (except for the very
+          first one) will have you pick your favorite two songs from the playlist that week (votes for your own song are
+          not counted for that song), match each of the players in the competition with one of the songs in the
+          playlist, and submit a new song for next week's playlist. The results of the previous week's survey will be
+          shown on a scheduled day and time once everyone has submitted a response and it will show everyone which
+          song(s) got the most votes, which players got the most and least correct matches, and a breakdown of who voted
+          for which song and who made each guess. The top voted song(s) each week will be added to a Song of the Year
+          playlist available to everyone. The next playlist and a new survey will also be released with the previous
+          week's results, and thus, the circle of Song of the Week continues.
         </p>
 
         <p>
           Anyway, it looks like you're not logged in. Please
-          <router-link :to="`/login`"><a class="">login</a></router-link> or
-          <router-link :to="`/register`"><a class="">register</a></router-link> to enter or start your own Song of the
-          Week competition!
+          <router-link :to="`/login`"><a class="" @click="loginOrRegister()">login</a></router-link> or
+          <router-link :to="`/register`"><a class="" @click="loginOrRegister()">register</a></router-link> to enter or
+          start your own Song of the Week competition!
         </p>
       </div>
       <div v-else class="text-center">
@@ -49,7 +49,7 @@
                 <router-link
                   v-for="sotw in user.sotw_list"
                   class="list-group-item list-group-item-action"
-                  :to="`/sotw/` + sotw.id"
+                  :to="`/sotw/` + sotw.id + `/survey`"
                   >{{ sotw.name }}</router-link
                 >
               </div>
@@ -57,11 +57,12 @@
             <div class="col"></div>
           </div>
         </div>
-        <button class="btn btn-outline-success" @click="create()">Create</button>
+        <router-link to="/sotw/create">
+          <button class="btn btn-outline-success" @click="create()">Create</button>
+        </router-link>
       </div>
     </div>
   </div>
-  <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" />
 </template>
 
 <script>
@@ -88,12 +89,19 @@ export default {
   mounted() {
     const vm = this;
 
+    vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
     if (vm.isLoggedIn) {
       vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
     }
   },
   methods: {
     ...mapActions(["getSotw"]),
+    loginOrRegister() {
+      const vm = this;
+      if (!vm.loginRegisterModal._isShown) {
+        vm.loginRegisterModal.show();
+      }
+    },
     create() {
       const vm = this;
       if (!vm.sotwCreationModal._isShown) {

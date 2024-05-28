@@ -5,15 +5,16 @@ from app.schemas.base import Base
 
 
 class SotwBase(Base):
-    playlist_link: str = "https://www.spotify.com/"
+    master_playlist_link: str = "https://www.spotify.com/"
+    soty_playlist_link: str = "https://www.spotify.com/"
 
 
 # properties to receive via API creation
 class SotwCreate(SotwBase):
     name: str
     created_at: datetime = datetime.now()
-    survey_datetime: datetime
-    results_datetime: datetime
+    owner_id: int
+    results_datetime: int
 
 
 # properties to receive via API update
@@ -37,8 +38,8 @@ class Sotw(SotwInDBBase):
     id: int
     name: str
     created_at: datetime
-    survey_datetime: datetime
-    results_datetime: datetime
+    owner_id: int
+    results_datetime: int
 
 
 # invite link

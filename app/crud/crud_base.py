@@ -34,7 +34,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         :session: a SQLAlchemy Session object that is connected to the database
         :id: the id of the object being sought after
         """
-        return session.query(self.model).filter(self.model.id == id).first()
+        return session.query(self.model).filter(self.model.id == id).scalar()
 
     def create(self, session: Session, *, object_in: CreateSchemaType) -> ModelType:
         """

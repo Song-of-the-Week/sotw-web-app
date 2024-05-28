@@ -22,7 +22,7 @@ class Result(Base):
     )
     picked_songs: Mapped[List[Song]] = relationship(back_populates="response")
     sotw_id: Mapped[int] = mapped_column(ForeignKey("sotw.id"))
-    week_id: Mapped[int] = mapped_column(ForeignKey("week.id"))
+    week_id: Mapped[str] = mapped_column(ForeignKey("week.id"))
     week = relationship("Week", foreign_keys=week_id, back_populates="responses")
     submitter_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     submitter = relationship(

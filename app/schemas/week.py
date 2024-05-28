@@ -5,6 +5,7 @@ from app.schemas.base import Base
 
 
 class WeekBase(Base):
+    id: str
     week_num: int
     playlist_link: str
     sotw_id: int
@@ -12,10 +13,9 @@ class WeekBase(Base):
 
 # properties to receive via API creation
 class WeekCreate(WeekBase):
-    sotw_id: int
-    survey_release: datetime
-    results_release: datetime
+    next_results_release: int
     responses: List[int] = []
+    survey: str = ""
 
 
 # properties to receive via API update
@@ -24,7 +24,7 @@ class WeekUpdate(WeekBase): ...
 
 # properties shared by models stored in DB
 class WeekInDBBase(WeekBase):
-    id: int = None
+    id: str = None
 
     class Config:
         from_attributes = True
@@ -36,6 +36,7 @@ class WeekInDB(WeekInDBBase): ...
 
 # additional properties to return via API
 class Week(WeekInDBBase):
-    survey_release: datetime
-    results_release: datetime
-    responses: List[int]
+    week_num: int
+    playlist_link: str
+    next_results_release: int
+    survey: str

@@ -33,6 +33,10 @@ class Config(BaseSettings):
     )
     ALGORITHM: str = "HS256"
 
+    ### SPOTIFY ###
+    SPOTIFY_CLIENT_ID: str = "911a15a1a8d042d9bd3fde70139f89fb"
+    SPOTIFY_CLIENT_SECRET: str = "c31fdeb0fd1347c9818ba415355b4857"
+
     ### MODEL ###
     SOTW_SHARE_ID_K: int = 12
 
@@ -55,13 +59,16 @@ class Config(BaseSettings):
         raise ValueError(v)
 
     ### DATABASE ###
-    POSTGRES_SCHEME: str = "postgresql"
-    POSTGRES_ASYNC_SCHEME: str = "postgresql+asyncpg"
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_USER: str = "clarice"
-    POSTGRES_PASSWORD: str = "password"
-    POSTGRES_DB: str = "sotw"
-    POSTGRES_PORT: int = 5432
+    DB_SCHEME: str = "postgresql"
+    DB_ASYNC_SCHEME: str = "postgresql+asyncpg"
+    DB_HOST: str = "localhost"
+    DB_USER: str = "clarice"
+    DB_PASSWORD: str = "password"
+    DB_NAME: str = "sotw"
+    DB_PORT: int = 5432
+    # AWS_ACCESS_KEY_ID: str = "DUMMYIDEXAMPLE"
+    # AWS_SECRET_ACCESS_KEY: str = "DUMMYEXAMPLEKEY"
+    # AWS_REGION: str = "us-east-1"
 
 
 def setup_app_logging(config: Config) -> None:

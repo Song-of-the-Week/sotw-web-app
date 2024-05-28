@@ -5,7 +5,15 @@
         <div class="modal-header">
           <h5 v-if="registering" class="modal-title">Register</h5>
           <h5 v-else class="modal-title">Login</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <router-link :to="initialPath">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              @click="close()"
+            ></button>
+          </router-link>
         </div>
         <div class="modal-body">
           <!-- Register -->
@@ -148,7 +156,9 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <router-link :to="initialPath">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="close()">Close</button>
+          </router-link>
           <div v-if="registering">
             <button v-if="loading" type="button" class="btn btn-primary btn-spinner-register">
               <div class="spinner-border" role="status">
@@ -189,6 +199,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    initialPath: {
+      type: String,
+      default: "/",
+    },
   },
   data() {
     return {
@@ -216,19 +230,24 @@ export default {
       loading: false,
     };
   },
-  mounted() {
+  async mounted() {
     const vm = this;
+
+    // check for redirection from spotify
+    await vm.$router.isReady();
+    if ("code" in vm.$route.query) {
+      console.log("CODE", vm.$route.query, vm.state, vm.registerForm);
+    } else if ("error" in vm.$route.query) {
+      console.log("ERROR", vm.$route.query, vm.state, vm.registerForm);
+    }
 
     // clean up modal form data on modal close
     document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
       if (!vm.isLoggedIn) {
-        if (vm.sotw != null) {
-          sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id);
-        } else {
-          sessionStorage.setItem("last_requested_path", "/");
-        }
+        sessionStorage.setItem("last_requested_path", "/");
+      } else if (vm.sotw != null) {
+        sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id + "/survey");
       }
-      vm.$router.push(sessionStorage.getItem("last_requested_path"));
       vm.loginForm = {
         email: "",
         password: "",
@@ -249,6 +268,8 @@ export default {
       vm.loginResponse500 = false;
       vm.registerResponse400 = null;
       vm.registerResponse500 = false;
+      // go to next route
+      vm.$router.push(sessionStorage.getItem("last_requested_path"));
     });
 
     // submit form on enter key hit
@@ -348,8 +369,20 @@ export default {
         await api.methods
           .apiPostRegister(vm.registerForm)
           .then(async (res) => {
-            if (res.status == 200) {
-              await vm.login(vm.registerForm);
+            if (res.status == 201) {
+              // get the spotify client id
+              await api.methods.getSpotifyClientId().then((res) => {
+                vm.state = Math.random().toString(36).substring(2);
+                let params = new URLSearchParams({
+                  client_id: res.data.client_id,
+                  response_type: "code",
+                  redirect_uri: config.SPOTIFY_CALLBACK_URI,
+                  state: vm.state,
+                  scope: "playlist-modify-public",
+                });
+                document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+              });
+              // await vm.login(vm.registerForm);
             }
           })
           .catch((err) => {
@@ -394,6 +427,10 @@ export default {
             console.error("ERROR:", err);
           }
         });
+    },
+    close() {
+      const vm = this;
+      vm.loginRegisterModal.hide();
     },
   },
   watch: {

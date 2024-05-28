@@ -13,10 +13,11 @@ class Sotw(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    survey_datetime: Mapped[DateTime] = mapped_column(DateTime)
-    results_datetime: Mapped[DateTime] = mapped_column(DateTime)
-    playlist_link: Mapped[str]
+    results_datetime: Mapped[float]
+    master_playlist_link: Mapped[str]
+    soty_playlist_link: Mapped[str]
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.utcnow())
+    owner_id: Mapped[int]
     user_list = relationship(
         "User", secondary=sotw_user_association_table, back_populates="sotw_list"
     )

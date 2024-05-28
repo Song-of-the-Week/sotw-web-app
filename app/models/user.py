@@ -18,6 +18,9 @@ class User(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     is_superuser: Mapped[bool] = mapped_column(nullable=False, default=False)
+    spotify_linked: Mapped[bool] = mapped_column(nullable=False, default=False)
+    spotify_access_token: Mapped[str] = mapped_column(nullable=True)
+    spotify_refresh_token: Mapped[str] = mapped_column(nullable=True)
     playlists: Mapped[List[UserPlaylist]] = relationship(
         cascade="all,delete-orphan", back_populates="user"
     )

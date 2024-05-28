@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from fastapi import APIRouter
@@ -14,6 +15,7 @@ from app.core.auth import create_access_token
 from app.models.user import User
 from app.models.sotw import Sotw
 from app.shared.config import cfg
+from app.shared.utils import get_next_datetime
 
 
 router = APIRouter()
@@ -26,11 +28,16 @@ async def create_sotw(
     payload: schemas.SotwCreate,
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
+    # TODO create a master spotify playlist for this sotw and a soty playlist for this sotw
+    payload.master_playlist_link = ""
+    payload.soty_playlist_link = ""
+    payload.owner_id = current_user.id
     # create sotw
     sotw = crud.sotw.create(session=session, object_in=payload)
 
     # add current user to the sotw
     crud.user.add_user_to_sotw(session=session, db_object=current_user, object_in=sotw)
+    # TODO create a spotify playlist for this user for this sotw
 
     return sotw
 
@@ -43,7 +50,7 @@ async def get_sotw(
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """
-    Update the user object in the db.
+    Retrieve a sotw object from the databases
 
     Args:
         sotw_id (int): ID of the sotw to retreive

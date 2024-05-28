@@ -37,8 +37,8 @@ def init_db(session: Session):
     if not sotw:
         sotw_in = schemas.SotwCreate(
             name="test",
-            survey_datetime=datetime(1907, 3, 5, 8, 0),
-            results_datetime=datetime(1907, 3, 3, 8, 0),
+            results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
+            owner_id=1,
         )
         sotw = crud.sotw.create(session, object_in=sotw_in)
         crud.user.add_user_to_sotw(session=session, db_object=superuser, object_in=sotw)

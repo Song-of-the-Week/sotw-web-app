@@ -10,11 +10,14 @@ export default {
     },
   },
   actions: {
-    async getSotw({ commit }, id) {
+    async getSotw({ commit, dispatch }, id) {
       await api.methods
         .apiGetSotw(id)
         .then(async (res) => {
           await commit("setActiveSotw", res.data);
+        })
+        .then(async (res) => {
+          await dispatch("getWeek", id, { root: true });
         })
         .catch((err) => {
           localStorage.removeItem("activeSotwId");

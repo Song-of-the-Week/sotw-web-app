@@ -9,6 +9,7 @@ from fastapi import Depends, HTTPException, status
 from jose import jwt, JWTError
 from sqlalchemy.orm.session import Session
 
+from app.clients.spotify import SpotifyClient
 from app.db.session import SessionLocal
 from app.db.session import AsyncSessionLocal
 from app.models.user import User
@@ -69,3 +70,11 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+
+def get_spotify_client():
+    client_id = cfg.SPOTIFY_CLIENT_ID
+    client_secret = cfg.SPOTIFY_CLIENT_SECRET
+    if not client_id or not client_secret:
+        raise Exception("Spotify credentials are not set in environment variables")
+    return SpotifyClient(client_id, client_secret)

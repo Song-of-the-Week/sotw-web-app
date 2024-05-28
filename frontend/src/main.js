@@ -7,7 +7,7 @@ import axios from "axios";
 
 /* axios config */
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8000/";
+axios.defaults.baseURL = config.API_HOSTNAME;
 axios.interceptors.response.use(undefined, function (error) {
   if (error) {
     console.log("HUH", error);

@@ -125,6 +125,7 @@ export default {
   methods: {
     emitInput() {
       const vm = this;
+      // hard coded to April 1907 (when the first of the month was a Sunday)
       vm.$emit("input-day-time", new Date(1907, 3, vm.day, vm.hour, vm.minute));
     },
   },

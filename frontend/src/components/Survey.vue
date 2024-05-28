@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <h2>Survey</h2>
-    <form class="row form-horizontal justify-content-center" id="surveyForm" @submit.prevent="submitSurvey">
+    <form class="row form-horizontal justify-content-center" id="surveyForm" @submit.prevent="submit">
       <!-- Pick your top 2 -->
-      <div class="row" id="voteCard">
+      <div v-if="!firstWeek" class="row" id="voteCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ invalid: !voteValid }">
             <div class="card-header">
@@ -35,7 +35,7 @@
         </div>
       </div>
       <!-- Match user with song -->
-      <div class="row" id="matchCard">
+      <div v-if="!firstWeek" class="row" id="matchCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ 'match-invalid': !matchValid }">
             <div class="card-header" :class="{ invalid: !matchValid }">
@@ -107,13 +107,16 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   name: "Survey",
   props: {
-    sotwId: String,
+    surveyString: String,
+    weekNum: Number,
   },
   data() {
     return {
+      firstWeek: true,
       songs: [],
       users: [],
       pickedSongs: [],
@@ -127,27 +130,36 @@ export default {
   computed: {},
   mounted() {
     const vm = this;
-    // TODO make mock api calls using vuex
-    vm.songs = [
-      { id: 0, name: "Good Will Hunting - Black Country, New Road" },
-      { id: 1, name: "Houdini - Dua Lipa" },
-      { id: 2, name: "Here Comes the Sun - The Beatles" },
-    ];
-    vm.users = [
-      { id: 0, name: "Jake", matched: false },
-      { id: 1, name: "Joan", matched: false },
-      { id: 2, name: "Daniel", matched: false },
-    ];
-    vm.songs.forEach((e) => {
-      vm.matchedUserSongs.push({
-        id: e.id,
-        user: undefined,
-        song: e,
-        error: false,
+
+    if (vm.surveyString.length != 0) {
+      let surveyJson = JSON.parse(vm.surveyString);
+
+      vm.songs = surveyJson.songs;
+      vm.users = surveyJson.users;
+
+      vm.songs.forEach((song) => {
+        vm.matchedUserSongs.push({
+          id: song.id,
+          user: undefined,
+          song: song,
+          error: false,
+        });
       });
-    });
+    }
+
+    // vm.songs = [
+    //   { id: 0, name: "Good Will Hunting - Black Country, New Road" },
+    //   { id: 1, name: "Houdini - Dua Lipa" },
+    //   { id: 2, name: "Here Comes the Sun - The Beatles" },
+    // ];
+    // vm.users = [
+    //   { id: 0, name: "Jake", matched: false },
+    //   { id: 1, name: "Joan", matched: false },
+    //   { id: 2, name: "Daniel", matched: false },
+    // ];
   },
   methods: {
+    ...mapActions(["submitSurvey"]),
     matchUserSong(song, user) {
       const vm = this;
       // remove the user from any other matches it has
@@ -163,8 +175,9 @@ export default {
       song.user = user;
       song.user.matched = true;
     },
-    async submitSurvey() {
+    async submit() {
       const vm = this;
+
       // validate spotify link
       if (vm.nextSong.length > 0) {
         // parse out the track id
@@ -177,42 +190,61 @@ export default {
         location.href = "#songCard";
       }
 
-      // validate song matching
-      let errCount = 0;
-      vm.matchedUserSongs.forEach((e) => {
-        if (e.user === undefined) {
-          e.error = true;
-          errCount++;
-          console.log(errCount);
-        } else {
-          e.error = false;
+      if (vm.firstWeek) {
+        if (vm.songValid) {
+          let payload = {
+            nextSong: vm.nextSong,
+          };
+
+          vm.submitSurvey(vm.$route.params.sotwId, vm.weekNum, payload);
         }
-      });
-      if (errCount !== 0) {
-        vm.matchValid = false;
-        location.href = "#matchCard";
       } else {
-        console.log(errCount);
-        vm.matchValid = true;
-      }
+        // validate song matching
+        let errCount = 0;
+        vm.matchedUserSongs.forEach((e) => {
+          if (e.user === undefined) {
+            e.error = true;
+            errCount++;
+            console.log(errCount);
+          } else {
+            e.error = false;
+          }
+        });
+        if (errCount !== 0) {
+          vm.matchValid = false;
+          location.href = "#matchCard";
+        } else {
+          console.log(errCount);
+          vm.matchValid = true;
+        }
 
-      // validate voting
-      if (vm.pickedSongs.length != 2) {
-        vm.voteValid = false;
-        location.href = "#voteCard";
-      } else {
-        vm.voteValid = true;
-      }
+        // validate voting
+        if (vm.pickedSongs.length != 2) {
+          vm.voteValid = false;
+          location.href = "#voteCard";
+        } else {
+          vm.voteValid = true;
+        }
 
-      // send form data to back end
-      if (vm.nameValid && vm.voteValid && vm.matchValid && vm.songValid) {
-        let formData = {
-          pickedSongs: vm.pickedSongs,
-          matchedUserSongs: vm.matchedUserSongs,
-          nextSong: vm.nextSong,
-        };
-        // TODO send valid form data to back end to evaluate form and add to database
-        console.log(formData);
+        // send form data to back end
+        if (vm.nameValid && vm.voteValid && vm.matchValid && vm.songValid) {
+          // construct the payload
+          let payloadMatches = [];
+          vm.matchedUserSongs.forEach((match) => {
+            payloadMatches.push({
+              songId: match.song.id,
+              userId: match.user.id,
+            });
+          });
+          let payload = {
+            pickedSong1: vm.pickedSongs[0],
+            pickedSong2: vm.pickedSongs[1],
+            matchedUserSongs: payloadMatches,
+            nextSong: vm.nextSong,
+          };
+          // send valid form data to back end to evaluate form and add to database
+          vm.submitSurvey(vm.$route.params.sotwId, vm.weekNum, payload);
+        }
       }
     },
   },

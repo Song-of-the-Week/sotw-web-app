@@ -8,24 +8,24 @@ from app.shared.config import cfg
 
 # Synchronous engine
 engine_url = URL.create(
-    cfg.POSTGRES_SCHEME,
-    username=cfg.POSTGRES_USER,
-    password=cfg.POSTGRES_PASSWORD,
-    host=cfg.POSTGRES_HOST,
-    port=cfg.POSTGRES_PORT,
-    database=cfg.POSTGRES_DB,
+    cfg.DB_SCHEME,
+    username=cfg.DB_USER,
+    password=cfg.DB_PASSWORD,
+    host=cfg.DB_HOST,
+    port=cfg.DB_PORT,
+    database=cfg.DB_NAME,
 )
 engine = create_engine(engine_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Asynchronous engine
 engine_async_url = URL.create(
-    cfg.POSTGRES_ASYNC_SCHEME,
-    username=cfg.POSTGRES_USER,
-    password=cfg.POSTGRES_PASSWORD,
-    host=cfg.POSTGRES_HOST,
-    port=cfg.POSTGRES_PORT,
-    database=cfg.POSTGRES_DB,
+    cfg.DB_ASYNC_SCHEME,
+    username=cfg.DB_USER,
+    password=cfg.DB_PASSWORD,
+    host=cfg.DB_HOST,
+    port=cfg.DB_PORT,
+    database=cfg.DB_NAME,
 )
 async_engine = create_async_engine(engine_async_url)
 AsyncSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=async_engine)

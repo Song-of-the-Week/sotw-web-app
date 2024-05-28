@@ -1,11 +1,6 @@
 export default Object.freeze({
-  HOSTNAME: function () {
-    //TODO use dev or prod env var
-    return "http://localhost:8080/";
-  },
-  API_HOSTNAME: function () {
-    //TODO use dev or prod env var
-    return "http://localhost:8000/";
-  },
-  BASE_API_V1_URL: "api/v1/",
+  HOSTNAME: process.env.VUE_APP_HOSTNAME,
+  API_HOSTNAME: process.env.VUE_APP_API_HOSTNAME,
+  BASE_API_V1_URL: process.env.VUE_APP_BASE_API_V1_URL,
+  SPOTIFY_CALLBACK_URI: process.env.VUE_APP_SPOTIFY_CALLBACK_URI,
 });

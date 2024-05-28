@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import user from "./modules/user";
 import sotw from "./modules/sotw";
+import week from "./modules/week";
 
 // create store
 export default createStore({
@@ -12,6 +13,7 @@ export default createStore({
   modules: {
     user,
     sotw,
+    week,
   },
   plugins: [createPersistedState()],
 });

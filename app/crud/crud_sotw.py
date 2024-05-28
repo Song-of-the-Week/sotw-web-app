@@ -26,8 +26,6 @@ class CRUDSotw(CRUDBase[Sotw, SotwCreate, SotwUpdate]):
         """
         db_object = Sotw(**object_in.model_dump())
 
-        # TODO fill in spotify api stuff to create a playlist for this new user and add the link to the new object
-
         session.add(db_object)
         session.commit()
 

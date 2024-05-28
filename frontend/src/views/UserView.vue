@@ -153,26 +153,25 @@
       </div>
       <div class="row mt-3 mb-3">
         <div class="col">
-          <button class="btn btn-outline-success" @click="create()">Create</button>
+          <router-link to="/sotw/create">
+            <button class="btn btn-outline-success" @click="create()">Create</button>
+          </router-link>
         </div>
       </div>
     </div>
   </div>
-  <SotwCreationModal :sotw-creation-modal="sotwCreationModal" />
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
 import config from "@/shared/config";
 import PasswordInput from "@/components/PasswordInput.vue";
-import SotwCreationModal from "@/components/SotwCreationModal.vue";
 import SotwTable from "@/components/SotwTable.vue";
 
 export default {
   name: "UserView",
   components: {
     PasswordInput,
-    SotwCreationModal,
     SotwTable,
   },
   data() {
@@ -285,12 +284,6 @@ export default {
         vm.newPasswordConfirmValid = true;
       }
     },
-    create() {
-      const vm = this;
-      if (!vm.sotwCreationModal._isShown) {
-        vm.sotwCreationModal.show();
-      }
-    },
     buildSotwList() {
       const vm = this;
       vm.sotwList = [];
@@ -299,7 +292,6 @@ export default {
       const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       vm.user.sotw_list.forEach((sotw) => {
         const results = new Date(sotw.results_datetime);
-        const survey = new Date(sotw.survey_datetime);
 
         // check to see if there's a share link chached
         let shareLink = null;
@@ -315,10 +307,14 @@ export default {
           share_link: shareLink,
           results:
             weekday[results.getDay()] + " at " + results.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          survey:
-            weekday[survey.getDay()] + " at " + survey.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         });
       });
+    },
+    create() {
+      const vm = this;
+      if (!vm.sotwCreationModal._isShown) {
+        vm.sotwCreationModal.show();
+      }
     },
   },
 };

@@ -23,6 +23,7 @@ class UserCreate(UserBase):
     email: EmailStr
     name: str
     password: str
+    spotify_linked: Optional[bool] = False
     playlists: Optional[List[int]] = []
     sotw_list: Optional[List[int]] = []
     responses: Optional[List[int]] = []
@@ -58,6 +59,7 @@ class User(UserInDBBase):
     email: EmailStr
     name: str
     is_superuser: bool
+    spotify_linked: bool
     playlists: Optional[List[int]]
     sotw_list: List[Sotw]
     responses: List[Response]

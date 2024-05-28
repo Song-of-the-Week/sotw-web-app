@@ -11,12 +11,12 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Create a Song of the Week</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="close()"></button>
         </div>
         <div class="modal-body">
           <form>
             <div class="mb-3">
-              <label for="sotwName" class="form-label" :class="{ invalid: !sotwNameValid }"> Name </label>
+              <label for="sotwName" class="form-label" :class="{ invalid: !sotwNameValid }">Name</label>
               <input
                 v-model="sotwName"
                 type="text"
@@ -26,32 +26,13 @@
               />
               <p v-if="!sotwNameValid" class="invalid">Name must be at least two characters long.</p>
             </div>
-            <div class="mb-3">
-              <label for="surveyDayTime" class="form-label">
-                Survey Release Day and Time
-                <i
-                  class="bi bi-question-circle"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="This will be the day of the week and time of day at which the survey is released each week."
-                ></i>
-              </label>
-              <DayTimePicker
-                @input-day-time="
-                  (datetime) => {
-                    surveyDayTime = datetime;
-                  }
-                "
-                id="surveyDay"
-                aria-describedby="surveyDayHelp"
-              />
-            </div>
             <div>
               <label for="resultsDayTime" class="form-label">
                 Results Release Day and Time
                 <i
                   class="bi bi-question-circle"
                   data-bs-toggle="tooltip"
-                  data-bs-title="This will be the day of the week and time of day at which the results is released each week."
+                  data-bs-title="This will be the day of the week and time of day at which the results and the next survey are released each week."
                 ></i>
               </label>
               <DayTimePicker
@@ -73,7 +54,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="close()">Close</button>
           <div>
             <button v-if="loading" type="button" class="btn btn-primary btn-spinner-register">
               <div class="spinner-border" role="status">
@@ -101,11 +82,14 @@ export default {
     sotwCreationModal: {
       default: null,
     },
+    initialPath: {
+      type: String,
+      default: "/",
+    },
   },
   data() {
     return {
       sotwName: "",
-      surveyDayTime: new Date(),
       resultsDayTime: new Date(),
       sotwNameValid: true,
       createResponse400: null,
@@ -119,12 +103,14 @@ export default {
     // clean up modal form data on modal close
     document.getElementById("sotwCreationModal").addEventListener("hidden.bs.modal", function (_) {
       vm.sotwName = "";
-      vm.surveyDayTime = new Date();
       vm.resultsDayTime = new Date();
       vm.sotwNameValid = true;
       vm.createResponse400 = null;
       vm.createResponse500 = false;
       vm.loading = false;
+
+      // go back to initial path
+      vm.$router.push(vm.initialPath);
     });
 
     // submit form on enter key hit
@@ -151,8 +137,7 @@ export default {
       if (vm.sotwNameValid) {
         let payload = {
           name: vm.sotwName,
-          survey_datetime: vm.surveyDayTime,
-          results_datetime: vm.resultsDayTime,
+          results_datetime: vm.resultsDayTime.getTime(),
         };
         vm.createSotw(payload)
           .then((_) => {
@@ -168,8 +153,14 @@ export default {
           .finally(() => {
             // refresh the user to get the new sotw in the user
             vm.getCurrentUser();
+            // close the modal
+            vm.sotwCreationModal.hide();
           });
       }
+    },
+    close() {
+      const vm = this;
+      vm.sotwCreationModal.hide();
     },
   },
   watch: {

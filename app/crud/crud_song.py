@@ -10,19 +10,21 @@ from app.schemas.song import SongUpdate
 
 
 class CRUDSong(CRUDBase[Song, SongCreate, SongUpdate]):
-    def get_song_from_user(
-        self, session: Session, *, submitter_id: int, week_id: int
+    def get_songs_from_week(
+        self, session: Session, *, sotw_id: int, week_id: int
     ) -> Song:
         """
-        Retrieves a song object from the database using the submitter's id and the week id that the song was submitted
+        Retrieves all the songs that were given in responses for a given week in a given sotw
         :session: a SQLAlchemy Session object that is connected to the database
-        :submitter_id: the id of the user who submitted the song
-        :week_id: the id of the week the song was created
+        :sotw_id: the id of the sotw for which the songs were submitted
+        :week_id: the id of the week the songs were submitted
         """
         return (
             session.query(Song)
-            .filter(and_(Song.submitter_id == submitter_id, Song.week_id == week_id))
-            .first()
+            .filter(
+                and_(Song.response.sotw_id == sotw_id, Song.response.week_id == week_id)
+            )
+            .all()
         )
 
 
