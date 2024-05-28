@@ -20,11 +20,11 @@ RUN apt-get update && apt-get install -y \
 # RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 
 # Upgrade pip, setuptools, and wheel to the latest version
-RUN pip3 install --upgrade pip3 setuptools wheel
+RUN pip install --upgrade pip setuptools wheel
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements.txt /requirements.txt
-RUN pip3 install --no-cache-dir -r /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
 COPY ./docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -36,4 +36,4 @@ WORKDIR /app
 
 COPY . .
 
-ENTRYPOINT [ "/entrypoint.sh /start_api.sh" ]
+ENTRYPOINT [ "/entrypoint.sh", "/start_api.sh" ]
