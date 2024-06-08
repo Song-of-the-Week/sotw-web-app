@@ -34,8 +34,8 @@ class Config(BaseSettings):
     ALGORITHM: str = "HS256"
 
     ### SPOTIFY ###
-    SPOTIFY_CLIENT_ID: str = "911a15a1a8d042d9bd3fde70139f89fb"
-    SPOTIFY_CLIENT_SECRET: str = "c31fdeb0fd1347c9818ba415355b4857"
+    SPOTIFY_CLIENT_ID: str = "id"
+    SPOTIFY_CLIENT_SECRET: str = "secret"
     SPOTIFY_CALLBACK_URI: str = "http://localhost:8080/"
 
     ### MODEL ###
