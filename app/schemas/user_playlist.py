@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic import ConfigDict
 
+from app.models.user import User
 from app.schemas.base import Base
 
 
@@ -10,8 +11,10 @@ class UserPlaylistBase(Base):
 
 # properties to receive via API creation
 class UserPlaylistCreate(UserPlaylistBase):
-    user_id: Optional[int]
-    sotw_id: Optional[int]
+    playlist_link: str
+    user_id: int
+    sotw_id: int
+    user: User
 
 
 # properties to receive via API update

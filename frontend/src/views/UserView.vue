@@ -66,6 +66,17 @@
               <button class="btn btn-outline-info" @click="editingEmail = true">Change</button>
             </div>
           </div>
+          <div class="row mt-3">
+            <div class="col-3">Spotify Account:</div>
+            <div v-if="user.spotify_linked" class="col-6 col-md-5">Linked ✅</div>
+            <div v-if="user.spotify_linked" class="col-2">
+              <button class="btn btn-outline-danger" @click="unlinkSpotify()">Unlink</button>
+            </div>
+            <div v-if="!user.spotify_linked" class="col-6 col-md-5">Not Linked ❌</div>
+            <div v-if="!user.spotify_linked" class="col-2">
+              <button class="btn btn-outline-success" @click="linkSpotify()">Link</button>
+            </div>
+          </div>
           <div v-if="editingPassword" class="row mt-3">
             <div class="col-12 pt-2 col-md-3 pt-md-0">
               <label for="currentPassword" class="form-label" :class="{ invalid: changePassword403.length > 0 }"
@@ -164,6 +175,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import api from "@/shared/api";
 import config from "@/shared/config";
 import PasswordInput from "@/components/PasswordInput.vue";
 import SotwTable from "@/components/SotwTable.vue";
@@ -210,6 +222,30 @@ export default {
   },
   methods: {
     ...mapActions(["updateUser"]),
+    unlinkSpotify() {
+      const vm = this;
+      vm.updateUser({ spotify_linked: false }).catch((err) => {
+        if (err.response.status == 500) {
+          vm.response500 = true;
+        } else {
+          console.log("ERROR", err);
+        }
+      });
+    },
+    async linkSpotify() {
+      const vm = this;
+      sessionStorage.setItem("last_requested_path", "/user");
+      await api.methods.getSpotifyClientId().then((res) => {
+        let params = new URLSearchParams({
+          client_id: res.data.client_id,
+          response_type: "code",
+          redirect_uri: config.SPOTIFY_CALLBACK_URI,
+          state: vm.user.email + "-" + vm.user.name,
+          scope: "playlist-modify-public",
+        });
+        document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+      });
+    },
     changeName() {
       const vm = this;
       vm.loadingName = true;

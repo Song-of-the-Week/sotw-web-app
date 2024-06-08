@@ -230,16 +230,8 @@ export default {
       loading: false,
     };
   },
-  async mounted() {
+  mounted() {
     const vm = this;
-
-    // check for redirection from spotify
-    await vm.$router.isReady();
-    if ("code" in vm.$route.query) {
-      console.log("CODE", vm.$route.query, vm.state, vm.registerForm);
-    } else if ("error" in vm.$route.query) {
-      console.log("ERROR", vm.$route.query, vm.state, vm.registerForm);
-    }
 
     // clean up modal form data on modal close
     document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
@@ -372,17 +364,15 @@ export default {
             if (res.status == 201) {
               // get the spotify client id
               await api.methods.getSpotifyClientId().then((res) => {
-                vm.state = Math.random().toString(36).substring(2);
                 let params = new URLSearchParams({
                   client_id: res.data.client_id,
                   response_type: "code",
                   redirect_uri: config.SPOTIFY_CALLBACK_URI,
-                  state: vm.state,
+                  state: vm.registerForm.email + "-" + vm.registerForm.name,
                   scope: "playlist-modify-public",
                 });
                 document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
               });
-              // await vm.login(vm.registerForm);
             }
           })
           .catch((err) => {

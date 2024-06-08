@@ -11,5 +11,7 @@ from app.schemas.user import (
     UserLoginRequest,
     UserCreate,
     UserUpdate,
+    UserSpotifyAuth,
 )
+from app.schemas.user_playlist import UserPlaylistCreate
 from app.schemas.week import Week, WeekCreate, WeekUpdate

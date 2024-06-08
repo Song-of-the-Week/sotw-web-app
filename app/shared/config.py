@@ -36,6 +36,7 @@ class Config(BaseSettings):
     ### SPOTIFY ###
     SPOTIFY_CLIENT_ID: str = "911a15a1a8d042d9bd3fde70139f89fb"
     SPOTIFY_CLIENT_SECRET: str = "c31fdeb0fd1347c9818ba415355b4857"
+    SPOTIFY_CALLBACK_URI: str = "http://localhost:8080/"
 
     ### MODEL ###
     SOTW_SHARE_ID_K: int = 12

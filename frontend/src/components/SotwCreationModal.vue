@@ -142,19 +142,19 @@ export default {
         vm.createSotw(payload)
           .then((_) => {
             localStorage.setItem("activeSotwId", vm.sotw.id);
-          })
-          .catch((err) => {
-            if (err.response.status == 500) {
-              vm.response500 = true;
-            } else {
-              console.log("ERROR", err);
-            }
-          })
-          .finally(() => {
             // refresh the user to get the new sotw in the user
             vm.getCurrentUser();
             // close the modal
             vm.sotwCreationModal.hide();
+          })
+          .catch((err) => {
+            if (err.cause >= 400 && err.cause < 500) {
+              vm.createResponse400 = err.message;
+            } else if (err.cause == 500) {
+              vm.createResponse500 = true;
+            } else {
+              console.log("ERROR", err);
+            }
           });
       }
     },

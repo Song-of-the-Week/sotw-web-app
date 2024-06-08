@@ -51,6 +51,9 @@ async def update_user(
         else:
             raise HTTPException(status_code=403, detail=f"Incorrect password.")
 
+    if "spotify_linked" in payload and not payload.spotify_linked:
+        payload.spotify_access_token = payload.spotify_refresh_token = None
+
     return crud.user.update(session=session, db_object=current_user, object_in=payload)
 
 

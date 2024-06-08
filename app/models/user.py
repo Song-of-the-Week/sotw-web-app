@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import List
 
-from sqlalchemy import String
+from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -21,6 +22,7 @@ class User(Base):
     spotify_linked: Mapped[bool] = mapped_column(nullable=False, default=False)
     spotify_access_token: Mapped[str] = mapped_column(nullable=True)
     spotify_refresh_token: Mapped[str] = mapped_column(nullable=True)
+    spotify_user_id: Mapped[str] = mapped_column(nullable=True)
     playlists: Mapped[List[UserPlaylist]] = relationship(
         cascade="all,delete-orphan", back_populates="user"
     )

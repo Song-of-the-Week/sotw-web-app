@@ -30,7 +30,7 @@ export default {
           await commit("setActiveSotw", res.data);
         })
         .catch((err) => {
-          console.error(err);
+          throw new Error(err.response.data.detail, { cause: err.response.status });
         });
     },
   },

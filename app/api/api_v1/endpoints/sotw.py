@@ -11,11 +11,11 @@ from jose import JWTError, jwt
 from app import crud
 from app import schemas
 from app.api import deps
+from app.clients.spotify import SpotifyClient
 from app.core.auth import create_access_token
 from app.models.user import User
 from app.models.sotw import Sotw
 from app.shared.config import cfg
-from app.shared.utils import get_next_datetime
 
 
 router = APIRouter()
@@ -26,18 +26,56 @@ async def create_sotw(
     session: Session = Depends(deps.get_session),
     *,
     payload: schemas.SotwCreate,
+    spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
-    # TODO create a master spotify playlist for this sotw and a soty playlist for this sotw
-    payload.master_playlist_link = ""
-    payload.soty_playlist_link = ""
+    if not current_user.spotify_linked:
+        raise HTTPException(
+            status_code=406,
+            detail=f"You must link your spotify account from your profile page in order to create a song of the week.",
+        )
+
+    # create the master playlist
+    master_playlist_name = f"{payload.name} Master Playlist"
+    master_playlist_description = (
+        f"All the songs contained in every week of the {payload.name} song of the week."
+    )
+    master_playlist = spotify_client.create_playlist(
+        master_playlist_name, master_playlist_description, session, current_user.id
+    )
+    payload.master_playlist_link = master_playlist["external_urls"]["spotify"]
+
+    # create the master playlist
+    soty_playlist_name = f"{payload.name} Song of the Year Playlist"
+    soty_playlist_description = f"The winners from each week so far of the {payload.name} song of the week for this year."
+    soty_playlist = spotify_client.create_playlist(
+        soty_playlist_name, soty_playlist_description, session, current_user.id
+    )
+    payload.soty_playlist_link = soty_playlist["external_urls"]["spotify"]
+
     payload.owner_id = current_user.id
-    # create sotw
+
+    # create the new sotw
     sotw = crud.sotw.create(session=session, object_in=payload)
 
     # add current user to the sotw
     crud.user.add_user_to_sotw(session=session, db_object=current_user, object_in=sotw)
-    # TODO create a spotify playlist for this user for this sotw
+
+    # create the user's playlist for this sotw
+    user_playlist_name = (
+        f"{current_user.spotify_user_id}'s {payload.name} Song of the Week Playlist"
+    )
+    user_playlist_description = f"All songs submitted for the {payload.name} Song of the Week for this year by {current_user.spotify_user_id}."
+    user_playlist = spotify_client.create_playlist(
+        user_playlist_name, user_playlist_description, session, current_user.id
+    )
+    user_playlist_create = schemas.UserPlaylistCreate(
+        playlist_link=user_playlist["external_urls"]["spotify"],
+        sotw_id=sotw.id,
+        user_id=current_user.id,
+        user=current_user,
+    )
+    crud.user_playlist.create(session, object_in=user_playlist_create)
 
     return sotw
 

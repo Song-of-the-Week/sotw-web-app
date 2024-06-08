@@ -20,7 +20,9 @@ docker-build: docker-build-backend docker-build-frontend
 # 	. venv/bin/activate && ./venv/bin/pip freeze > ./app/requirements.txt
 # 	cd app && docker build --no-cache -t sotw-api .
 docker-build-backend:
+	cp alembic.ini app/
 	cd app && docker build --no-cache -t sotw-api .
+	rm app/alembic.ini
 
 docker-build-frontend:
 	cd frontend && docker build -t sotw-frontend .

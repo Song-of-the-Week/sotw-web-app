@@ -67,6 +67,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import api from "@/shared/api";
 import store from "@/store/index.js";
 import SotwCreationModal from "@/components/SotwCreationModal.vue";
 
@@ -86,8 +87,32 @@ export default {
       return store.getters.isAuthenticated;
     },
   },
-  mounted() {
+  async mounted() {
     const vm = this;
+
+    // check for redirection from spotify
+    await vm.$router.isReady();
+    if ("state" in vm.$route.query && vm.$route.query.state == vm.user.email + "-" + vm.user.name) {
+      if ("code" in vm.$route.query) {
+        const payload = {
+          code: vm.$route.query.code,
+          state: vm.$route.query.state,
+        };
+        // make api call to backend with the authorization code and update user on front end
+        api.methods
+          .apiUpdateUserSpotifyToken(payload)
+          .then(async (res) => {
+            await vm.getCurrentUser();
+          })
+          .then((_) => {
+            vm.$router.push(sessionStorage.getItem("last_requested_path"));
+          });
+        // TODO maybe add toastr or modal or something to indicate spotify linked
+      } else if ("error" in vm.$route.query) {
+        console.log("ERROR", vm.$route.query.error);
+        // TODO maybe add toastr or something to indicate spotify not linked
+      }
+    }
 
     vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
     if (vm.isLoggedIn) {
@@ -95,7 +120,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["getSotw"]),
+    ...mapActions(["getSotw", "getCurrentUser"]),
     loginOrRegister() {
       const vm = this;
       if (!vm.loginRegisterModal._isShown) {

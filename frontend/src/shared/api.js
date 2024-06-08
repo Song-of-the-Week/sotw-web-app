@@ -25,6 +25,9 @@ export default {
     apiUpdateUser(id, payload) {
       return axios.put(config.BASE_API_V1_URL + "user/" + id, payload);
     },
+    apiUpdateUserSpotifyToken(payload) {
+      return axios.put(config.BASE_API_V1_URL + "auth/spotify-access-token", payload);
+    },
     // SOTW
     apiPostSotw(payload) {
       return axios.post(config.BASE_API_V1_URL + "sotw", payload);

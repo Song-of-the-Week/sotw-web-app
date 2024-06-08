@@ -13,7 +13,7 @@ class SotwBase(Base):
 class SotwCreate(SotwBase):
     name: str
     created_at: datetime = datetime.now()
-    owner_id: int
+    owner_id: Optional[int] = None
     results_datetime: int
 
 
