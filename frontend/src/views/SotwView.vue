@@ -116,6 +116,7 @@
           tabindex="0"
         >
           <h1>Soty Playlist</h1>
+          <a :href="sotw.soty_playlist_link" target="_blank">{{ sotw.soty_playlist_link }}</a>
         </div>
         <div
           class="tab-pane fade"
@@ -126,6 +127,7 @@
           tabindex="0"
         >
           <h1>Master Playlist</h1>
+          <a :href="sotw.master_playlist_link" target="_blank">{{ sotw.master_playlist_link }}</a>
         </div>
       </div>
     </div>

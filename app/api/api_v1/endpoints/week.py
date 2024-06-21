@@ -12,6 +12,7 @@ from jose import JWTError, jwt
 from app import crud
 from app import schemas
 from app.api import deps
+from app.clients.spotify import SpotifyClient
 from app.core.auth import create_access_token
 from app.models.user import User
 from app.models.sotw import Sotw
@@ -27,6 +28,7 @@ async def get_current_week(
     session: Session = Depends(deps.get_session),
     *,
     sotw_id: int,
+    spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """
@@ -35,6 +37,7 @@ async def get_current_week(
     Args:
         sotw_id (int): ID of the sotw to retreive
         session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        spotify_client (SpotifyClient, optional): Client to communicate with spotify api.
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
@@ -96,8 +99,27 @@ async def get_current_week(
             target_hour=results_datetime.hour,
             target_minute=results_datetime.minute,
         )
-        # TODO create spotify playlist for this next week with the responses from `current_week`
-        playlist_link = ""
+
+        # create spotify playlist for this next week
+        week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num}"
+        week_playlist_description = (
+            f"Week {current_week.week_num} for {sotw.name} Song of the Week."
+        )
+        week_playlist = spotify_client.create_playlist(
+            week_playlist_name, week_playlist_description, session, current_user.id
+        )
+        playlist_link = week_playlist["external_urls"]["spotify"]
+        playlist_id = week_playlist["id"]
+
+        # add all responses from `current_week` to the new playlist
+        uris = []
+        current_week.responses.shuffle()
+        for response in current_week.responses:
+            uris.append(response.next_song.spotify_uri)
+        spotify_client.add_songs_to_playlist(
+            playlist_id, uris, session, current_user.id
+        )
+
         # create survey object with the responses from `current_week`
         survey = {
             "songs": [],

@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 
+from pydantic import ConfigDict
+
 from app.schemas.base import Base
 from app.db.base import Song
 from app.schemas.user_song_match import UserSongMatchBase
@@ -43,9 +45,7 @@ class ResponseUpdate(ResponseBase):
 # properties shared by models stored in DB
 class ResponseInDBBase(ResponseBase):
     id: int = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # additional properties stored in DB bt not returned by API

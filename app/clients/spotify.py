@@ -151,3 +151,24 @@ class SpotifyClient:
             response.raise_for_status()
 
         return response.json()
+
+    def add_songs_to_playlist(self, playlist_id, uris, session, user_id) -> Dict:
+        user = self.get_user_access_token(session, user_id)
+
+        response = requests.post(
+            f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks",
+            data=json.dumps(
+                {
+                    "uris": uris,
+                }
+            ),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {user.spotify_access_token}",
+            },
+        )
+        if response.status_code != 201:
+            logger.error(response.json())
+            response.raise_for_status()
+
+        return response.json()

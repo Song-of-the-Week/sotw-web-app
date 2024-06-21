@@ -47,9 +47,7 @@ class UserUpdate(UserBase):
 # properties shared by models stored in DB
 class UserInDBBase(UserBase):
     id: int = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # additional properties stored in DB but not returned by API

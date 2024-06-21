@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Optional
 
+from pydantic import ConfigDict
+
 from app.schemas.base import Base
 
 
@@ -24,9 +26,7 @@ class SotwUpdate(SotwBase): ...
 # properties shared by models stored in DB
 class SotwInDBBase(SotwBase):
     id: int = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # additional properties stored in DB bt not returned by API

@@ -1,10 +1,12 @@
 from datetime import datetime
 
+from pydantic import ConfigDict
+
 from app.schemas.base import Base
 
 
 class SongBase(Base):
-    spotify_link: str
+    spotify_uri: str
 
 
 # properties to receive via API creation
@@ -23,9 +25,7 @@ class SongUpdate(SongBase): ...
 # properties shared by models stored in DB
 class SongInDBBase(SongBase):
     id: int = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # additional properties stored in DB bt not returned by API

@@ -14,3 +14,5 @@ __pychache__/
 ./app/schemas/__pycache__
 ./app/shared/__pycache__
 ./app/models/__pycache__
+
+test.db

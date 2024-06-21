@@ -103,7 +103,7 @@ async def register(
     # if cfg.SEND_REGISTRATION_EMAILS:
     #     background_tasks.add_task(send_registration_confirmed_email, user=user, client=email_client)
 
-    # WIP ggive the user an access token upon registering
+    # WIP give the user an access token upon registering
     # TODO: Have email verification link be used for login (spotify account linking redirects to email verification page -> loginregistration modal)
     token = create_access_token(sub=user.id, lifetime=cfg.ACCESS_TOKEN_EXPIRE_MINUTES)
 
@@ -129,7 +129,7 @@ async def spotify_client_id():
     return {"status": 200, "client_id": cfg.SPOTIFY_CLIENT_ID}
 
 
-@router.put("/spotify-access-token", response_model=schemas.User)
+@router.put("/spotify-access-token", response_model=schemas.User, status_code=202)
 async def spotify_access_token(
     session: Session = Depends(deps.get_session),
     *,
@@ -177,4 +177,4 @@ async def spotify_access_token(
             session=session, db_object=current_user, object_in=object_in
         )
 
-    return {"status": 202}
+    return current_user

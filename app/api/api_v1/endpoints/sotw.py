@@ -47,7 +47,7 @@ async def create_sotw(
 
     # create the master playlist
     soty_playlist_name = f"{payload.name} Song of the Year Playlist"
-    soty_playlist_description = f"The winners from each week so far of the {payload.name} song of the week for this year."
+    soty_playlist_description = f"The winners from each week so far of the {payload.name} Song of the Week for this year."
     soty_playlist = spotify_client.create_playlist(
         soty_playlist_name, soty_playlist_description, session, current_user.id
     )

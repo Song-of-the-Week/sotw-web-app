@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from pydantic import validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from pydantic import AnyHttpUrl
 from typing import List
@@ -51,7 +51,7 @@ class Config(BaseSettings):
 
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = "http://localhost:8080/*"
 
-    @validator("BACKEND_CORS_ORIGINS", pre=True)  # 3
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")  # 3
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]

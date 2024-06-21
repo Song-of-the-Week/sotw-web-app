@@ -1,3 +1,4 @@
+from pydantic import ConfigDict
 from app.schemas.base import Base
 from app.models.response import Response
 
@@ -20,9 +21,7 @@ class UserSongMatchUpdate(UserSongMatchBase): ...
 # properties shared by models stored in DB
 class UserSongMatchInDBBase(UserSongMatchBase):
     id: int = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # additional properties stored in DB bt not returned by API

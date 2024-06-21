@@ -40,7 +40,7 @@ async def update_user(
     Returns:
         Any: the uupdated user object
     """
-    if user_id != current_user.id or not current_user.is_superuser:
+    if not current_user.is_superuser and user_id != current_user.id:
         raise HTTPException(status_code=403, detail=f"Not authorized to update.")
 
     if payload.current_password is not None and payload.new_password is not None:
@@ -50,9 +50,14 @@ async def update_user(
             payload = {"password": get_password_hash(payload.new_password)}
         else:
             raise HTTPException(status_code=403, detail=f"Incorrect password.")
-
-    if "spotify_linked" in payload and not payload.spotify_linked:
-        payload.spotify_access_token = payload.spotify_refresh_token = None
+    elif payload.spotify_linked == False and payload.spotify_linked != None:
+        payload = {
+            "spotify_linked": False,
+            "spotify_access_token": None,
+            "spotify_refresh_token": None,
+        }
+    else:
+        payload = {}
 
     return crud.user.update(session=session, db_object=current_user, object_in=payload)
 
@@ -81,7 +86,7 @@ async def delete_user(
     Returns:
         Any: The deleted object
     """
-    if user_id != current_user.id or not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail=f"Not authorized to delete")
+    if not current_user.is_superuser and user_id != current_user.id:
+        raise HTTPException(status_code=403, detail=f"Not authorized to delete.")
 
     return crud.user.delete(session=session, id=user_id)
