@@ -6,6 +6,8 @@ venv/
 .vscode/
 postgres/
 venv/
+*/__pycache__/
+*.pyc
 __pychache__/
 ./app/alembic/versions/__pycache__
 ./app/api/api_v1/__pycache__
