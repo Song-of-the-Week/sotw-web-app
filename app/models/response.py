@@ -18,6 +18,7 @@ class Response(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow()
     )
+    next_song_id: Mapped[int] = mapped_column(ForeignKey("song.id"), nullable=True)
     next_song = relationship("Song", back_populates="response", uselist=False)
     matched_users_songs: Mapped[List[UserSongMatch]] = relationship(
         back_populates="response",

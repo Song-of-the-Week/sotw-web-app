@@ -14,8 +14,6 @@ class SongCreate(SongBase):
     name: str
     spotify_link: str
     submitter_id: int
-    response_id: int
-    week_id: datetime
 
 
 # properties to receive via API update

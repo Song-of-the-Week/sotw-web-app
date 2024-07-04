@@ -1,7 +1,6 @@
 from typing import List, Optional
 from pydantic import ConfigDict
 
-from app.models.user import User
 from app.schemas.base import Base
 
 
@@ -14,7 +13,6 @@ class UserPlaylistCreate(UserPlaylistBase):
     playlist_link: str
     user_id: int
     sotw_id: int
-    user: User
 
 
 # properties to receive via API update
@@ -36,4 +34,6 @@ class UserPlaylistInDB(UserPlaylistInDBBase): ...
 class UserPlaylist(UserPlaylistInDBBase):
     model_config = ConfigDict(from_attributes=True)
 
-    playlist_link: List[str]
+    id: int
+    playlist_link: str
+    sotw_id: int

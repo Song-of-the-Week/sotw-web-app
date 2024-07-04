@@ -25,7 +25,7 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
-      <div v-else-if="sotwRes.alreadyIn" class="modal-content">
+      <div v-else-if="sotwRes.already_in" class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">You are already a part of {{ sotwRes.name }}!</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -74,7 +74,7 @@ export default {
   },
   data() {
     return {
-      sotwRes: { alreadyIn: false },
+      sotwRes: { already_in: false },
       loading: false,
       response400: false,
       response500: false,
@@ -89,7 +89,7 @@ export default {
     });
 
     document.getElementById("inviteModal").addEventListener("hidden.bs.modal", function (_) {
-      vm.sotwRes = { alreadyIn: false };
+      vm.sotwRes = { already_in: false };
       vm.loading = false;
       vm.response400 = vm.response500 = false;
     });

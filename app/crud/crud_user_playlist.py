@@ -10,15 +10,15 @@ from app.schemas.user_playlist import UserPlaylistUpdate
 
 class CRUDUserPlaylist(CRUDBase[UserPlaylist, UserPlaylistCreate, UserPlaylistUpdate]):
 
-    def create(
-        self, session: Session, *, object_in: UserPlaylistCreate
-    ) -> UserPlaylist:
-        """
-        Creates a Response in the database
-        :session: a SQLAlchemy Session object that is connected to the database
-        :object_in: a pydantic model ResponseCreate object
-        """
-        # TODO once we know what the data coming from the api endpoint looks like
+    # def create(
+    #     self, session: Session, *, object_in: UserPlaylistCreate
+    # ) -> UserPlaylist:
+    #     """
+    #     Creates a Response in the database
+    #     :session: a SQLAlchemy Session object that is connected to the database
+    #     :object_in: a pydantic model ResponseCreate object
+    #     """
+    #     # TODO once we know what the data coming from the api endpoint looks like
 
     def update(
         self,

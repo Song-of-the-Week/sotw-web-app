@@ -32,7 +32,7 @@ async def create_sotw(
     if not current_user.spotify_linked:
         raise HTTPException(
             status_code=406,
-            detail=f"You must link your spotify account from your profile page in order to create a song of the week.",
+            detail=f"You must link your spotify account from your profile page in order to create a Song of the Week competition.",
         )
 
     # create the master playlist
@@ -73,7 +73,6 @@ async def create_sotw(
         playlist_link=user_playlist["external_urls"]["spotify"],
         sotw_id=sotw.id,
         user_id=current_user.id,
-        user=current_user,
     )
     crud.user_playlist.create(session, object_in=user_playlist_create)
 
@@ -197,7 +196,7 @@ async def get_sotw_invite_pending(
         )
     # don't worry about if the user's already in the sotw
     if current_user in sotw.user_list:
-        return schemas.SotwInfo(id=sotw.id, name=sotw.name, alreadyIn=True)
+        return schemas.SotwInfo(id=sotw.id, name=sotw.name, already_in=True)
 
     return schemas.SotwInfo(id=sotw.id, name=sotw.name)
 
@@ -207,6 +206,7 @@ async def get_sotw_invite_join(
     session: Session = Depends(deps.get_session),
     *,
     share_token: str,
+    spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """
@@ -223,6 +223,12 @@ async def get_sotw_invite_join(
     Returns:
         Any: The id of the sotw object to be joined
     """
+    # must have spotify linked to join a sotw
+    if not current_user.spotify_linked:
+        raise HTTPException(
+            status_code=406,
+            detail=f"You must link your spotify account from your profile page in order to join a Song of the Week competition.",
+        )
     try:
         # decode the token
         payload = jwt.decode(
@@ -247,5 +253,20 @@ async def get_sotw_invite_join(
 
     # add current user to the sotw
     crud.user.add_user_to_sotw(session=session, db_object=current_user, object_in=sotw)
+
+    # create the user's playlist for this sotw
+    user_playlist_name = (
+        f"{current_user.spotify_user_id}'s {sotw.name} Song of the Week Playlist"
+    )
+    user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {current_user.spotify_user_id}."
+    user_playlist = spotify_client.create_playlist(
+        user_playlist_name, user_playlist_description, session, current_user.id
+    )
+    user_playlist_create = schemas.UserPlaylistCreate(
+        playlist_link=user_playlist["external_urls"]["spotify"],
+        sotw_id=sotw.id,
+        user_id=current_user.id,
+    )
+    crud.user_playlist.create(session, object_in=user_playlist_create)
 
     return schemas.SotwInfo(id=sotw.id)

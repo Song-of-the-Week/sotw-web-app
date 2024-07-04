@@ -51,4 +51,4 @@ class SotwInvite(Base):
 class SotwInfo(Base):
     id: Optional[int] = 0
     name: Optional[str] = ""
-    alreadyIn: Optional[bool] = False
+    already_in: Optional[bool] = False

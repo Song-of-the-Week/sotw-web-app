@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from loguru import logger
 
 from app.crud.crud_base import CRUDBase
+from app.models.response import Response
 from app.models.week import Week
 from app.schemas.week import WeekCreate
 from app.schemas.week import WeekUpdate
@@ -45,6 +46,21 @@ class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
             .filter(Week.sotw_id == sotw_id)
             .scalar()
         )
+
+    def add_response_to_week(
+        self, session: Session, *, db_object: Week, object_in: Response
+    ) -> Week:
+        """
+        Adds the response to the week (and vice versa via model relationship)
+        :session: a SQLAlchemy Session object that is connected to the database
+        :db_object: a model object of the week to update
+        :object_in: a response
+        """
+        db_object.responses.append(object_in)
+        session.add(db_object)
+        session.commit()
+        session.refresh(db_object)
+        return db_object
 
 
 week = CRUDWeek(Week)

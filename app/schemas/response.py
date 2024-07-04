@@ -4,7 +4,6 @@ from typing import List, Optional
 from pydantic import ConfigDict
 
 from app.schemas.base import Base
-from app.db.base import Song
 from app.schemas.user_song_match import UserSongMatchBase
 
 
@@ -16,27 +15,26 @@ class ResponsePost(Base):
 
 
 class ResponseBase(Base):
-    created_at: datetime
-    next_song: Song
+    next_song_id: int
     matched_users_songs: Optional[List[int]] = []
     picked_song_1_id: Optional[int] = None
     picked_song_2_id: Optional[int] = None
     sotw_id: int
-    week_id: int
+    week_id: str
     submitter_id: int
 
 
 # properties to receive via API creation
 class ResponseCreate(ResponseBase):
-    next_song: Song
+    next_song_id: int
     sotw_id: int
-    week_id: int
+    week_id: str
     submitter_id: int
 
 
 # properties to receive via API update
 class ResponseUpdate(ResponseBase):
-    next_song: Optional[Song] = None
+    next_song_id: Optional[int] = None
     matched_users_songs: Optional[List[int]] = []
     picked_song_1_id: Optional[int] = None
     picked_song_2_id: Optional[int] = None

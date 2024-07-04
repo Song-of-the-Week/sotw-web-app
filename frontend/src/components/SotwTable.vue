@@ -93,12 +93,12 @@ export default {
       await api.methods
         .apiGetSotwInviteLink(sotwId)
         .then((res) => {
-          vm.$cookies.set("invite-" + sotwId, window.config.HOSTNAME() + res.data.url, "30MIN");
+          vm.$cookies.set("invite-" + sotwId, window.config.HOSTNAME + res.data.url, "30MIN");
           vm.$emit("build-sotw-list", sotwId);
           vm.loadingLink = false;
         })
         .catch((err) => {
-          alert("There was an error generating your share link:\n" + err.response.data.detail);
+          alert("There was an error generating your share link:\n" + err);
           console.error(err);
         });
     },

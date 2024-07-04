@@ -3,9 +3,8 @@ from typing import List, Optional
 from pydantic import ConfigDict
 from pydantic import EmailStr
 
-from app.models.response import Response
 from app.schemas.base import Base
-from app.schemas import Sotw
+from app.schemas import Sotw, UserPlaylist
 
 
 class UserLoginRequest(Base):
@@ -27,7 +26,6 @@ class UserCreate(UserBase):
     spotify_linked: Optional[bool] = False
     playlists: Optional[List[int]] = []
     sotw_list: Optional[List[int]] = []
-    responses: Optional[List[int]] = []
 
 
 # properties to receive via API update
@@ -64,9 +62,8 @@ class User(UserInDBBase):
     name: str
     is_superuser: bool
     spotify_linked: bool
-    playlists: Optional[List[int]]
+    playlists: Optional[List[UserPlaylist]]
     sotw_list: List[Sotw]
-    responses: List[Response]
 
 
 class UserSpotifyAuth(Base):

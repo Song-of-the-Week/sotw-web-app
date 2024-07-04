@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import random
 from typing import Any
 
 from fastapi import APIRouter
@@ -113,8 +114,9 @@ async def get_current_week(
 
         # add all responses from `current_week` to the new playlist
         uris = []
-        current_week.responses.shuffle()
-        for response in current_week.responses:
+        responses = list(current_week.responses)
+        random.shuffle(responses)
+        for response in responses:
             uris.append(response.next_song.spotify_uri)
         spotify_client.add_songs_to_playlist(
             playlist_id, uris, session, current_user.id
@@ -125,16 +127,16 @@ async def get_current_week(
             "songs": [],
             "users": [],
         }
-        current_week.responses.shuffle()
-        for response in current_week.responses:
+        random.shuffle(responses)
+        for response in responses:
             survey["songs"].append(
                 {
                     "id": response.next_song.id,
                     "name": response.next_song.name,
                 }
             )
-        current_week.responses.shuffle()
-        for response in current_week.responses:
+        random.shuffle(responses)
+        for response in responses:
             survey["users"].append(
                 {
                     "id": response.submitter_id,
@@ -145,7 +147,7 @@ async def get_current_week(
 
         # create the new week
         next_week = schemas.WeekCreate(
-            id=f"{sotw.id} + {current_week.next_results_release}",
+            id=f"{sotw.id}+{current_week.next_results_release}",
             week_num=current_week.week_num + 1,
             playlist_link=playlist_link,
             sotw_id=sotw.id,
