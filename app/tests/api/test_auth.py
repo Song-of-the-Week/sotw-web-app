@@ -15,7 +15,6 @@ def test_login_400(client):
     assert response.status_code == 400
 
 
-
 def test_login_success(client):
     # When
     payload = {
@@ -28,7 +27,7 @@ def test_login_success(client):
     # Then
     assert response.status_code == 200
     assert "name" in data.keys()
-    assert data["name"] == "admin"
+    assert data["name"] == "test1"
 
 
 def test_logout(client):
@@ -50,7 +49,7 @@ def test_get_current_user(client):
     # Then
     assert response.status_code == 200
     assert "name" in data.keys()
-    assert data["name"] == "admin"
+    assert data["name"] == "test1"
 
 
 def test_register_400(client):
@@ -110,7 +109,7 @@ def test_spotify_access_token_401(client):
 def test_spotify_access_token_202(client):
     # When
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "error": "failure",
     }
     response = client.put(
@@ -127,7 +126,7 @@ def test_spotify_access_token_202(client):
 def test_spotify_access_token_success(client):
     # When
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(

@@ -13,4 +13,4 @@ class Song(Base):
     submitter_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     response = relationship("Response", back_populates="next_song", uselist=False)
     spotify_link: Mapped[str]
-    spotify_uri: Mapped[str]
+    spotify_id: Mapped[str]

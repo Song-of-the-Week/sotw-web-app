@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="card-body">
-              <ul class="list-group-flush text-start" v-for="matchedSong in matchedUserSongs" :key="matchedSong.id">
+              <ul class="list-group-flush text-start" v-for="matchedSong in userSongMatches" :key="matchedSong.id">
                 <li class="list-group-item">
                   <h5 class="card-title" :class="{ 'match-item-invalid': matchedSong.error }">
                     {{ matchedSong.song.name }}
@@ -120,7 +120,7 @@ export default {
       songs: [],
       users: [],
       pickedSongs: [],
-      matchedUserSongs: [],
+      userSongMatches: [],
       nextSong: "",
       voteValid: true,
       matchValid: true,
@@ -138,7 +138,7 @@ export default {
       vm.users = surveyJson.users;
 
       vm.songs.forEach((song) => {
-        vm.matchedUserSongs.push({
+        vm.userSongMatches.push({
           id: song.id,
           user: undefined,
           song: song,
@@ -163,7 +163,7 @@ export default {
     matchUserSong(song, user) {
       const vm = this;
       // remove the user from any other matches it has
-      vm.matchedUserSongs.forEach((e) => {
+      vm.userSongMatches.forEach((e) => {
         if (e.user === user) {
           e.user = undefined;
         }
@@ -201,7 +201,7 @@ export default {
       } else {
         // validate song matching
         let errCount = 0;
-        vm.matchedUserSongs.forEach((e) => {
+        vm.userSongMatches.forEach((e) => {
           if (e.user === undefined) {
             e.error = true;
             errCount++;
@@ -230,7 +230,7 @@ export default {
         if (vm.nameValid && vm.voteValid && vm.matchValid && vm.songValid) {
           // construct the payload
           let payloadMatches = [];
-          vm.matchedUserSongs.forEach((match) => {
+          vm.userSongMatches.forEach((match) => {
             payloadMatches.push({
               songId: match.song.id,
               userId: match.user.id,
@@ -239,7 +239,7 @@ export default {
           let payload = {
             pickedSong1: vm.pickedSongs[0],
             pickedSong2: vm.pickedSongs[1],
-            matchedUserSongs: payloadMatches,
+            userSongMatches: payloadMatches,
             nextSong: vm.nextSong,
           };
           // send valid form data to back end to evaluate form and add to database

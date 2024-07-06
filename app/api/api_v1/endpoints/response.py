@@ -23,7 +23,9 @@ from app.shared.utils import get_next_datetime
 router = APIRouter()
 
 
-@router.post("/{sotw_id}/{week_num}", response_model=schemas.Week)
+@router.post(
+    "/{sotw_id}/{week_num}", response_model=schemas.ResponseResponse, status_code=201
+)
 async def post_survey_response(
     session: Session = Depends(deps.get_session),
     *,
@@ -31,22 +33,28 @@ async def post_survey_response(
     week_num: int,
     payload: schemas.ResponsePost,
     current_user: User = Depends(deps.get_current_user),
-    spotify_client: SpotifyClient = Depends(deps.get_spotify_client)
+    spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
 ) -> Any:
     """
-    Retrieve the current week for the sotw with the sotw id given.
+    Receive and process a survey response from the front end
 
     Args:
-        sotw_id (int): ID of the sotw to retreive
-        week_num (int): The week number for which this response was sent
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
-        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+        sotw_id (int): url param for the id of the sotw being responded to
+        week_num (int): url param number of the week that the response is for
+        payload (schemas.ResponsePost): The answers to the survey
+        session (Session, optional): db session. Defaults to Depends(deps.get_session).
+        current_user (User, optional): currently authenticated user. Defaults to Depends(deps.get_current_user).
+        spotify_client (SpotifyClient, optional): client for spotify interactions. Defaults to Depends(deps.get_spotify_client).
 
     Raises:
-        HTTPException: 403 for unauthorized users
+        HTTPException: 404 - sotw not found
+        HTTPException: 403 - user not authorized
+        HTTPException: 404 - week not found
+        HTTPException: 406 - wrong week
+        HTTPException: 400 - incorrect payload
 
     Returns:
-        Any: 200 response
+        Any: A response telling the front endd if the song is a repeat
     """
     # get the sotw and check permissions
     sotw = crud.sotw.get(session=session, id=sotw_id)
@@ -69,124 +77,125 @@ async def post_survey_response(
 
     if current_week.week_num != week_num:
         raise HTTPException(
-            status_code=417,
+            status_code=406,
             detail=f"Survey responses can only be sent for the current week.",
         )
 
+    # check to see if current_user has submitted a response already and delete that response if so
+    for response in current_week.responses:
+        if current_user.id == response.submitter_id:
+            # delete the song from this response
+            crud.song.delete(session=session, id=response.next_song_id)
+            # delete all the user song matches
+            for match in response.user_song_matches:
+                crud.user_song_match.delete(session=session, id=match.id)
+            # delete the response
+            crud.response.delete(session=session, id=response.id)
+
     if week_num == 0:
-        # payload is the following structure
-        """
-        payload = {
-            next_song: "www.spotify.com",
-          };
-        class ResponseCreate(ResponseBase):
-            next_song: Song
-            sotw_id: int
-            week_id: int
-            submitter_id: int
-        class SongCreate(SongBase):
-            name: str
-            spotify_link: str
-            submitter_id: int
-            response_id: int
-            week_id: datetime
-        """
-        # TODO create spotify client
-        pass
+        # get song info and create the song in the db
+        next_song_track_id = payload.next_song.split("/")[-1].split("?")[0]
+        song = spotify_client.get_track_info(
+            next_song_track_id, session, current_user.id
+        )
+        song_name = f"{song['name']} - {song['artists'][0]['name']}"
+        for artist in song["artists"][1:]:
+            song_name = song_name + f", {artist['name']}"
+
+        song_in = schemas.SongCreate(
+            spotify_id=next_song_track_id,
+            spotify_link=payload.next_song,
+            name=song_name,
+            submitter_id=current_user.id,
+        )
+
+        next_song_obj = crud.song.create(session=session, object_in=song_in)
+
+        # create response object in db
+        response_in = schemas.ResponseCreate(
+            next_song_id=next_song_obj.id,
+            sotw_id=current_week.sotw_id,
+            week_id=current_week.id,
+            submitter_id=current_user.id,
+        )
+        response = crud.response.create(session=session, object_in=response_in)
+
+        # add response to week
+        week = crud.week.add_response_to_week(
+            session=session, db_object=current_week, object_in=response
+        )
+
+        # return a response with the current week
+        return schemas.ResponseResponse(repeat=False, week=week)
     else:
-        # payload is the following structure
-        """payload = {
-            picked_song_1: 0,
-            picked_song_2: 1,
-            matched_user_songs: [
-                {
-                    song_id: song.id,
-                    user_id: user.id,
-                },
-            ],
-            next_song: "www.spotify.com",
-          };
-        """
-        
-        pass
-
-    # check to see if we need a new week
-    if not current_week:
-        # create week 0
-        results_datetime = datetime.fromtimestamp(sotw.results_datetime / 1000.0)
-        next_results_release = get_next_datetime(
-            target_day=results_datetime.weekday(),
-            target_hour=results_datetime.hour,
-            target_minute=results_datetime.minute,
+        # get song info and create the song in the db
+        next_song_track_id = payload.next_song.split("/")[-1].split("?")[0]
+        song = spotify_client.get_track_info(
+            next_song_track_id, session, current_user.id
         )
-        first_week = schemas.WeekCreate(
-            id=str(sotw.id) + "+0",
-            week_num=0,
-            playlist_link="",
-            sotw_id=sotw.id,
-            next_results_release=next_results_release,
-            responses=[],
-        )
-        # create the first week of this sotw
-        current_week = crud.week.create(session=session, object_in=first_week)
-    elif datetime.now().timestamp() * 1000 >= current_week.next_results_release:
-        # we have passed this week's next results release datetime, now determine if we can make a new week based on if there are enough players in the sotw competition and if each player in the sotw has submitted a response.
-        sotw_num_users = len(sotw.user_list)
-        if sotw_num_users < 3:
-            raise HTTPException(
-                status_code=417,
-                detail=f"You will need at least three players in your Song of the Week competition in order to continue playing.",
-            )
-        if len(current_week.responses) < sotw_num_users:
-            raise HTTPException(
-                status_code=417,
-                detail=f"Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on {sotw_num_users - len(current_week.responses)} players to submit.",
-            )
+        song_name = f"{song['name']} - {song['artists'][0]['name']}"
+        for artist in song["artists"][1:]:
+            song_name = song_name + f", {artist['name']}"
 
-        # get the next results release timestamp
-        results_datetime = datetime.fromtimestamp(sotw.results_datetime / 1000.0)
-        next_results_release = get_next_datetime(
-            target_day=results_datetime.weekday(),
-            target_hour=results_datetime.hour,
-            target_minute=results_datetime.minute,
-        )
-        # TODO create spotify playlist for this next week with the responses from `current_week`
-        playlist_link = ""
-        # create survey object with the responses from `current_week`
-        survey = {
-            "songs": [],
-            "users": [],
-        }
-        current_week.responses.shuffle()
-        for response in current_week.responses:
-            survey["songs"].append(
-                {
-                    "id": response.next_song.id,
-                    "name": response.next_song.name,
-                }
-            )
-        current_week.responses.shuffle()
-        for response in current_week.responses:
-            survey["users"].append(
-                {
-                    "id": response.submitter_id,
-                    "name": response.submitter.name,
-                    "matched": False,
-                }
-            )
-
-        # create the new week
-        next_week = schemas.WeekCreate(
-            id=f"{sotw.id} + {current_week.next_results_release}",
-            week_num=current_week.week_num + 1,
-            playlist_link=playlist_link,
-            sotw_id=sotw.id,
-            next_results_release=next_results_release,
-            survey=json.dumps(survey),
-            responses=[],
+        # determine if this song has been submitted before:
+        repeat = (
+            False
+            if not crud.song.get_song_by_name(session=session, name=song_name)
+            else True
         )
 
-        # create the new current week
-        current_week = crud.week.create(session=session, object_in=next_week)
+        song_in = schemas.SongCreate(
+            spotify_id=next_song_track_id,
+            spotify_link=payload.next_song,
+            name=song_name,
+            submitter_id=current_user.id,
+        )
 
-    return current_week
+        next_song_obj = crud.song.create(session=session, object_in=song_in)
+
+        # create response object in db
+        response_in = schemas.ResponseCreate(
+            next_song_id=next_song_obj.id,
+            sotw_id=current_week.sotw_id,
+            week_id=current_week.id,
+            submitter_id=current_user.id,
+            picked_song_1_id=payload.picked_song_1,
+            picked_song_2_id=payload.picked_song_2,
+        )
+        response = crud.response.create(session=session, object_in=response_in)
+
+        # create user song matches
+        number_correct_matches = 0
+        for match in payload.user_song_matches:
+            song = crud.song.get(session=session, id=match.song_id)
+            # the payload has some sort of error if the song can't be found
+            if not song:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"There's something wrong with your request. A song with the given id {match.song_id} does not exist.",
+                )
+            user_song_match_in = schemas.UserSongMatchCreate(
+                song_id=match.song_id,
+                user_id=match.user_id,
+                correct_guess=match.user_id == song.submitter_id,
+                response_id=response.id,
+            )
+            number_correct_matches += 1 if user_song_match_in.correct_guess else 0
+            crud.user_song_match.create(session=session, object_in=user_song_match_in)
+
+        # update the response
+        crud.response.update(
+            session=session,
+            db_object=response,
+            object_in=schemas.ResponseUpdate(
+                number_correct_matches=number_correct_matches
+            ),
+        )
+
+        # add response to week
+        week = crud.week.add_response_to_week(
+            session=session, db_object=current_week, object_in=response
+        )
+
+        # return a response with the current week
+        return schemas.ResponseResponse(repeat=repeat)

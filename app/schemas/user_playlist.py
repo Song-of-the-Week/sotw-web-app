@@ -10,6 +10,7 @@ class UserPlaylistBase(Base):
 
 # properties to receive via API creation
 class UserPlaylistCreate(UserPlaylistBase):
+    id: str
     playlist_link: str
     user_id: int
     sotw_id: int
@@ -22,7 +23,7 @@ class UserPlaylistUpdate(UserPlaylistBase):
 
 # properties shared by models stored in DB
 class UserPlaylistInDBBase(UserPlaylistBase):
-    id: int = None
+    id: str = None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -34,6 +35,7 @@ class UserPlaylistInDB(UserPlaylistInDBBase): ...
 class UserPlaylist(UserPlaylistInDBBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: str
     playlist_link: str
     sotw_id: int
+    user_id: int

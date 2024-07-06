@@ -40,3 +40,4 @@ class Week(WeekInDBBase):
     playlist_link: str
     next_results_release: int
     survey: str
+    submitted: bool

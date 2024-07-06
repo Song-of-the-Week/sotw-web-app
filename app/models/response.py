@@ -8,7 +8,6 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
-from app.models.song import Song
 from app.models.user_song_match import UserSongMatch
 
 
@@ -20,9 +19,10 @@ class Response(Base):
     )
     next_song_id: Mapped[int] = mapped_column(ForeignKey("song.id"), nullable=True)
     next_song = relationship("Song", back_populates="response", uselist=False)
-    matched_users_songs: Mapped[List[UserSongMatch]] = relationship(
+    user_song_matches: Mapped[List[UserSongMatch]] = relationship(
         back_populates="response",
     )
+    number_correct_matches: Mapped[int] = mapped_column(default=0)
     picked_song_1_id: Mapped[int] = mapped_column(nullable=True)
     picked_song_2_id: Mapped[int] = mapped_column(nullable=True)
     sotw_id: Mapped[int] = mapped_column(ForeignKey("sotw.id"))

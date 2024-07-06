@@ -21,7 +21,7 @@ def test_sotw_creation_success(client):
     # When
     # "link" spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(
@@ -67,7 +67,7 @@ def test_get_sotw_success(client):
     # When
     # "link" spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(
@@ -113,7 +113,7 @@ def test_get_sotw_invite_link_success(_create_token, client):
     # When
     # "link" spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(
@@ -162,7 +162,7 @@ def test_get_sotw_invite_pending_already_in_success(decode, client):
     # When
     # "link" spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(
@@ -204,7 +204,7 @@ def test_get_sotw_invite_join_403(client):
     # When
     # "link" spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(
@@ -224,7 +224,7 @@ def test_get_sotw_invite_join_404(decode, client):
     # When
     # "link" spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(
@@ -252,7 +252,7 @@ def test_get_sotw_invite_join_success(decode, client, sotw):
     # When
     # "link" spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(

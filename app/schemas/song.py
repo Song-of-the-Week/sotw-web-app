@@ -6,7 +6,7 @@ from app.schemas.base import Base
 
 
 class SongBase(Base):
-    spotify_uri: str
+    spotify_id: str
 
 
 # properties to receive via API creation

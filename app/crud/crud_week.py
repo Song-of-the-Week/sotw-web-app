@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 from loguru import logger
 
@@ -44,6 +44,21 @@ class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
         return (
             session.query(func.max(Week.week_num))
             .filter(Week.sotw_id == sotw_id)
+            .scalar()
+        )
+    
+    def get_week_by_number(self, session: Session, *, week_num: int, sotw_id: int) -> Optional[Week]:
+        """
+        Session query to get the current week from a sotw
+        :session: a SQLAlchemy Session object that is connected to the database
+        :week_num: the number of the Week being sought after
+        :sotw_id: the sotw id of the Week being sought after
+        """
+        return (
+            session.query(Week)
+            .filter(
+                and_(Week.week_num == week_num, Week.sotw_id == sotw_id)
+            )
             .scalar()
         )
 

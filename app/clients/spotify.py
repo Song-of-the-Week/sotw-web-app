@@ -172,3 +172,21 @@ class SpotifyClient:
             response.raise_for_status()
 
         return response.json()
+
+    def get_track_info(self, track_id, session, user_id) -> Dict:
+        user = self.get_user_access_token(session, user_id)
+
+        # get track info
+        response = requests.get(
+            f"https://api.spotify.com/v1/tracks/{track_id}",
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": f"Bearer {user.spotify_access_token}",
+            },
+        )
+
+        if response.status_code != 200:
+            logger.error(response.json())
+            response.raise_for_status()
+
+        return response.json()

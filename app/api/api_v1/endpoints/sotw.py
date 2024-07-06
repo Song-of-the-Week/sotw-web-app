@@ -70,6 +70,7 @@ async def create_sotw(
         user_playlist_name, user_playlist_description, session, current_user.id
     )
     user_playlist_create = schemas.UserPlaylistCreate(
+        id=user_playlist["id"],
         playlist_link=user_playlist["external_urls"]["spotify"],
         sotw_id=sotw.id,
         user_id=current_user.id,
@@ -263,6 +264,7 @@ async def get_sotw_invite_join(
         user_playlist_name, user_playlist_description, session, current_user.id
     )
     user_playlist_create = schemas.UserPlaylistCreate(
+        id=user_playlist["id"],
         playlist_link=user_playlist["external_urls"]["spotify"],
         sotw_id=sotw.id,
         user_id=current_user.id,

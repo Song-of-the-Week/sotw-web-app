@@ -10,8 +10,8 @@ class UserSongMatchBase(Base):
 
 # properties to receive via API creation
 class UserSongMatchCreate(UserSongMatchBase):
-    user_id: int
-    song_id: int
+    correct_guess: bool
+    response_id: int
 
 
 # properties to receive via API update
@@ -33,4 +33,5 @@ class UserSongMatchInDB(UserSongMatchInDBBase):
 class UserSongMatch(UserSongMatchInDBBase):
     user_id: int
     week_id: int
+    correct_guess: bool
     response_id: int

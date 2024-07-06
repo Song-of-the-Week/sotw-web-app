@@ -24,7 +24,7 @@ class UserCreate(UserBase):
     name: str
     password: str
     spotify_linked: Optional[bool] = False
-    playlists: Optional[List[int]] = []
+    playlists: Optional[List[UserPlaylist]] = []
     sotw_list: Optional[List[int]] = []
 
 

@@ -79,7 +79,7 @@ def test_update_user_password_change_success(client):
 def test_update_user_unlink_spotify_success(client):
     # First, link user's spotify
     payload = {
-        "state": "admin@admin.admin-admin",
+        "state": "admin@admin.admin-test1",
         "code": "success",
     }
     response = client.put(

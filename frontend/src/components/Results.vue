@@ -45,7 +45,7 @@
               <tr>
                 <th scope="col">Who ye be</th>
                 <th scope="col">Number of Correct Guesses</th>
-                <th scope="col" v-for="song in allSongs" :key="song.id">{{ song.song }}</th>
+                <th scope="col" v-for="key in Object.keys(allSongs)" :key="key">{{ allSongs[key].name }}</th>
               </tr>
             </thead>
             <tbody>
@@ -54,7 +54,7 @@
                 <td>{{ guesser.numCorrectGuesses }}</td>
                 <td
                   v-for="guess in guesser.guesses"
-                  :class="{ 'correct-guess': guess.submitterGuess === guess.submitterReal }"
+                  :class="{ 'correct-guess': guess.correct }"
                   :key="guess.submitterReal"
                 >
                   {{ guess.submitterGuess }}
@@ -95,58 +95,55 @@ export default {
     vm.firstPlace = ["Sample1", "Sample2", "Sample3"];
     vm.secondPlace = ["Sample1", "Sample2", "Sample3"];
 
-    vm.allSongs = [
-      { id: 0, song: "sample1", voters: ["Dan", "Jan"], submitter: "Sam" },
-      { id: 1, song: "sample2", voters: ["Sam", "Dan"], submitter: "Jan" },
-      { id: 2, song: "sample3", voters: ["Jan", "Sam"], submitter: "Dan" },
-    ];
+    vm.allSongs = {
+      0: { name: "sample1", voters: ["Dan", "Jan"], submitter: "Sam" },
+      1: { name: "sample2", voters: ["Sam", "Dan"], submitter: "Jan" },
+      2: { name: "sample3", voters: ["Jan", "Sam"], submitter: "Dan" },
+    };
 
     vm.guessingData = [
       {
         id: 0,
         name: "Dan",
         guesses: [
-          { song: "sample1", submitterGuess: "Jan", submitterReal: "Sam" },
-          { song: "sample2", submitterGuess: "Sam", submitterReal: "Jan" },
-          { song: "sample3", submitterGuess: "Dan", submitterReal: "Dan" },
+          { song: "sample1", submitterGuess: "Jan", correct: false },
+          { song: "sample2", submitterGuess: "Sam", correct: false },
+          { song: "sample3", submitterGuess: "Dan", correct: true },
         ],
         numCorrectGuesses: 1,
-        votes: ["sample1", "sample2"],
       },
       {
         id: 1,
         name: "Sam",
         guesses: [
-          { song: "sample1", submitterGuess: "Sam", submitterReal: "Sam" },
-          { song: "sample2", submitterGuess: "Jan", submitterReal: "Jan" },
-          { song: "sample3", submitterGuess: "Dan", submitterReal: "Dan" },
+          { song: "sample1", submitterGuess: "Sam", correct: true },
+          { song: "sample2", submitterGuess: "Jan", correct: true },
+          { song: "sample3", submitterGuess: "Dan", correct: true },
         ],
         numCorrectGuesses: 3,
-        votes: ["sample2", "sample3"],
       },
       {
         id: 2,
         name: "Jan",
         guesses: [
-          { song: "sample1", submitterGuess: "Dan", submitterReal: "Sam" },
-          { song: "sample2", submitterGuess: "Jan", submitterReal: "Jan" },
-          { song: "sample3", submitterGuess: "Sam", submitterReal: "Dan" },
+          { song: "sample1", submitterGuess: "Dan", correct: false },
+          { song: "sample2", submitterGuess: "Jan", correct: true },
+          { song: "sample3", submitterGuess: "Sam", correct: false },
         ],
         numCorrectGuesses: 1,
-        votes: ["sample1", "sample3"],
       },
     ];
 
     // Chart Options
     let dataPoints = [];
-    vm.allSongs.forEach((s) => {
+    for (const key in vm.allSongs) {
       dataPoints.push({
-        label: s.song,
-        y: s.voters.length,
-        voters: s.voters,
-        submitter: s.submitter,
+        label: vm.allSongs[key].name,
+        y: vm.allSongs[key].voters.length,
+        voters: vm.allSongs[key].voters,
+        submitter: vm.allSongs[key].submitter,
       });
-    });
+    }
 
     vm.chartOptions = {
       theme: "dark1",
