@@ -41,3 +41,9 @@ class Week(WeekInDBBase):
     next_results_release: int
     survey: str
     submitted: bool
+
+
+class WeekErrorResponse(Base):
+    week: Week
+    status: int
+    message: str

@@ -7,8 +7,10 @@ from app.schemas.base import Base
 
 
 class SotwBase(Base):
-    master_playlist_link: str = "https://www.spotify.com/"
-    soty_playlist_link: str = "https://www.spotify.com/"
+    master_playlist_link: str = ""
+    master_playlist_id: str = ""
+    soty_playlist_link: str = ""
+    soty_playlist_id: str = ""
 
 
 # properties to receive via API creation

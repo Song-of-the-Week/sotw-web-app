@@ -20,5 +20,10 @@ from app.schemas.user import (
     UserUpdate,
     UserSpotifyAuth,
 )
-from app.schemas.week import Week, WeekCreate, WeekUpdate
-from app.schemas.results import ResultsCreate, ResultsUpdate, Results
+from app.schemas.week import Week, WeekCreate, WeekUpdate, WeekErrorResponse
+from app.schemas.results import (
+    ResultsCreate,
+    ResultsUpdate,
+    Results,
+    ResultsErrorResponse,
+)

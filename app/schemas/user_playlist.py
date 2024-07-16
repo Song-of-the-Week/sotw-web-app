@@ -6,12 +6,13 @@ from app.schemas.base import Base
 
 class UserPlaylistBase(Base):
     playlist_link: str
+    playlist_id: str
 
 
 # properties to receive via API creation
 class UserPlaylistCreate(UserPlaylistBase):
-    id: str
     playlist_link: str
+    playlist_id: str
     user_id: int
     sotw_id: int
 
@@ -23,7 +24,7 @@ class UserPlaylistUpdate(UserPlaylistBase):
 
 # properties shared by models stored in DB
 class UserPlaylistInDBBase(UserPlaylistBase):
-    id: str = None
+    id: int = None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -35,7 +36,7 @@ class UserPlaylistInDB(UserPlaylistInDBBase): ...
 class UserPlaylist(UserPlaylistInDBBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: int
     playlist_link: str
     sotw_id: int
     user_id: int

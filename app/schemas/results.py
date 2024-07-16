@@ -38,3 +38,8 @@ class Results(ResultsInDBBase):
     second_place: str
     all_songs: str
     guessing_data: str
+
+
+class ResultsErrorResponse(Base):
+    message: str
+    release_time: int

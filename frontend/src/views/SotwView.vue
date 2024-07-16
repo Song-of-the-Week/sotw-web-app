@@ -75,7 +75,7 @@
           aria-labelledby="survey-tab"
           tabindex="0"
         >
-          <Survey :survey-string="currentWeek.survey" :week-num="currentWeek.week_num" />
+          <Survey :survey-string="currentWeek.survey" :week="currentWeek" :week-error="currentWeekError" />
         </div>
         <div
           class="tab-pane fade"
@@ -85,7 +85,9 @@
           aria-labelledby="results-tab"
           tabindex="0"
         >
-          <Results />
+          <div v-if="renderResults">
+            <Results :sotw-id="sotw.id" :week-num="currentWeek.week_num" />
+          </div>
         </div>
         <div
           class="tab-pane fade"
@@ -96,6 +98,25 @@
           tabindex="0"
         >
           <h1>Previous Results</h1>
+          <div v-if="currentWeek.week_num < 2" class="row">
+            <div class="col">
+              <p>No previous results yet!</p>
+            </div>
+          </div>
+          <div v-else class="row">
+            <div class="col"></div>
+            <div class="col-10 col-lg-3 p-4">
+              <div class="list-group">
+                <router-link
+                  v-for="n in currentWeek.week_num - 1"
+                  class="list-group-item list-group-item-action"
+                  :to="`/sotw/` + sotw.id + `/results/` + n"
+                  >week {{ n }} results</router-link
+                >
+              </div>
+            </div>
+            <div class="col"></div>
+          </div>
         </div>
         <div
           class="tab-pane fade"
@@ -106,6 +127,7 @@
           tabindex="0"
         >
           <h1>Current Playlist</h1>
+          <a :href="currentWeek.playlist_link" target="_blank">{{ currentWeek.playlist_link }}</a>
         </div>
         <div
           class="tab-pane fade"
@@ -149,33 +171,58 @@ export default {
   },
   data() {
     return {
+      renderResults: false,
       loading: false,
     };
   },
   computed: {
-    ...mapGetters({ sotw: "getActiveSotw", currentWeek: "getCurrentWeek" }),
+    ...mapGetters({ sotw: "getActiveSotw", currentWeek: "getCurrentWeek", currentWeekError: "getCurrentWeekError" }),
   },
   beforeMount() {
     const vm = this;
 
     if (!vm.sotw || vm.sotw.id != vm.$route.params.sotwId) {
       vm.loading = true;
-      vm.getSotw(vm.$route.params.sotwId).then(() => {
-        localStorage.setItem("activeSotwId", vm.sotw.id);
-        vm.loading = false;
-      });
+      vm.getSotw(vm.$route.params.sotwId)
+        .then(() => {
+          localStorage.setItem("activeSotwId", vm.sotw.id);
+          vm.loading = false;
+        })
+        .then(() => {
+          vm.getWeek(vm.sotw.id);
+        });
     }
   },
   mounted() {
     const vm = this;
+
     vm.activeClass(vm.$route.name);
   },
   methods: {
-    ...mapActions(["getSotw"]),
+    ...mapActions(["getSotw", "getWeek"]),
     activeClass(name) {
       const vm = this;
       if (name == vm.$route.name) {
+        if (name == "results") {
+          vm.renderResults = true;
+        } else {
+          vm.renderResults = false;
+        }
         return "show active";
+      } else if (vm.$route.name == "sotw") {
+        // calculate how far we are from the next release date
+        if (Math.round((vm.currentWeek.next_results_release - new Date().getTime()) / (1000 * 3600 * 24)) < 5) {
+          if (name == "survey") {
+            return "show active";
+          }
+        } else {
+          if (name == "results") {
+            vm.renderResults = true;
+            return "show active";
+          } else {
+            vm.renderResults = false;
+          }
+        }
       }
     },
   },

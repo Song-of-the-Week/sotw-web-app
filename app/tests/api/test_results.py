@@ -32,7 +32,7 @@ def test_post_response_404_week_not_found(client, current_week):
 
     # Then
     assert response.status_code == 404
-    assert data["detail"] == "Results for week 4 not found for sotw 1."
+    assert data["detail"] == "Week 4 not found for sotw 1."
 
 
 def test_get_results_success(client, current_week_new_week_new_results):
@@ -61,6 +61,18 @@ def test_get_results_success(client, current_week_new_week_new_results):
     assert "all_songs" in data.keys()
     assert (
         data["all_songs"]
-        == '{"1": {"name": "Doctor Worm - They Might Be Giants", "voters": ["test2", "test3"], "submitter": "test1"}, "2": {"name": "Headlock - Snail Mail", "voters": ["test1", "test3"], "submitter": "test2"}, "3": {"name": "Lithonia - Childish Gambino", "voters": ["test1", "test2"], "submitter": "test3"}}'
+        == '{"1": {"name": "Doctor Worm - They Might Be Giants", "voters": ["test2", "test3"], "submitter": "test1", "spotify_id": "6OmApaLQPqHZL3iI78FOUR"}, "2": {"name": "Headlock - Snail Mail", "voters": ["test1", "test3"], "submitter": "test2", "spotify_id": "5mqceEgI5vhogd5pOAlwUO"}, "3": {"name": "Lithonia - Childish Gambino", "voters": ["test1", "test2"], "submitter": "test3", "spotify_id": "4JfpJrrGNXRj2yXm1fYV23"}}'
     )
     assert "guessing_data" in data.keys()
+
+
+def test_get_results_404_not_ready(client, current_week_new_week_new_results):
+    # When
+    # get results from previous week
+    response = client.get(f"{cfg.API_V1_STR}/results/1/1")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert "message" in data.keys()
+    assert data["message"] == "Results for week 1 for test not yet available."

@@ -108,6 +108,14 @@ def test_post_response_success_week_0(client):
     assert "repeat" in data.keys()
     assert data["repeat"] == False
 
+    # check to see if the week shows that the current user has submitted
+    response = client.get(f"{cfg.API_V1_STR}/week/{sotw_id}/current_week")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert "submitted" in data.keys()
+    assert data["submitted"] == True
+
 
 def test_post_response_400(client, current_week):
     # When
@@ -163,8 +171,7 @@ def test_post_response_success_week_n_no_repeat(client, current_week_new_week):
 
     # Then
     assert response.status_code == 201
-    assert "repeat" in data.keys()
-    assert data["repeat"] == False
+    assert "repeat" not in data.keys()
 
 
 def test_post_response_success_week_n_repeat(client, current_week_new_week_plus_1):
@@ -199,6 +206,42 @@ def test_post_response_success_week_n_repeat(client, current_week_new_week_plus_
     assert response.status_code == 201
     assert "repeat" in data.keys()
     assert data["repeat"] == True
+
+
+def test_post_response_success_week_n_repeat_approved(
+    client, current_week_new_week_plus_1
+):
+    # When
+    # kick off the new week
+    response = client.get(f"{cfg.API_V1_STR}/week/1/current_week")
+
+    # post a response
+    payload = {
+        "picked_song_1": 1,
+        "picked_song_2": 2,
+        "user_song_matches": [
+            {
+                "song_id": 1,
+                "user_id": 1,
+            },
+            {
+                "song_id": 2,
+                "user_id": 2,
+            },
+            {
+                "song_id": 3,
+                "user_id": 3,
+            },
+        ],
+        "next_song": "https://open.spotify.com/track/1auuYcOrua5hrsGCS7idun?si=f951bceb14204344",
+        "repeat_approved": True,
+    }
+    response = client.post(f"{cfg.API_V1_STR}/response/1/1", data=json.dumps(payload))
+    data = response.json()
+
+    # Then
+    assert response.status_code == 201
+    assert "repeat" not in data.keys()
 
 
 def test_post_response_success_week_n_replace_existing_response(

@@ -10,7 +10,10 @@
 export default {
   name: "Countdown",
   props: {
-    sotwId: String,
+    releaseTimestamp: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -21,18 +24,13 @@ export default {
         seconds: 0,
       },
       countdownInterval: undefined,
+      release: null,
     };
-  },
-  computed: {
-    release: function () {
-      // const vm = this;
-      // TODO get the sotw survey release time (expect it as a datetime object froom the back end)
-      let release = new Date(2024, 2, 25, 14, 0, 0, 0);
-      return release;
-    },
   },
   mounted() {
     const vm = this;
+
+    vm.release = new Date(vm.releaseTimestamp);
     vm.getTimeRemaining();
     vm.countdownInterval = setInterval(vm.updateTimer, 1000);
   },

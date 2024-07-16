@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -14,29 +14,31 @@ from app.models.user import User
 router = APIRouter()
 
 
-@router.get("/{sotw_id}/{week_num}", response_model=schemas.Results)
+@router.get(
+    "/{sotw_id}/{week_num}",
+    response_model=Union[schemas.Results, schemas.ResultsErrorResponse],
+)
 async def get_results(
     session: Session = Depends(deps.get_session),
     *,
     sotw_id: int,
     week_num: int,
     current_user: User = Depends(deps.get_current_user),
-) -> Any:
+) -> schemas.Results:
     """
-    Get the results for the given week of the given sotw
+    Get the results for the given week of the given sotw.
 
     Args:
         sotw_id (int): ID of the sotw to query
-        week_num (int): number of the week for which the results are sought
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
-        spotify_client (SpotifyClient, optional): Client to communicate with spotify api.
+        week_num (int): Number of the week for which the results are sought.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
         HTTPException: 403 for unauthorized users
 
     Returns:
-        Any: the sotw object retreived
+        schemas.Results: The results for the given sotw and week num.
     """
     # get the sotw and check permissions
     sotw = crud.sotw.get(session=session, id=sotw_id)
@@ -56,12 +58,18 @@ async def get_results(
     if week is None:
         raise HTTPException(
             status_code=404,
-            detail=f"Results for week {week_num} not found for sotw {sotw.id}.",
+            detail=f"Week {week_num} not found for sotw {sotw.id}.",
         )
 
     # get the results from the given week and sotw
     results = crud.results.get_results_by_week(
         session=session, week_id=week.id, sotw_id=sotw.id
     )
+
+    if results is None:
+        return schemas.ResultsErrorResponse(
+            message=f"Results for week {week_num} for {sotw.name} not yet available.",
+            release_time=week.next_results_release,
+        )
 
     return results

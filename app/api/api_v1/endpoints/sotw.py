@@ -1,11 +1,7 @@
-from datetime import datetime
-from typing import Any
-
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.orm.session import Session
-from loguru import logger
 from jose import JWTError, jwt
 
 from app import crud
@@ -14,7 +10,6 @@ from app.api import deps
 from app.clients.spotify import SpotifyClient
 from app.core.auth import create_access_token
 from app.models.user import User
-from app.models.sotw import Sotw
 from app.shared.config import cfg
 
 
@@ -28,7 +23,22 @@ async def create_sotw(
     payload: schemas.SotwCreate,
     spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
     current_user: User = Depends(deps.get_current_user),
-) -> Any:
+) -> schemas.Sotw:
+    """
+    Create a new sotw.
+
+    Args:
+        payload (schemas.SotwCreate): The details to create the sotw object with.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        spotify_client (SpotifyClient, optional): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
+        current_user (User, optional): Currently authenticcated user making the request. Defaults to Depends(deps.get_current_user).
+
+    Raises:
+        HTTPException: 406 when the user's Spotify has not been linked with their account.
+
+    Returns:
+        schemas.Sotw: The newly created sotw.
+    """
     if not current_user.spotify_linked:
         raise HTTPException(
             status_code=406,
@@ -44,6 +54,7 @@ async def create_sotw(
         master_playlist_name, master_playlist_description, session, current_user.id
     )
     payload.master_playlist_link = master_playlist["external_urls"]["spotify"]
+    payload.master_playlist_id = master_playlist["id"]
 
     # create the master playlist
     soty_playlist_name = f"{payload.name} Song of the Year Playlist"
@@ -52,6 +63,7 @@ async def create_sotw(
         soty_playlist_name, soty_playlist_description, session, current_user.id
     )
     payload.soty_playlist_link = soty_playlist["external_urls"]["spotify"]
+    payload.soty_playlist_id = soty_playlist["id"]
 
     payload.owner_id = current_user.id
 
@@ -70,7 +82,7 @@ async def create_sotw(
         user_playlist_name, user_playlist_description, session, current_user.id
     )
     user_playlist_create = schemas.UserPlaylistCreate(
-        id=user_playlist["id"],
+        playlist_id=user_playlist["id"],
         playlist_link=user_playlist["external_urls"]["spotify"],
         sotw_id=sotw.id,
         user_id=current_user.id,
@@ -86,20 +98,20 @@ async def get_sotw(
     *,
     sotw_id: int,
     current_user: User = Depends(deps.get_current_user),
-) -> Any:
+) -> schemas.Sotw:
     """
-    Retrieve a sotw object from the databases
+    Retrieve a sotw object from the database.
 
     Args:
-        sotw_id (int): ID of the sotw to retreive
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        sotw_id (int): ID of the sotw to retreive.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
-        HTTPException: 403 for unauthorized users
+        HTTPException: 403 for unauthorized users.
 
     Returns:
-        Any: the sotw object retreived
+        schemas.Sotw: The sotw object retreived.
     """
     sotw = crud.sotw.get(session=session, id=sotw_id)
 
@@ -119,20 +131,20 @@ async def get_sotw_invite_link(
     *,
     sotw_id: int,
     current_user: User = Depends(deps.get_current_user),
-) -> Any:
+) -> schemas.SotwInvite:
     """
-    Generate a link for sharing the sotw
+    Generate a link for sharing the sotw.
 
     Args:
-        sotw_id (int): ID of the sotw to share
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        sotw_id (int): ID of the sotw to share.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
-        HTTPException: 403 for unauthorized users
+        HTTPException: 403 for unauthorized users.
 
     Returns:
-        Any: the sotw object retreived
+        schemas.SotwInvite: The share link for the sotw.
     """
     sotw = crud.sotw.get(session=session, id=sotw_id)
 
@@ -159,20 +171,20 @@ async def get_sotw_invite_pending(
     *,
     share_token: str,
     current_user: User = Depends(deps.get_current_user),
-) -> Any:
+) -> schemas.SotwInfo:
     """
-    Get the basic info from the sotw
+    Intermediate step for joining a sotw.
 
     Args:
         share_token (int): JWT token with the sotw id for the user to get the name from
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
         HTTPException: 403 for unauthorized users
 
     Returns:
-        Any: the sotw object retreived
+        schemas.SotwInfo: The info for the sotw being joined.
     """
     try:
         # decode the token
@@ -209,20 +221,20 @@ async def get_sotw_invite_join(
     share_token: str,
     spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
     current_user: User = Depends(deps.get_current_user),
-) -> Any:
+) -> schemas.SotwInfo:
     """
-    Join a sotw from the share_token
+    Join a sotw from the share_token.
 
     Args:
-        share_token (int): JWT token with the sotw id for the user to join
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        share_token (int): JWT token with the sotw id for the user to join.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
         HTTPException: 403 for unauthorized users
 
     Returns:
-        Any: The id of the sotw object to be joined
+        schemas.SotwInfo: The id of the sotw object to be joined.
     """
     # must have spotify linked to join a sotw
     if not current_user.spotify_linked:
@@ -264,7 +276,7 @@ async def get_sotw_invite_join(
         user_playlist_name, user_playlist_description, session, current_user.id
     )
     user_playlist_create = schemas.UserPlaylistCreate(
-        id=user_playlist["id"],
+        playlist_id=user_playlist["id"],
         playlist_link=user_playlist["external_urls"]["spotify"],
         sotw_id=sotw.id,
         user_id=current_user.id,

@@ -56,7 +56,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="close()">Close</button>
           <div>
-            <button v-if="loading" type="button" class="btn btn-primary btn-spinner-register">
+            <button v-if="loading" type="button" class="btn btn-primary btn-spinner-create">
               <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
@@ -183,12 +183,8 @@ p {
 .invalid {
   color: #d91313;
 }
-.btn-spinner-register {
-  width: 84.34px;
-  height: 38px;
-}
-.btn-spinner-login {
-  width: 66.3px;
+.btn-spinner-create {
+  width: 73.7px;
   height: 38px;
 }
 .spinner-border {

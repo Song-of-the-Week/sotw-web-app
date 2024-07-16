@@ -3,10 +3,14 @@ import api from "@/shared/api";
 export default {
   state: {
     currentWeek: null,
+    currentWeekError: null,
   },
   getters: {
     getCurrentWeek: (state) => {
       return state.currentWeek;
+    },
+    getCurrentWeekError: (state) => {
+      return state.currentWeekError;
     },
   },
   actions: {
@@ -14,19 +18,26 @@ export default {
       await api.methods
         .apiGetWeek(id)
         .then(async (res) => {
-          await commit("setCurrentWeek", res.data);
+          if ("status" in res.data && "message" in res.data && "week" in res.data) {
+            await commit("setCurrentWeekError", res.data.message);
+            await commit("setCurrentWeek", res.data.week);
+          } else {
+            console.log("WHAT", res.data);
+            await commit("setCurrentWeekError", null);
+            await commit("setCurrentWeek", res.data);
+          }
         })
         .catch((err) => {
           localStorage.removeItem("activeSotwId");
         });
     },
-    async submitSurvey(sotwId, weekNum, payload) {
-      await api.methods.apiPostSurveyResponse(sotwId, weekNum, payload);
-    },
   },
   mutations: {
     setCurrentWeek(state, week) {
       state.currentWeek = week;
+    },
+    setCurrentWeekError(state, err) {
+      state.currentWeekError = err;
     },
   },
 };

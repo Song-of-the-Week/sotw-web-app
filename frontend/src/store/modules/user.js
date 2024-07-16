@@ -36,9 +36,11 @@ export default {
         });
     },
     async updateUser({ commit, state }, payload) {
+      console.log("PAYLOAD", payload);
       await api.methods
         .apiUpdateUser(state.user.id, payload)
         .then(async (res) => {
+          console.log("HELLO", res);
           await commit("setUser", res.data);
         })
         .catch((err) => {

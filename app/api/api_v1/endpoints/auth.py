@@ -1,18 +1,12 @@
-from ast import Str
 from datetime import datetime
-from typing import Any
-import base64
-import requests
+from typing import Dict
 
 from fastapi import APIRouter
-from fastapi import BackgroundTasks
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import Response
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
 from sqlalchemy.orm.session import Session
-from loguru import logger
 
 from app import crud
 from app import schemas
@@ -36,9 +30,20 @@ async def login(
     *,
     form_data: OAuth2PasswordRequestForm = Depends(),
     response: Response,
-) -> Any:
+) -> schemas.User:
     """
-    Get the JWT for a user from OAuth2 request body
+    Log the user in using the JWT for a user from OAuth2 request body.
+
+    Args:
+        response (Response): The response to be sent with the user that contains the cookie with the JWT.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        form_data (OAuth2PasswordRequestForm, optional): The username and password used to log in. Defaults to Depends().
+
+    Raises:
+        HTTPException: 400 when the app fails to authenticate the user based on the credentials given.
+
+    Returns:
+        schemas.User: The user object found after authentication.
     """
     user = authenticate(
         email=form_data.username, password=form_data.password, session=session
@@ -62,18 +67,32 @@ async def login(
 
 
 @router.get("/logout")
-async def logout(*, response: Response):
+async def logout(*, response: Response) -> Dict:
     """
-    Delete the user's Authorization cookie for logout
+    Delete the user's Authorization cookie for logout.
+
+    Args:
+        response (Response): The response to be sent with the user that contains no authorization cookie.
+
+    Returns:
+        Dict: A 200 response.
     """
     response.delete_cookie("Authorization")
     return {"status": 200}
 
 
 @router.get("/current_user", response_model=schemas.User)
-async def get_current_user(current_user: User = Depends(deps.get_current_user)):
+async def get_current_user(
+    current_user: User = Depends(deps.get_current_user),
+) -> schemas.User:
     """
-    Fetch the current logged in user
+    Fetch the currently logged in user.
+
+    Args:
+        current_user (User, optional): A dependency to get the authenticated user. Defaults to Depends(deps.get_current_user).
+
+    Returns:
+        schemas.User: The currently logged in user
     """
 
     return current_user
@@ -87,9 +106,20 @@ async def register(
     # background_tasks: BackgroundTasks,
     user_in: schemas.UserCreate,
     response: Response,
-) -> Any:
+) -> schemas.User:
     """
-    Register a new user
+    Register a new user.
+
+    Args:
+        user_in (schemas.UserCreate): The payload with the new user's information.
+        response (Response): The response to be sent with the new user that contains the cookie with the JWT.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+
+    Raises:
+        HTTPException: 400 when the user_in.email already exists in the database for another user.
+
+    Returns:
+        User: The newly created user
     """
     user = crud.user.get_by_email(session=session, email=user_in.email)
 
@@ -121,9 +151,12 @@ async def register(
 
 
 @router.get("/spotify-client-id")
-async def spotify_client_id():
+async def spotify_client_id() -> Dict:
     """
     Retrieve the client ID for the spotify API
+
+    Returns:
+        Dict: A dictionary with the app's Spotify client ID
     """
 
     return {"status": 200, "client_id": cfg.SPOTIFY_CLIENT_ID}
@@ -136,20 +169,21 @@ async def spotify_access_token(
     current_user: User = Depends(deps.get_current_user),
     spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
     payload: schemas.UserSpotifyAuth,
-) -> Any:
+) -> schemas.User:
     """
     Endpoint to link a user's spotify to the db by getting a new access token and the user's profile info
 
     Args:
-        payload (schemas.UserSpotifyAuth): A payload with the authorization code for spotify for the user
-        session (Session, optional): a sqlalchemy db session. Defaults to Depends(deps.get_session).
-        current_user (User, optional): the user making the request. Defaults to Depends(deps.get_current_user).
+        payload (schemas.UserSpotifyAuth): A payload with the authorization code for spotify for the user.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        current_user (User, optional): The currently logged in user making the request. Defaults to Depends(deps.get_current_user).
+        spotify_client (SpotifyClient, optional): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
 
     Raises:
         HTTPException: 401 if the request body state does not match the current user's info
 
     Returns:
-        Any: 202 upon a successful update of the user
+        schemas.User: 202 upon a successful update of the user.
     """
 
     if (

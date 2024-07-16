@@ -89,9 +89,14 @@ def test_get_current_week_n_406_not_enough_players(
     data = response.json()
 
     # Then
-    assert response.status_code == 406
+    assert response.status_code == 200
+    assert "week" in data.keys()
+    assert data["week"]["week_num"] == 0
+    assert "status" in data.keys()
+    assert data["status"] == 406
+    assert "message" in data.keys()
     assert (
-        data["detail"]
+        data["message"]
         == "You will need at least three players in your Song of the Week competition in order to continue playing."
     )
 
@@ -104,9 +109,14 @@ def test_get_current_week_n_406_not_enough_responses(
     data = response.json()
 
     # Then
-    assert response.status_code == 406
+    assert response.status_code == 200
+    assert "week" in data.keys()
+    assert data["week"]["week_num"] == 0
+    assert "status" in data.keys()
+    assert data["status"] == 406
+    assert "message" in data.keys()
     assert (
-        data["detail"]
+        data["message"]
         == "Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on 3 players to submit."
     )
 

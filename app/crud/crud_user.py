@@ -14,17 +14,27 @@ from app.core.security import get_password_hash
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, session: Session, *, email: str) -> Optional[User]:
         """
-        Session query to get an object from the database with the specified email
-        :session: a SQLAlchemy Session object that is connected to the database
-        :email: the email of the object being sought after
+        Get a user model object from the database with the specified email
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            email (str): The email of the user being sought after.
+
+        Returns:
+            Optional[User]: The user with the given email.
         """
         return session.query(User).filter(User.email == email).first()
 
     def create(self, session: Session, *, object_in: UserCreate) -> User:
         """
-        Creates a User in the database and creates a spotify playlist for the user
-        :session: a SQLAlchemy Session object that is connected to the database
-        :object_in: a pydantic model UserCreate object
+        Creates a User in the database with a hashed password.
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            object_in (UserCreate): A pydantic model used to create the user.
+
+        Returns:
+            User: The newly created user.
         """
 
         create_data = object_in.model_dump()
@@ -41,9 +51,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     ) -> User:
         """
         Adds the sotw to the user (and vice versa via model relationship)
-        :session: a SQLAlchemy Session object that is connected to the database
-        :db_object: a model object of the ser to update
-        :object_in: a sotw model
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            db_object (User): A model object of the user to update.
+            object_in (Sotw): A sotw model object to add to the user.
+
+        Returns:
+            User: The newly updated user.
         """
         db_object.sotw_list.append(object_in)
         session.add(db_object)

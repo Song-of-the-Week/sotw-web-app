@@ -1,15 +1,11 @@
 from datetime import datetime
-from typing import List
 
 from sqlalchemy import DateTime, String
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
-from app.models.song import Song
-from app.models.user_song_match import UserSongMatch
 
 
 class Results(Base):

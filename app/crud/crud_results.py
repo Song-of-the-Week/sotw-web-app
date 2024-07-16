@@ -18,12 +18,12 @@ class CRUDResults(CRUDBase[Results, ResultsCreate, ResultsUpdate]):
         Retrieve the results object with the corresponding week id and sotw id
 
         Args:
-            session (Session): a SQLAlchemy Session object that is connected to the database
-            week_id (int): the ID of the week for which the results are being sought
-            sotw_id (int): the ID of the sotw for which the results are being sought
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            week_id (int): The ID of the week for which the results are being sought.
+            sotw_id (int): The ID of the sotw for which the results are being sought.
 
         Returns:
-            Optional[Results]: a results object
+            Optional[Results]: A results model object.
         """
         return (
             session.query(Results)

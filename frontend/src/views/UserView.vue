@@ -213,15 +213,17 @@ export default {
   mounted() {
     const vm = this;
 
-    vm.userName = vm.user.name;
-    vm.userEmail = vm.user.email;
+    vm.getCurrentUser().then(() => {
+      vm.userName = vm.user.name;
+      vm.userEmail = vm.user.email;
+    });
 
     vm.buildSotwList();
 
     vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
   },
   methods: {
-    ...mapActions(["updateUser"]),
+    ...mapActions(["getCurrentUser", "updateUser"]),
     unlinkSpotify() {
       const vm = this;
       vm.updateUser({ spotify_linked: false }).catch((err) => {
@@ -291,6 +293,7 @@ export default {
           }
         })
         .catch((err) => {
+          console.log(err);
           if (err.response.status == 403) {
             vm.changePassword403 = err.response.data.detail;
           } else if (err.response.status == 500) {

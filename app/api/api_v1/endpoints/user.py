@@ -4,7 +4,6 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.orm.session import Session
-from loguru import logger
 
 from app import crud
 from app import schemas
@@ -31,7 +30,7 @@ async def update_user(
     Args:
         user_id (int): ID of the user to update
         payload (schemas.UserUpdate): Data to update user with
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
@@ -56,8 +55,6 @@ async def update_user(
             "spotify_access_token": None,
             "spotify_refresh_token": None,
         }
-    else:
-        payload = {}
 
     return crud.user.update(session=session, db_object=current_user, object_in=payload)
 
@@ -73,18 +70,18 @@ async def delete_user(
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
     """
-    Delete specified user
+    Delete specified user.
 
     Args:
         user_id (int): ID of the user to  delete
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
-        HTTPException: 403 for unauthorized users
+        HTTPException: 403 for unauthorized users.s
 
     Returns:
-        Any: The deleted object
+        Any: The deleted object.
     """
     if not current_user.is_superuser and user_id != current_user.id:
         raise HTTPException(status_code=403, detail=f"Not authorized to delete.")

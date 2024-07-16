@@ -14,15 +14,14 @@ from app.shared.config import cfg
 class CRUDSotw(CRUDBase[Sotw, SotwCreate, SotwUpdate]):
     def create(self, session: Session, *, object_in: SotwCreate) -> Sotw:
         """
-        Creates a Sotw object in the database and creates a spotify playlist for the
-        object as well as instatiates the datetime fields in the object
+        Creates a Sotw object in the database.
 
         Args:
-            session (Session): a SQLAlchemy Session object that is connected to the database
-            object_in (SotwCreate): a pydantic model SotwCreate object
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            object_in (SotwCreate): A pydantic model to create the sotw with.
 
         Returns:
-            Sotw: Newly created sotw object
+            Sotw: Newly created sotw object.
         """
         db_object = Sotw(**object_in.model_dump())
 

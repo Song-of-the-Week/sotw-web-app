@@ -28,9 +28,9 @@
 
         <p>
           Anyway, it looks like you're not logged in. Please
-          <router-link :to="`/login`"><a class="" @click="loginOrRegister()">login</a></router-link> or
-          <router-link :to="`/register`"><a class="" @click="loginOrRegister()">register</a></router-link> to enter or
-          start your own Song of the Week competition!
+          <router-link :to="`/login`"><a class="">login</a></router-link> or
+          <router-link :to="`/register`"><a class="">register</a></router-link> to enter or start your own Song of the
+          Week competition!
         </p>
       </div>
       <div v-else class="text-center">
@@ -49,7 +49,7 @@
                 <router-link
                   v-for="sotw in user.sotw_list"
                   class="list-group-item list-group-item-action"
-                  :to="`/sotw/` + sotw.id + `/survey`"
+                  :to="`/sotw/` + sotw.id"
                   >{{ sotw.name }}</router-link
                 >
               </div>
@@ -121,12 +121,6 @@ export default {
   },
   methods: {
     ...mapActions(["getSotw", "getCurrentUser"]),
-    loginOrRegister() {
-      const vm = this;
-      if (!vm.loginRegisterModal._isShown) {
-        vm.loginRegisterModal.show();
-      }
-    },
     create() {
       const vm = this;
       if (!vm.sotwCreationModal._isShown) {

@@ -9,7 +9,8 @@ from app.db.base_class import Base
 
 class UserPlaylist(Base):
 
-    id: Mapped[str] = mapped_column(String, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    playlist_id: Mapped[str] = mapped_column(String, nullable=True)
     playlist_link: Mapped[str] = mapped_column(String, nullable=True)
     sotw_id: Mapped[int] = mapped_column(ForeignKey("sotw.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))

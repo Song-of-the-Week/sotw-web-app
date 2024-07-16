@@ -12,10 +12,12 @@ class ResponsePost(Base):
     picked_song_2: Optional[int] = None
     user_song_matches: Optional[List[UserSongMatchBase]] = None
     next_song: str
+    repeat_approved: Optional[bool] = False
 
 
 class ResponseResponse(Base):
-    repeat: bool = False
+    valid: Optional[bool] = False
+    repeat: Optional[bool] = False
 
 
 class ResponseBase(Base):
@@ -50,5 +52,5 @@ class ResponseInDB(ResponseInDBBase): ...
 class Response(ResponseInDBBase):
     submitter_id: int
     user_song_matches: List[UserSongMatch]
-    num_correct_guesses: int
+    number_correct_matches: int
     votes: List[int]

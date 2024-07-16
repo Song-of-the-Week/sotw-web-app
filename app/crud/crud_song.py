@@ -15,15 +15,15 @@ class CRUDSong(CRUDBase[Song, SongCreate, SongUpdate]):
         self, session: Session, *, sotw_id: int, week_id: int
     ) -> List[Song]:
         """
-        Retrieves all the songs that were given in responses for a given week in a given sotw
+        Retrieves all the songs that were given in responses for a given week in a given sotw.
 
         Args:
-            session (Session): a SQLAlchemy Session object that is connected to the database
-            sotw_id (int): the id of the sotw for which the songs were submitted
-            week_id (int): the id of the week the songs were submitted
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            sotw_id (int): The id of the sotw for which the songs were submitted.
+            week_id (int): The id of the week the songs were submitted.
 
         Returns:
-            Song: A list of song objects
+            Song: A list of song objects.
         """
         return (
             session.query(Song)
@@ -32,18 +32,33 @@ class CRUDSong(CRUDBase[Song, SongCreate, SongUpdate]):
             .all()
         )
 
-    def get_song_by_name(self, session: Session, *, name: str) -> Song | None:
+    def get_song_by_name(
+        self, session: Session, *, name: str, sotw_id: int, week_id: int
+    ) -> Song | None:
         """
-        Retrieves a song with the same name value as the one given
+        Retrieves a song with the same name value as the one given.
 
         Args:
-            session (Session): a SQLAlchemy Session object that is connected to the database
-            name (str): the name of a song and the artist(s) like `song_name - artist(1, artist2, etc.)
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            name (str): The name of a song and the artist(s) like `song_name - artist(1, artist2, etc.).
+            sotw_id (int): The ID of the sotw being searched in.
+            week_id (int): The ID of the week to exclude from the search (only want songs from outside of the given week).
 
         Returns:
-            Song: A Song object from the db
+            Song: A Song object from the db.
         """
-        return session.query(Song).filter(Song.name == name).first()
+        return (
+            session.query(Song)
+            .join(Response)
+            .filter(
+                and_(
+                    Song.name == name,
+                    Response.sotw_id == sotw_id,
+                    Response.week_id != week_id,
+                )
+            )
+            .first()
+        )
 
 
 song = CRUDSong(Song)

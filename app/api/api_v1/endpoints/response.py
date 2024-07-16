@@ -1,30 +1,25 @@
-from datetime import datetime
-import json
-from typing import Any
-
+from typing import Union
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from requests import HTTPError
 from sqlalchemy.orm.session import Session
 from loguru import logger
-from jose import JWTError, jwt
 
 from app import crud
 from app import schemas
 from app.api import deps
 from app.clients.spotify import SpotifyClient
-from app.core.auth import create_access_token
 from app.models.user import User
-from app.models.sotw import Sotw
-from app.shared.config import cfg
-from app.shared.utils import get_next_datetime
 
 
 router = APIRouter()
 
 
 @router.post(
-    "/{sotw_id}/{week_num}", response_model=schemas.ResponseResponse, status_code=201
+    "/{sotw_id}/{week_num}",
+    response_model=schemas.ResponseResponse,
+    status_code=201,
 )
 async def post_survey_response(
     session: Session = Depends(deps.get_session),
@@ -34,17 +29,17 @@ async def post_survey_response(
     payload: schemas.ResponsePost,
     current_user: User = Depends(deps.get_current_user),
     spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
-) -> Any:
+) -> schemas.ResponseResponse:
     """
-    Receive and process a survey response from the front end
+    Receive and process a survey response from the front end.
 
     Args:
-        sotw_id (int): url param for the id of the sotw being responded to
-        week_num (int): url param number of the week that the response is for
-        payload (schemas.ResponsePost): The answers to the survey
-        session (Session, optional): db session. Defaults to Depends(deps.get_session).
-        current_user (User, optional): currently authenticated user. Defaults to Depends(deps.get_current_user).
-        spotify_client (SpotifyClient, optional): client for spotify interactions. Defaults to Depends(deps.get_spotify_client).
+        sotw_id (int): URL param for the id of the sotw being responded to.
+        week_num (int): URL param number of the week that the response is for.
+        payload (schemas.ResponsePost): The answers to the survey.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        current_user (User, optional): Currently authenticated user. Defaults to Depends(deps.get_current_user).
+        spotify_client (SpotifyClient, optional): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
 
     Raises:
         HTTPException: 404 - sotw not found
@@ -54,7 +49,7 @@ async def post_survey_response(
         HTTPException: 400 - incorrect payload
 
     Returns:
-        Any: A response telling the front endd if the song is a repeat
+        schemas.ResponseResponse: A response telling the front end if the song submitted is a repeat.s
     """
     # get the sotw and check permissions
     sotw = crud.sotw.get(session=session, id=sotw_id)
@@ -81,6 +76,15 @@ async def post_survey_response(
             detail=f"Survey responses can only be sent for the current week.",
         )
 
+    # validate the spotify link
+    next_song_track_id = payload.next_song.split("/")[-1].split("?")[0]
+    try:
+        song = spotify_client.get_track_info(
+            next_song_track_id, session, current_user.id
+        )
+    except HTTPError:
+        return schemas.ResponseResponse(repeat=False, valid=False)
+
     # check to see if current_user has submitted a response already and delete that response if so
     for response in current_week.responses:
         if current_user.id == response.submitter_id:
@@ -94,10 +98,6 @@ async def post_survey_response(
 
     if week_num == 0:
         # get song info and create the song in the db
-        next_song_track_id = payload.next_song.split("/")[-1].split("?")[0]
-        song = spotify_client.get_track_info(
-            next_song_track_id, session, current_user.id
-        )
         song_name = f"{song['name']} - {song['artists'][0]['name']}"
         for artist in song["artists"][1:]:
             song_name = song_name + f", {artist['name']}"
@@ -121,28 +121,28 @@ async def post_survey_response(
         response = crud.response.create(session=session, object_in=response_in)
 
         # add response to week
-        week = crud.week.add_response_to_week(
+        crud.week.add_response_to_week(
             session=session, db_object=current_week, object_in=response
         )
 
         # return a response with the current week
-        return schemas.ResponseResponse(repeat=False, week=week)
+        return schemas.ResponseResponse(repeat=False, valid=True)
     else:
-        # get song info and create the song in the db
-        next_song_track_id = payload.next_song.split("/")[-1].split("?")[0]
-        song = spotify_client.get_track_info(
-            next_song_track_id, session, current_user.id
-        )
         song_name = f"{song['name']} - {song['artists'][0]['name']}"
         for artist in song["artists"][1:]:
             song_name = song_name + f", {artist['name']}"
 
         # determine if this song has been submitted before:
-        repeat = (
-            False
-            if not crud.song.get_song_by_name(session=session, name=song_name)
-            else True
-        )
+        if (
+            crud.song.get_song_by_name(
+                session=session,
+                name=song_name,
+                sotw_id=sotw.id,
+                week_id=current_week.id,
+            )
+            and not payload.repeat_approved
+        ):
+            return schemas.ResponseResponse(repeat=True, valid=True)
 
         song_in = schemas.SongCreate(
             spotify_id=next_song_track_id,
@@ -184,7 +184,8 @@ async def post_survey_response(
             crud.user_song_match.create(session=session, object_in=user_song_match_in)
 
         # update the response
-        crud.response.update(
+        session.refresh(response)
+        response = crud.response.update(
             session=session,
             db_object=response,
             object_in=schemas.ResponseUpdate(
@@ -193,9 +194,9 @@ async def post_survey_response(
         )
 
         # add response to week
-        week = crud.week.add_response_to_week(
+        crud.week.add_response_to_week(
             session=session, db_object=current_week, object_in=response
         )
 
         # return a response with the current week
-        return schemas.ResponseResponse(repeat=repeat)
+        return schemas.ResponseResponse(repeat=False, valid=True)

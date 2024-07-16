@@ -54,9 +54,14 @@ oauth2_scheme = OAuth2PasswordBearerCookie(token_url=f"{cfg.API_V1_STR}/auth/log
 def authenticate(*, email: str, password: str, session: Session) -> Optional[User]:
     """
     Authenticate the user with the email and password provided
-    :email: the email of the user to be authenticated
-    :password: the password of the user to be authenticated
-    :session: a database session
+
+    Args:
+        email (str): The email of the user to be authenticated.
+        password (str): The password of the user to be authenticated.
+        session (Session): A SQLAlchemy Session object that is connected to the database.
+
+    Returns:
+        Optional[User]: The authenticated user.
     """
     user = session.query(User).filter(User.email == email).first()
     if not user or not verify_password(password, user.password):
@@ -68,6 +73,16 @@ def authenticate(*, email: str, password: str, session: Session) -> Optional[Use
 def create_access_token(
     *, sub: str, lifetime: int = cfg.ACCESS_TOKEN_EXPIRE_MINUTES
 ) -> str:
+    """
+    Create a JWT access token with a `lifetime` expiry time.
+
+    Args:
+        sub (str): The data being stored in the token.
+        lifetime (int, optional): The number of minutes for the newly created token will be alive. Defaults to cfg.ACCESS_TOKEN_EXPIRE_MINUTES.
+
+    Returns:
+        str: A new JWT.
+    """
     return _create_token(
         token_type="access_token",
         lifetime=timedelta(minutes=lifetime),
@@ -76,6 +91,17 @@ def create_access_token(
 
 
 def _create_token(token_type: str, lifetime: timedelta, sub: str) -> str:
+    """
+    Helper function to create a JWT.
+
+    Args:
+        token_type (str): The type of token this is.
+        lifetime (timedelta): The time in minutes for this token to expire.
+        sub (str): The subject data of the token.
+
+    Returns:
+        str: A new JWT with specified info.
+    """
     payload = {}
     expire = datetime.utcnow() + lifetime
     payload["type"] = token_type

@@ -1,51 +1,50 @@
 from datetime import datetime
 import json
 import random
-from typing import Any
+from typing import Any, Union
 
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
-from sqlalchemy.orm.session import Session
 from loguru import logger
-from jose import JWTError, jwt
+from sqlalchemy.orm.session import Session
 
 from app import crud
 from app import schemas
 from app.api import deps
 from app.clients.spotify import SpotifyClient
-from app.core.auth import create_access_token
 from app.models.user import User
-from app.models.sotw import Sotw
-from app.shared.config import cfg
 from app.shared.utils import get_next_datetime
 
 
 router = APIRouter()
 
 
-@router.get("/{sotw_id}/current_week", response_model=schemas.Week)
+@router.get(
+    "/{sotw_id}/current_week",
+    response_model=Union[schemas.Week, schemas.WeekErrorResponse],
+)
 async def get_current_week(
     session: Session = Depends(deps.get_session),
     *,
     sotw_id: int,
     spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
     current_user: User = Depends(deps.get_current_user),
-) -> Any:
+) -> schemas.Week:
     """
     Retrieve the current week for the sotw with the sotw id given.
 
     Args:
         sotw_id (int): ID of the sotw to retreive
-        session (Session, optional): Sqlalchemy db session for db operations. Defaults to Depends(deps.get_session).
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
         spotify_client (SpotifyClient, optional): Client to communicate with spotify api.
         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
 
     Raises:
-        HTTPException: 403 for unauthorized users
+        HTTPException: 403 for unauthorized users.
 
     Returns:
-        Any: the sotw object retreived
+        schemas.Week: the week object retreived - the current week for the given sotw.
     """
     # get the sotw and check permissions
     sotw = crud.sotw.get(session=session, id=sotw_id)
@@ -59,6 +58,13 @@ async def get_current_week(
 
     # query to find out what the current week is
     current_week = crud.week.get_current_week(session=session, sotw_id=sotw.id)
+
+    submitted = False
+    if current_week is not None:
+        for response in current_week.responses:
+            if current_user.id == response.submitter_id:
+                submitted = True
+                break
 
     # check to see if we need a new week
     if not current_week:
@@ -83,14 +89,16 @@ async def get_current_week(
         # we have passed this week's next results release datetime, now determine if we can make a new week based on if there are enough players in the sotw competition and if each player in the sotw has submitted a response.
         sotw_num_users = len(sotw.user_list)
         if sotw_num_users < 3:
-            raise HTTPException(
-                status_code=406,
-                detail=f"You will need at least three players in your Song of the Week competition in order to continue playing.",
+            return schemas.WeekErrorResponse(
+                week=schemas.Week(submitted=submitted, **current_week.__dict__),
+                status=406,
+                message=f"You will need at least three players in your Song of the Week competition in order to continue playing.",
             )
         if len(current_week.responses) < sotw_num_users:
-            raise HTTPException(
-                status_code=406,
-                detail=f"Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on {sotw_num_users - len(current_week.responses)} players to submit.",
+            return schemas.WeekErrorResponse(
+                week=schemas.Week(submitted=submitted, **current_week.__dict__),
+                status=406,
+                message=f"Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on {sotw_num_users - len(current_week.responses)} player{'s' if sotw_num_users - len(current_week.responses) > 1 else ''} to submit.",
             )
 
         # create the results for the previous week and update user playlists
@@ -116,7 +124,7 @@ async def get_current_week(
                 )
                 # add the song to the playlist
                 spotify_client.add_songs_to_playlist(
-                    playlist_id=playlist.id,
+                    playlist_id=playlist.playlist_id,
                     uris=[f"spotify:track:{song.spotify_id}"],
                     session=session,
                     user_id=current_user.id,
@@ -128,6 +136,7 @@ async def get_current_week(
                     "name": song.name,
                     "voters": [],
                     "submitter": user.name,
+                    "spotify_id": song.spotify_id,
                 }
 
             # create results for previous week
@@ -161,34 +170,52 @@ async def get_current_week(
                 )
 
             # calculate first and second places
-            first_place = []
-            second_place = []
+            first_place_names = []
+            first_place_ids = []
             first_place_votes = 0
+            second_place_names = []
+            second_place_ids = []
             second_place_votes = 0
-            for song in all_songs:
-                num_votes = len(all_songs[song]["voters"])
+            for song_id in all_songs:
+                num_votes = len(all_songs[song_id]["voters"])
                 if num_votes == first_place_votes:
-                    first_place.append(all_songs[song]["name"])
+                    # add first place ties
+                    first_place_names.append(all_songs[song_id]["name"])
+                    first_place_ids.append(all_songs[song_id]["spotify_id"])
                 elif num_votes > first_place_votes:
+                    # new first place votes
                     first_place_votes = num_votes
-                    second_place = first_place
-                    first_place = [all_songs[song]["name"]]
+                    second_place_names = first_place_names
+                    first_place_names = [all_songs[song_id]["name"]]
+                    first_place_ids = [all_songs[song_id]["spotify_id"]]
                 elif num_votes == second_place_votes:
-                    second_place.append(all_songs[song]["name"])
+                    # add second place ties
+                    second_place_names.append(all_songs[song_id]["name"])
+                    second_place_ids.append(all_songs[song_id]["spotify_id"])
                 elif num_votes > second_place_votes:
+                    # new second place votes
                     second_place_votes = num_votes
-                    second_place = [all_songs[song]["name"]]
+                    second_place_names = [all_songs[song_id]["name"]]
+                    second_place_ids = [all_songs[song_id]["spotify_id"]]
 
             # create the results for the previous week
             results_in = schemas.ResultsCreate(
                 sotw_id=sotw.id,
                 week_id=current_week.id,
-                first_place=json.dumps(first_place),
-                second_place=json.dumps(second_place),
+                first_place=json.dumps(first_place_names),
+                second_place=json.dumps(second_place_names),
                 all_songs=json.dumps(all_songs),
                 guessing_data=json.dumps(guessing_data),
             )
             crud.results.create(session=session, object_in=results_in)
+
+            # add first and second place songs to the soty playlsit
+            uris = []
+            for song_id in first_place_ids + second_place_ids:
+                uris.append(f"spotify:track:{song_id}")
+            spotify_client.add_songs_to_playlist(
+                sotw.soty_playlist_id, uris, session, current_user.id
+            )
 
         # get the next results release timestamp
         results_datetime = datetime.fromtimestamp(sotw.results_datetime / 1000.0)
@@ -217,6 +244,10 @@ async def get_current_week(
             uris.append(f"spotify:track:{response.next_song.spotify_id}")
         spotify_client.add_songs_to_playlist(
             playlist_id, uris, session, current_user.id
+        )
+        # also add these songs to the master playlist for the sotw
+        spotify_client.add_songs_to_playlist(
+            sotw.master_playlist_id, uris, session, current_user.id
         )
 
         # create survey object with the responses from `current_week`
@@ -257,9 +288,7 @@ async def get_current_week(
         # create the new current week
         current_week = crud.week.create(session=session, object_in=next_week)
 
-    submitted = False
-    for response in current_week.responses:
-        if current_user.id == response.submitter_id:
-            submitted = True
+        # user has not submitted for this new week
+        submitted = False
 
     return schemas.Week(submitted=submitted, **current_week.__dict__)

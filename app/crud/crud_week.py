@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import List, Optional
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -12,19 +12,29 @@ from app.schemas.week import WeekUpdate
 
 
 class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
-    def get_by_sotw_id(self, session: Session, *, sotw_id: int) -> Optional[Week]:
+    def get_by_sotw_id(self, session: Session, *, sotw_id: int) -> Optional[List[Week]]:
         """
-        Session query to get all the weeks in a sotw
-        :session: a SQLAlchemy Session object that is connected to the database
-        :sotw_id: the sotw id of the Weeks being sought after
+        Get all the weeks in a sotw.
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            sotw_id (int): The sotw ID of the Weeks being sought after.
+
+        Returns:
+            Optional[List[Week]]: A list of week model objects for the given sotw.
         """
         return session.query(Week).filter(Week.sotw_id == sotw_id).all()
 
     def get_current_week(self, session: Session, *, sotw_id: int) -> Optional[Week]:
         """
         Session query to get the current week from a sotw
-        :session: a SQLAlchemy Session object that is connected to the database
-        :sotw_id: the sotw id of the Week being sought after
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            sotw_id (int): The sotw ID of the Week being sought after.
+
+        Returns:
+            Optional[Week]: The latest week model object in the sotw.
         """
         sub_query = self._get_current_week_num(session=session, sotw_id=sotw_id)
         return (
@@ -37,28 +47,38 @@ class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
         self, session: Session, *, sotw_id: int
     ) -> Optional[Week]:
         """
-        Session query to get the current week from a sotw
-        :session: a SQLAlchemy Session object that is connected to the database
-        :sotw_id: the sotw id of the Week being sought after
+        Helper function to get the current week in a sotw.
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            sotw_id (int): The sotw ID of the Week being sought after.
+
+        Returns:
+            Optional[Week]: The week model object with the maximum week_num value for the given sotw.
         """
         return (
             session.query(func.max(Week.week_num))
             .filter(Week.sotw_id == sotw_id)
             .scalar()
         )
-    
-    def get_week_by_number(self, session: Session, *, week_num: int, sotw_id: int) -> Optional[Week]:
+
+    def get_week_by_number(
+        self, session: Session, *, week_num: int, sotw_id: int
+    ) -> Optional[Week]:
         """
         Session query to get the current week from a sotw
-        :session: a SQLAlchemy Session object that is connected to the database
-        :week_num: the number of the Week being sought after
-        :sotw_id: the sotw id of the Week being sought after
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            week_num (int): The number of the week being sought after.
+            sotw_id (int): The sotw ID of the week being sought after.
+
+        Returns:
+            Optional[Week]: The week model object with the given number for the given sotw.
         """
         return (
             session.query(Week)
-            .filter(
-                and_(Week.week_num == week_num, Week.sotw_id == sotw_id)
-            )
+            .filter(and_(Week.week_num == week_num, Week.sotw_id == sotw_id))
             .scalar()
         )
 
@@ -67,9 +87,14 @@ class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
     ) -> Week:
         """
         Adds the response to the week (and vice versa via model relationship)
-        :session: a SQLAlchemy Session object that is connected to the database
-        :db_object: a model object of the week to update
-        :object_in: a response
+
+        Args:
+            session (Session): a SQLAlchemy Session object that is connected to the database.
+            db_object (Week): a model object of the week to update.
+            object_in (Response): A response model object.
+
+        Returns:
+            Week: The week given with the new response in it's responses list.
         """
         db_object.responses.append(object_in)
         session.add(db_object)

@@ -78,6 +78,7 @@
       </div>
     </div>
   </nav>
+  <!-- Modals -->
   <LoginRegisterModal
     :registering="loginRegistering"
     :login-register-modal="loginRegisterModal"
@@ -136,10 +137,11 @@ export default {
     if (vm.isLoggedIn) {
       vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
       vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+      vm.getCurrentUser();
     }
   },
   methods: {
-    ...mapActions(["logout"]),
+    ...mapActions(["logout", "getCurrentUser"]),
     login() {
       const vm = this;
       if (!vm.loginRegisterModal._isShown) {
@@ -165,6 +167,7 @@ export default {
     $route: {
       immediate: true,
       handler: function (newVal, oldVal) {
+        // console.log("WHAT", newVal, oldVal);
         const vm = this;
 
         if (oldVal && oldVal.path != "/login" && oldVal.path != "/register" && oldVal.path != "/sotw/create") {

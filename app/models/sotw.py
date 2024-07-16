@@ -15,7 +15,9 @@ class Sotw(Base):
     name: Mapped[str]
     results_datetime: Mapped[float]
     master_playlist_link: Mapped[str]
+    master_playlist_id: Mapped[str]
     soty_playlist_link: Mapped[str]
+    soty_playlist_id: Mapped[str]
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.utcnow())
     owner_id: Mapped[int]
     user_list = relationship(

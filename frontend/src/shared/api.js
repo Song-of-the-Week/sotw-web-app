@@ -52,5 +52,9 @@ export default {
     apiPostSurveyResponse(sotwId, weekNum, payload) {
       return axios.post(config.BASE_API_V1_URL + "response/" + sotwId + "/" + weekNum, payload);
     },
+    // RESULTS
+    apiGetResults(sotwId, weekNum) {
+      return axios.get(config.BASE_API_V1_URL + "results/" + sotwId + "/" + weekNum);
+    },
   },
 };

@@ -1,9 +1,52 @@
 <template>
   <div class="container">
     <h2>Survey</h2>
-    <form class="row form-horizontal justify-content-center" id="surveyForm" @submit.prevent="submit">
+    <div v-if="submitted">
+      <div class="row">
+        <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+          <div class="card px-0 mb-4">
+            <div class="card-header">Thank you for submitting!</div>
+            <div v-if="weekError != null" class="card-body">
+              <div class="row">
+                <div class="col">
+                  <p>Results for this week are not quite ready yet:</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <p>{{ weekError }}</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <button class="btn btn-outline-warning" @click="edit()">Edit Submission</button>
+                </div>
+              </div>
+            </div>
+            <div v-else class="card-body">
+              <div class="row">
+                <div class="col">
+                  <p>Results for this week will be available in:</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <Countdown :release-timestamp="week.next_results_release" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <button class="btn btn-outline-warning" @click="edit()">Edit Submission</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form v-else class="row form-horizontal justify-content-center" id="surveyForm" @submit.prevent="submit(false)">
       <!-- Pick your top 2 -->
-      <div v-if="!firstWeek" class="row" id="voteCard">
+      <div v-if="!week.week_num == 0" class="row" id="voteCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ invalid: !voteValid }">
             <div class="card-header">
@@ -18,10 +61,10 @@
                       <input
                         class="form-check-input me-3"
                         type="checkbox"
-                        :value="song"
+                        :value="song.id"
                         v-model="pickedSongs"
                         :id="'vote-' + song.id"
-                        :disabled="pickedSongs.length >= 2 && pickedSongs.indexOf(song) === -1"
+                        :disabled="pickedSongs.length >= 2 && pickedSongs.indexOf(song.id) === -1"
                       />
                     </div>
                     <div class="col">
@@ -35,7 +78,7 @@
         </div>
       </div>
       <!-- Match user with song -->
-      <div v-if="!firstWeek" class="row" id="matchCard">
+      <div v-if="!week.week_num == 0" class="row" id="matchCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ 'match-invalid': !matchValid }">
             <div class="card-header" :class="{ invalid: !matchValid }">
@@ -97,26 +140,72 @@
         </div>
       </div>
       <!-- Submit -->
+      <div v-if="!user.spotify_linked" class="row">
+        <div class="col col-10 col-sm-6 offset-1 offset-sm-3 text-start">
+          <p>You need to link your Spotify account to participate in Song of the Week.</p>
+        </div>
+      </div>
       <div class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3 text-start">
-          <button type="submit" class="btn btn-primary mb-3">Submit</button>
+          <button v-if="loading" type="button" class="btn btn-primary mb-3 btn-spinner-submit">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+          <button v-else type="submit" class="btn btn-primary mb-3" :disabled="!user.spotify_linked">Submit</button>
         </div>
       </div>
     </form>
   </div>
+  <!-- Modal -->
+  <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelby="alertModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Alert!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            The song you just submitted has already been submitted to this Song of the Week competition for a prior
+            week. Would you like to submit it anyway?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Edit Submission</button>
+          <div>
+            <button v-if="loading" type="button" class="btn btn-primary btn-spinner-create">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </button>
+            <button v-else type="button" class="btn btn-primary" @click="submit(true)">Submit Anyway</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
+import api from "@/shared/api";
+import Countdown from "@/components/Countdown.vue";
 export default {
   name: "Survey",
+  components: {
+    Countdown,
+  },
   props: {
-    surveyString: String,
-    weekNum: Number,
+    week: {
+      default: null,
+    },
+    weekError: {
+      default: null,
+    },
   },
   data() {
     return {
-      firstWeek: true,
       songs: [],
       users: [],
       pickedSongs: [],
@@ -125,41 +214,43 @@ export default {
       voteValid: true,
       matchValid: true,
       songValid: true,
+      alertModal: null,
+      submitted: false,
+      loading: false,
     };
   },
-  computed: {},
+  computed: {
+    ...mapGetters({ user: "getUser" }),
+  },
   mounted() {
     const vm = this;
 
-    if (vm.surveyString.length != 0) {
-      let surveyJson = JSON.parse(vm.surveyString);
+    vm.submitted = vm.week.submitted;
 
-      vm.songs = surveyJson.songs;
-      vm.users = surveyJson.users;
+    vm.alertModal = new window.bootstrap.Modal("#alertModal");
 
-      vm.songs.forEach((song) => {
-        vm.userSongMatches.push({
-          id: song.id,
-          user: undefined,
-          song: song,
-          error: false,
+    vm.$nextTick(() => {
+      console.log("UHUHUHUHUHHU", vm.week);
+      if (vm.week.survey.length != 0) {
+        console.log("OKAY WHAT THE FUCK", vm.week.survey);
+        let surveyJson = JSON.parse(vm.week.survey);
+
+        vm.songs = surveyJson.songs;
+        vm.users = surveyJson.users;
+
+        vm.songs.forEach((song) => {
+          vm.userSongMatches.push({
+            id: song.id,
+            user: undefined,
+            song: song,
+            error: false,
+          });
         });
-      });
-    }
-
-    // vm.songs = [
-    //   { id: 0, name: "Good Will Hunting - Black Country, New Road" },
-    //   { id: 1, name: "Houdini - Dua Lipa" },
-    //   { id: 2, name: "Here Comes the Sun - The Beatles" },
-    // ];
-    // vm.users = [
-    //   { id: 0, name: "Jake", matched: false },
-    //   { id: 1, name: "Joan", matched: false },
-    //   { id: 2, name: "Daniel", matched: false },
-    // ];
+      }
+    });
   },
   methods: {
-    ...mapActions(["submitSurvey"]),
+    ...mapActions(["getWeek"]),
     matchUserSong(song, user) {
       const vm = this;
       // remove the user from any other matches it has
@@ -175,28 +266,20 @@ export default {
       song.user = user;
       song.user.matched = true;
     },
-    async submit() {
+    edit() {
+      const vm = this;
+      vm.submitted = false;
+    },
+    async submit(repeatApproved = false) {
       const vm = this;
 
-      // validate spotify link
-      if (vm.nextSong.length > 0) {
-        // parse out the track id
-        const trackId = vm.nextSong.split("/").pop().split("?")[0];
-        console.log(trackId);
-        // TODO send track id to API endpoint to validate the track on the back end
-        vm.songValid = true;
-      } else {
-        vm.songValid = false;
-        location.href = "#songCard";
-      }
-
-      if (vm.firstWeek) {
+      if (vm.week.week_num == 0) {
         if (vm.songValid) {
           let payload = {
-            nextSong: vm.nextSong,
+            next_song: vm.nextSong,
           };
 
-          vm.submitSurvey(vm.$route.params.sotwId, vm.weekNum, payload);
+          vm.submitSurvey(vm.$route.params.sotwId, vm.week.week_num, payload);
         }
       } else {
         // validate song matching
@@ -205,7 +288,6 @@ export default {
           if (e.user === undefined) {
             e.error = true;
             errCount++;
-            console.log(errCount);
           } else {
             e.error = false;
           }
@@ -214,7 +296,6 @@ export default {
           vm.matchValid = false;
           location.href = "#matchCard";
         } else {
-          console.log(errCount);
           vm.matchValid = true;
         }
 
@@ -227,25 +308,54 @@ export default {
         }
 
         // send form data to back end
-        if (vm.nameValid && vm.voteValid && vm.matchValid && vm.songValid) {
+        if (vm.voteValid && vm.matchValid && vm.songValid) {
           // construct the payload
           let payloadMatches = [];
           vm.userSongMatches.forEach((match) => {
             payloadMatches.push({
-              songId: match.song.id,
-              userId: match.user.id,
+              song_id: match.song.id,
+              user_id: match.user.id,
             });
           });
           let payload = {
-            pickedSong1: vm.pickedSongs[0],
-            pickedSong2: vm.pickedSongs[1],
-            userSongMatches: payloadMatches,
-            nextSong: vm.nextSong,
+            picked_song_1: vm.pickedSongs[0],
+            picked_song_2: vm.pickedSongs[1],
+            user_song_matches: payloadMatches,
+            next_song: vm.nextSong,
+            repeat_approved: repeatApproved,
           };
           // send valid form data to back end to evaluate form and add to database
-          vm.submitSurvey(vm.$route.params.sotwId, vm.weekNum, payload);
+          vm.submitSurvey(vm.$route.params.sotwId, vm.week.week_num, payload);
         }
       }
+    },
+    async submitSurvey(sotwId, weekNum, payload) {
+      const vm = this;
+      vm.loading = true;
+      console.log(payload.repeat_approved);
+      await api.methods
+        .apiPostSurveyResponse(sotwId, weekNum, payload)
+        .then((res) => {
+          if (res.status == 201) {
+            if (!res.data.valid) {
+              vm.songValid = false;
+              location.href = "#songCard";
+            } else if (res.data.repeat) {
+              vm.alertModal.show();
+            } else {
+              vm.songValid = true;
+              if (vm.alertModal._isShown) {
+                vm.alertModal.hide();
+              }
+              location.href = "/sotw/" + sotwId;
+            }
+          }
+          vm.loading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+          vm.loading = false;
+        });
     },
   },
 };
@@ -262,5 +372,9 @@ export default {
 }
 .match-item-invalid {
   color: #d91313;
+}
+.btn-spinner-submit {
+  width: 76.36px;
+  height: 38px;
 }
 </style>

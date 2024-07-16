@@ -537,6 +537,54 @@ def run_around_tests():
     Base.metadata.drop_all(bind=engine)
 
 
+def _create_song_response(
+    spotify_id,
+    name,
+    spotify_link,
+    submitter_id,
+    sotw,
+    week,
+    picked_song_1_id: int = None,
+    picked_song_2_id: int = None,
+):
+    # add song
+    song_in = schemas.SongCreate(
+        spotify_id=spotify_id,
+        name=name,
+        spotify_link=spotify_link,
+        submitter_id=submitter_id,
+    )
+    song = crud.song.create(session=override_session, object_in=song_in)
+    # add response
+    response_in = schemas.ResponseCreate(
+        next_song_id=song.id,
+        sotw_id=sotw.id,
+        week_id=week.id,
+        submitter_id=submitter_id,
+    )
+    if picked_song_1_id is not None and picked_song_2_id is not None:
+        response_in.picked_song_1_id = picked_song_1_id
+        response_in.picked_song_2_id = picked_song_2_id
+    response = crud.response.create(session=override_session, object_in=response_in)
+    crud.week.add_response_to_week(
+        session=override_session,
+        db_object=week,
+        object_in=response,
+    )
+    return response
+
+
+def _create_user_song_match(response, user_id, song_id, correct):
+    # add user_song_matches
+    user_song_match_in = schemas.UserSongMatchCreate(
+        user_id=user_id,
+        song_id=song_id,
+        correct_guess=correct,
+        response_id=response.id,
+    )
+    crud.user_song_match.create(session=override_session, object_in=user_song_match_in)
+
+
 @pytest.fixture()
 def sotw():
     # create a sotw for testing responses
@@ -580,7 +628,7 @@ def current_week_not_enough_players(sotw):
     user = override_get_current_user()
     crud.user.add_user_to_sotw(session=override_session, db_object=user, object_in=sotw)
     user_playlist_create = schemas.UserPlaylistCreate(
-        id="abc123",
+        playlist_id="abc123",
         playlist_link="www.spotify.com",
         sotw_id=sotw.id,
         user_id=user.id,
@@ -624,7 +672,7 @@ def current_week_not_enough_responses(sotw, current_week_not_enough_players):
     user = crud.user.create(override_session, object_in=user_in)
     crud.user.add_user_to_sotw(session=override_session, db_object=user, object_in=sotw)
     user_playlist_create = schemas.UserPlaylistCreate(
-        id="abc456",
+        playlist_id="abc456",
         playlist_link="www.spotify.com",
         sotw_id=sotw.id,
         user_id=user.id,
@@ -641,7 +689,7 @@ def current_week_not_enough_responses(sotw, current_week_not_enough_players):
     user = crud.user.create(override_session, object_in=user_in)
     crud.user.add_user_to_sotw(session=override_session, db_object=user, object_in=sotw)
     user_playlist_create = schemas.UserPlaylistCreate(
-        id="xyz123",
+        playlist_id="xyz123",
         playlist_link="www.spotify.com",
         sotw_id=sotw.id,
         user_id=user.id,
@@ -773,54 +821,6 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
         db_object=response_3,
         object_in=schemas.ResponseUpdate(number_correct_matches=1),
     )
-
-
-def _create_song_response(
-    spotify_id,
-    name,
-    spotify_link,
-    submitter_id,
-    sotw,
-    week,
-    picked_song_1_id: int = None,
-    picked_song_2_id: int = None,
-):
-    # add song
-    song_in = schemas.SongCreate(
-        spotify_id=spotify_id,
-        name=name,
-        spotify_link=spotify_link,
-        submitter_id=submitter_id,
-    )
-    song = crud.song.create(session=override_session, object_in=song_in)
-    # add response
-    response_in = schemas.ResponseCreate(
-        next_song_id=song.id,
-        sotw_id=sotw.id,
-        week_id=week.id,
-        submitter_id=submitter_id,
-    )
-    if picked_song_1_id is not None and picked_song_2_id is not None:
-        response_in.picked_song_1_id = picked_song_1_id
-        response_in.picked_song_2_id = picked_song_2_id
-    response = crud.response.create(session=override_session, object_in=response_in)
-    crud.week.add_response_to_week(
-        session=override_session,
-        db_object=week,
-        object_in=response,
-    )
-    return response
-
-
-def _create_user_song_match(response, user_id, song_id, correct):
-    # add user_song_matches
-    user_song_match_in = schemas.UserSongMatchCreate(
-        user_id=user_id,
-        song_id=song_id,
-        correct_guess=correct,
-        response_id=response.id,
-    )
-    crud.user_song_match.create(session=override_session, object_in=user_song_match_in)
 
 
 @pytest.fixture()

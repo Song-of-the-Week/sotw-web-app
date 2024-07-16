@@ -1,7 +1,5 @@
 import json
-from unittest.mock import patch
 
-from app.models.user import User
 from app.shared.config import cfg
 
 
@@ -13,7 +11,6 @@ def test_update_user_wrong_id_403(client):
     }
     response = client.put(f"{cfg.API_V1_STR}/user/{3}", data=json.dumps(payload))
     data = response.json()
-    print(f"HELLLLLOOOO {data}")
 
     # Then
     assert response.status_code == 403
