@@ -13,6 +13,14 @@ const routes = [
 
     children: [
       {
+        path: "/auth/verify/:verificationToken",
+        props: true,
+        name: "verify",
+        meta: {
+          guest: true,
+        },
+      },
+      {
         path: "register",
         props: true,
         name: "register",
@@ -36,6 +44,15 @@ const routes = [
         name: "invite",
         meta: {
           inviteModal: true,
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "link-spotify",
+        props: true,
+        name: "spotify",
+        meta: {
+          spotifyModal: true,
           requiresAuth: true,
         },
       },
@@ -130,6 +147,19 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
+  },
+  {
+    path: "/user/email/verify/:verificationToken",
+    name: "email",
+    component: () => import(/* webpackChunkName: "user" */ "../views/UserView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/password-reset/:verificationToken",
+    name: "password",
+    component: () => import("../views/PasswordResetView.vue"),
   },
   {
     path: "/403",

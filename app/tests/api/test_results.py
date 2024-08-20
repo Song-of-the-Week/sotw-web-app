@@ -1,10 +1,4 @@
-from datetime import datetime
-import json
-import random
-from unittest.mock import patch
-
 from app.shared.config import cfg
-from app.shared.utils import get_next_datetime
 
 
 def test_get_results_404_sotw_not_found(client):

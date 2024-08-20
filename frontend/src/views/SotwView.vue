@@ -119,7 +119,7 @@
           </div>
         </div>
         <div
-          class="tab-pane fade"
+          class="tab-pane fade spotify-playlist"
           :class="activeClass('playlist')"
           id="current-playlist-tab-pane"
           role="tabpanel"
@@ -127,10 +127,10 @@
           tabindex="0"
         >
           <h1>Current Playlist</h1>
-          <a :href="currentWeek.playlist_link" target="_blank">{{ currentWeek.playlist_link }}</a>
+          <SpotifyEmbed :spotify-link="currentWeek.playlist_link" type="playlist" />
         </div>
         <div
-          class="tab-pane fade"
+          class="tab-pane fade spotify-playlist"
           :class="activeClass('soty')"
           id="soty-playlist-tab-pane"
           role="tabpanel"
@@ -138,10 +138,10 @@
           tabindex="0"
         >
           <h1>Soty Playlist</h1>
-          <a :href="sotw.soty_playlist_link" target="_blank">{{ sotw.soty_playlist_link }}</a>
+          <SpotifyEmbed :spotify-link="sotw.soty_playlist_link" type="playlist" />
         </div>
         <div
-          class="tab-pane fade"
+          class="tab-pane fade spotify-playlist"
           :class="activeClass('playlist_list')"
           id="master-playlist-tab-pane"
           role="tabpanel"
@@ -149,7 +149,7 @@
           tabindex="0"
         >
           <h1>Master Playlist</h1>
-          <a :href="sotw.master_playlist_link" target="_blank">{{ sotw.master_playlist_link }}</a>
+          <SpotifyEmbed :spotify-link="sotw.master_playlist_link" type="playlist" />
         </div>
       </div>
     </div>
@@ -161,6 +161,7 @@ import { mapActions, mapGetters } from "vuex";
 import Countdown from "@/components/Countdown.vue";
 import Survey from "@/components/Survey.vue";
 import Results from "@/components/Results.vue";
+import SpotifyEmbed from "@/components/SpotifyEmbed.vue";
 
 export default {
   name: "SotwView",
@@ -168,6 +169,7 @@ export default {
     Countdown,
     Survey,
     Results,
+    SpotifyEmbed,
   },
   data() {
     return {
@@ -176,20 +178,26 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ sotw: "getActiveSotw", currentWeek: "getCurrentWeek", currentWeekError: "getCurrentWeekError" }),
+    ...mapGetters({
+      sotw: "getActiveSotw",
+      currentWeek: "getCurrentWeek",
+      currentWeekError: "getCurrentWeekError",
+      user: "getUser",
+    }),
   },
   beforeMount() {
     const vm = this;
 
-    if (!vm.sotw || vm.sotw.id != vm.$route.params.sotwId) {
+    if (!vm.sotw || vm.sotw.id != vm.$route.params.sotwId || vm.user.sotw_list.indexOf(vm.sotw.id) == -1) {
       vm.loading = true;
       vm.getSotw(vm.$route.params.sotwId)
         .then(() => {
           localStorage.setItem("activeSotwId", vm.sotw.id);
-          vm.loading = false;
         })
         .then(() => {
-          vm.getWeek(vm.sotw.id);
+          vm.getWeek(vm.sotw.id).then(() => {
+            vm.loading = false;
+          });
         });
     }
   },
@@ -232,5 +240,8 @@ export default {
 <style scoped lang="scss">
 .home {
   text-align: center;
+}
+.spotify-playlist {
+  height: 70vh;
 }
 </style>

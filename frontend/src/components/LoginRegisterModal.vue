@@ -1,7 +1,108 @@
 <template>
   <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
+      <div v-if="emailVerifyPending" class="modal-content">
+        <div class="modal-header">
+          <h5>Verify Email</h5>
+          <router-link :to="initialPath">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              @click="close()"
+            ></button>
+          </router-link>
+        </div>
+        <div class="modal-body">
+          <p>
+            You're almost there! Please verify your email via the link that was just sent to {{ registerForm.email }} to
+            complete your registration. The verification link will expire in 10 minutes.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <router-link :to="initialPath">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="close()">Okay</button>
+          </router-link>
+        </div>
+      </div>
+      <div v-else-if="passwordReset" class="modal-content">
+        <div class="modal-header">
+          <h5>Reset Password</h5>
+          <router-link :to="initialPath">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              @click="close()"
+            ></button>
+          </router-link>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <p>Please enter the email associated with your account to receive a password reset link in your inbox.</p>
+            </div>
+            <div class="mb-3">
+              <label for="passwordResetEmail" class="form-label" :class="{ invalid: !passwordResetEmailValid }"
+                >Email Address</label
+              >
+              <input
+                v-model="passwordResetEmail"
+                type="email"
+                class="form-control"
+                id="passwordResetEmail"
+                aria-describedby="emailHelp"
+              />
+              <p v-if="!passwordResetEmailValid" class="invalid">Email is invalid.</p>
+            </div>
+            <div v-if="passwordResetResponse400">
+              <p class="invalid">{{ passwordResetResponse400 }}</p>
+            </div>
+            <div v-if="passwordResetResponse500">
+              <p class="invalid">Sorry! Something went wrong... Please contact an administrator.</p>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <router-link :to="initialPath">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="close()">Close</button>
+          </router-link>
+          <button v-if="loading" type="button" class="btn btn-primary btn-spinner-reset">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+          <button v-else type="button" class="btn btn-primary" @click="submitResetPassword()">Send Email</button>
+        </div>
+      </div>
+      <div v-else-if="passwordResetPending" class="modal-content">
+        <div class="modal-header">
+          <h5>Email Sent!</h5>
+          <router-link :to="initialPath">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              @click="close()"
+            ></button>
+          </router-link>
+        </div>
+        <div class="modal-body">
+          <p>
+            An email has been sent to {{ passwordResetEmail }} with a link to reset your password. The link will expire
+            in 10 minutes.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <router-link :to="initialPath">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="close()">Okay</button>
+          </router-link>
+        </div>
+      </div>
+      <div v-else class="modal-content">
         <div class="modal-header">
           <h5 v-if="registering" class="modal-title">Register</h5>
           <h5 v-else class="modal-title">Login</h5>
@@ -139,13 +240,7 @@
             <div v-if="loginResponse500">
               <p class="invalid">Sorry! Something went wrong... Please contact an administrator.</p>
             </div>
-            <p>
-              Forgot your password? Click
-              <router-link v-if="!loading" :to="`/reset`">
-                <a>here</a>
-              </router-link>
-              <a v-else href="#">here</a> to reset.
-            </p>
+            <p>Forgot your password? Click <a @click="resetPassword" href="#">here</a> to reset.</p>
             <p>
               Don't have an account? Click
               <router-link v-if="!loading" :to="`/register`">
@@ -227,6 +322,13 @@ export default {
       loginResponse500: false,
       registerResponse400: null,
       registerResponse500: false,
+      emailVerifyPending: false,
+      passwordReset: false,
+      passwordResetPending: false,
+      passwordResetEmail: "",
+      passwordResetEmailValid: true,
+      passwordResetResponse400: null,
+      passwordResetResponse500: false,
       loading: false,
     };
   },
@@ -238,7 +340,7 @@ export default {
       if (!vm.isLoggedIn) {
         sessionStorage.setItem("last_requested_path", "/");
       } else if (vm.sotw != null) {
-        sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id + "/survey");
+        sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id);
       }
       vm.loginForm = {
         email: "",
@@ -260,6 +362,13 @@ export default {
       vm.loginResponse500 = false;
       vm.registerResponse400 = null;
       vm.registerResponse500 = false;
+      vm.emailVerifyPending = false;
+      vm.passwordReset = false;
+      vm.passwordResetPending = false;
+      vm.passwordResetEmail = "";
+      vm.passwordResetEmailValid = true;
+      vm.passwordResetResponse400 = null;
+      vm.passwordResetResponse500 = false;
       // go to next route
       vm.$router.push(sessionStorage.getItem("last_requested_path"));
     });
@@ -284,24 +393,54 @@ export default {
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
+    resetPassword() {
+      const vm = this;
+      vm.passwordReset = true;
+    },
+    submitResetPassword() {
+      const vm = this;
+      vm.loading = true;
+      vm.passwordResetResponse400 = null;
+      vm.passwordResetResponse500 = false;
+
+      // validate email
+      vm.passwordResetEmailValid = vm.passwordResetEmail.match(vm.validEmailRegex);
+
+      if (vm.passwordResetEmailValid) {
+        api.methods
+          .apiPostResetPassword({ email: vm.passwordResetEmail })
+          .then((res) => {
+            if (res && res.status == 200) {
+              vm.passwordResetPending = true;
+              vm.passwordReset = false;
+            }
+          })
+          .catch((err) => {
+            if (400 <= err.response.status < 500) {
+              vm.passwordResetResponse400 = err.response.data.detail;
+            } else if (err.response.status >= 500) {
+              vm.passwordResetResponse500 = true;
+            } else {
+              console.error("ERROR:", err);
+            }
+          })
+          .finally(() => {
+            vm.loading = false;
+          });
+      } else {
+        vm.loading = false;
+      }
+    },
     validatePassword() {
       const vm = this;
       // password validation
-      if (vm.registerForm.password.length < 8) {
-        vm.registerPasswordValid = false;
-      } else {
-        vm.registerPasswordValid = true;
-      }
+      vm.registerPasswordValid = vm.registerForm.password.length >= 8;
       vm.validatePasswordConfirm();
     },
     validatePasswordConfirm() {
       const vm = this;
       // password confirm validation
-      if (vm.registerForm.password != vm.registerForm.passwordConfirm) {
-        vm.registerPasswordConfirmValid = false;
-      } else {
-        vm.registerPasswordConfirmValid = true;
-      }
+      vm.registerPasswordConfirmValid = vm.registerForm.password == vm.registerForm.passwordConfirm;
     },
     async submitLogin() {
       const vm = this;
@@ -311,17 +450,10 @@ export default {
       vm.loginResponse500 = false;
 
       // email validation
-      if (!vm.loginForm.email.match(vm.validEmailRegex)) {
-        vm.loginEmailValid = false;
-      } else {
-        vm.loginEmailValid = true;
-      }
+      vm.loginEmailValid = vm.loginForm.email.match(vm.validEmailRegex);
+
       // password validation
-      if (vm.loginForm.password.length < 8) {
-        vm.loginPasswordValid = false;
-      } else {
-        vm.loginPasswordValid = true;
-      }
+      vm.loginPasswordValid = vm.loginForm.password.length >= 8;
 
       if (vm.loginEmailValid && vm.loginPasswordValid) {
         // send login request
@@ -361,30 +493,23 @@ export default {
         await api.methods
           .apiPostRegister(vm.registerForm)
           .then(async (res) => {
-            if (res.status == 201) {
-              // get the spotify client id
-              await api.methods.getSpotifyClientId().then((res) => {
-                let params = new URLSearchParams({
-                  client_id: res.data.client_id,
-                  response_type: "code",
-                  redirect_uri: config.SPOTIFY_CALLBACK_URI,
-                  state: vm.registerForm.email + "-" + vm.registerForm.name,
-                  scope: "playlist-modify-public",
-                });
-                document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
-              });
+            if (res && res.status == 200) {
+              localStorage.setItem("activeSotwId", null);
+              vm.emailVerifyPending = true;
             }
           })
           .catch((err) => {
-            vm.loading = false;
             // error handling
-            if (err.response.status == 400) {
+            if (400 <= err.response.status < 500) {
               vm.registerResponse400 = err.response.data.detail;
-            } else if (err.response.status == 500) {
+            } else if (err.response.status >= 500) {
               vm.registerResponse500 = true;
             } else {
               console.error("ERROR:", err);
             }
+          })
+          .finally(() => {
+            vm.loading = false;
           });
       } else {
         vm.loading = false;
@@ -398,24 +523,24 @@ export default {
       await api.methods
         .apiPostLogin(loginForm)
         .then(async (res) => {
-          if (res.status == 200) {
-            vm.loading = false;
+          if (res && res.status == 200) {
             // set the user
             await vm.getCurrentUser();
             vm.loginRegisterModal.hide();
           }
         })
         .catch((err) => {
-          vm.loading = false;
           // error handling
-          console.error("ERROR:", err);
-          if (err.response.status == 400) {
+          if (400 <= err.response.status < 500) {
             vm.loginResponse400 = err.response.data.detail;
-          } else if (err.response.status == 500) {
+          } else if (err.response.status >= 500) {
             vm.loginResponse500 = true;
           } else {
             console.error("ERROR:", err);
           }
+        })
+        .finally(() => {
+          vm.loading = false;
         });
     },
     close() {
@@ -449,6 +574,10 @@ p {
 }
 .btn-spinner-login {
   width: 66.3px;
+  height: 38px;
+}
+.btn-spinner-reset {
+  width: 106.02px;
   height: 38px;
 }
 .spinner-border {

@@ -505,10 +505,17 @@ def override_get_spotify_client() -> MagicMock:
     return mock
 
 
+def override_get_email_client() -> MagicMock:
+    mock = MagicMock()
+    mock.send_verification_email.return_value = {"MessageId": "test-id"}
+    return mock
+
+
 @pytest.fixture()
 def client() -> Generator:
     with TestClient(app) as client:
         app.dependency_overrides[deps.get_spotify_client] = override_get_spotify_client
+        app.dependency_overrides[deps.get_email_client] = override_get_email_client
         app.dependency_overrides[deps.get_current_user] = override_get_current_user
         app.dependency_overrides[deps.get_session] = override_get_session
         yield client

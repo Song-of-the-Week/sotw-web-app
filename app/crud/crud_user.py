@@ -66,5 +66,31 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         session.refresh(db_object)
         return db_object
 
+    def remove_user_from_sotw(
+        self, session: Session, *, db_object: User, object_in: Sotw
+    ) -> User:
+        """
+        Removes the sotw from the user (and vice versa via model relationship)
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            db_object (User): A model object of the user to update.
+            object_in (Sotw): A sotw model object to remove from the user.
+
+        Returns:
+            User: The newly updated user.
+        """
+        index = None
+        for i, sotw in enumerate(db_object.sotw_list):
+            if sotw.id == object_in.id:
+                index = i
+                break
+        if index is not None:
+            del db_object.sotw_list[index]
+        session.add(db_object)
+        session.commit()
+        session.refresh(db_object)
+        return db_object
+
 
 user = CRUDUser(User)

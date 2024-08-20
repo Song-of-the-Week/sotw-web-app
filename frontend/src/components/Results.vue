@@ -118,7 +118,8 @@ export default {
           vm.secondPlace = toRaw(JSON.parse(res.data.second_place));
           vm.allSongs = toRaw(JSON.parse(res.data.all_songs));
           vm.guessingData = toRaw(JSON.parse(res.data.guessing_data));
-          vm.guessingData.sort((a, b) => a.num_correct_guesses - b.num_correct_guesses);
+          // sort by best guesser to worst
+          vm.guessingData.sort((a, b) => b.num_correct_guesses - a.num_correct_guesses);
           vm.buildChart();
         }
       })

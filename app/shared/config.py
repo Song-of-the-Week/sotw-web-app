@@ -23,15 +23,26 @@ class Config(BaseSettings):
     LOGGER_LEVEL: int = logging.INFO
     LOGGING_CONFIG: str = "/home/clarice/sotw-web-app/app/log_conf.yaml"
     DEBUG: bool = False
-    SEND_REGISTRATION_EMAILS: bool = False
+    SEND_REGISTRATION_EMAILS: bool = True
+    REGISTRATION_VERIFICATION_URL: str = "http://localhost:8080/auth/verify/"
+    EMAIL_CHANGE_VERIFICATION_URL: str = "http://localhost:8080/user/email/verify/"
+    PASSWORD_RESET_VERIFICATION_URL: str = "http://localhost:8080/password-reset/"
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  # 8 days
     SHARE_TOKEN_EXPIRE_MINUTES: int = 30  # 30 minutes
+    VERIFICATION_TOKEN_EXPIRE_MINUTES: int = 10  # 10 minutes
     SESSION_COOKIE_EXPIRE_SECONDS: int = 86400  # 30 minutes
     JWT_SECRET: str = (
         "7f0a187153e8c67cd0ef1a27552803e61b0a7051b9d981c8bf41a031b72a74d1"  # use `openssl rand -hex 32` to generate
     )
     ALGORITHM: str = "HS256"
+
+    ### EMAIL ###
+    AWS_REGION: str = "us-east-1"
+    SMTP_USERNAME: str = "user"
+    SMTP_PASSWORD: str = "password"
+    SMTP_FROM: str = "songoftheweekaws@gmail.com"  # "no-reply@sotw-app.com"
+    SMTP_FROM_NAME: str = "Sotw App"
 
     ### SPOTIFY ###
     SPOTIFY_CLIENT_ID: str = "id"

@@ -1,5 +1,7 @@
 import json
+from unittest.mock import patch
 
+from app import schemas
 from app.shared.config import cfg
 
 
@@ -73,9 +75,22 @@ def test_register_success(client):
         "password": "password",
     }
     response = client.post(f"{cfg.API_V1_STR}/auth/register", data=json.dumps(payload))
-    data = response.json()
 
     # Then
+    assert response.status_code == 200
+
+
+@patch("app.api.api_v1.endpoints.sotw.jwt.decode")
+def test_verify_registration_success(decode, client):
+    decode.return_value = {
+        "sub": schemas.UserCreate(
+            email="example@example.example", name="example", password="password"
+        ).model_dump_json()
+    }
+    # when
+    response = client.get(f"{cfg.API_V1_STR}/auth/verify/exampletoken")
+    data = response.json()
+
     assert response.status_code == 201
     assert "name" in data.keys()
     assert data["name"] == "example"

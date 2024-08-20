@@ -33,6 +33,7 @@ class UserUpdate(UserBase):
     name: Optional[str] = None
     email: Optional[str] = None
     sotw: Optional[int] = None
+    password: Optional[str] = None
     current_password: Optional[str] = None
     new_password: Optional[str] = None
     spotify_linked: Optional[bool] = None

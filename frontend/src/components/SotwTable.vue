@@ -4,18 +4,15 @@
       <thead>
         <tr>
           <th scope="col">Name</th>
-          <th scope="col">Playlist Link</th>
           <th scope="col" class="text"><span>Results Release</span></th>
           <th scope="col">Invite Link</th>
+          <th scope="col">Leave</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="sotw in sotwList">
           <td>
             <button @click="setSotw(sotw.id)" class="btn btn-outline-primary">{{ sotw.name }}</button>
-          </td>
-          <td>
-            <a :href="sotw.playlist_link" target="_blank">{{ sotw.playlist_link }}</a>
           </td>
           <td>{{ sotw.results }}</td>
           <td v-if="sotw.share_link != null" class="text">
@@ -42,6 +39,9 @@
               Generate Invite Link
             </button>
           </td>
+          <td>
+            <button @click="leaveSotw(sotw.id)" class="btn btn-outline-danger">Leave</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -63,11 +63,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ sotw: "getActiveSotw" }),
+    // ...mapGetters({ sotw: "getActiveSotw" }),
   },
   mounted() {},
   methods: {
-    ...mapActions(["getSotw"]),
+    ...mapActions(["getSotw", "getCurrentUser"]),
     setSotw(sotwId) {
       const vm = this;
       // set active sotw
@@ -82,7 +82,7 @@ export default {
       const vm = this;
       if (!vm.$cookies.isKey("invite-" + sotwId)) {
         alert("This link has expired, please generate a new one.");
-        vm.$emit("build-sotw-list", sotwId);
+        vm.$emit("build-sotw-list");
       } else {
         navigator.clipboard.writeText(link);
       }
@@ -94,11 +94,24 @@ export default {
         .apiGetSotwInviteLink(sotwId)
         .then((res) => {
           vm.$cookies.set("invite-" + sotwId, window.config.HOSTNAME + res.data.url, "30MIN");
-          vm.$emit("build-sotw-list", sotwId);
+          vm.$emit("build-sotw-list");
           vm.loadingLink = false;
         })
         .catch((err) => {
           alert("There was an error generating your share link:\n" + err);
+          console.error(err);
+        });
+    },
+    async leaveSotw(sotwId) {
+      const vm = this;
+      await api.methods
+        .apiGetLeaveSotw(sotwId)
+        .then((res) => {
+          vm.getCurrentUser().then(() => {
+            vm.$emit("build-sotw-list");
+          });
+        })
+        .catch((err) => {
           console.error(err);
         });
     },

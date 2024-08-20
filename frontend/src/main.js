@@ -10,7 +10,7 @@ axios.defaults.withCredentials = true;
 axios.defaults.baseURL = config.API_HOSTNAME;
 axios.interceptors.response.use(undefined, function (error) {
   if (error) {
-    console.log("HUH", error);
+    console.log("ERROR", error);
     const status = error.response !== undefined ? error.response.status : 500;
     const originalRequest = error.config;
     if (status === 401 && !originalRequest._retry) {
@@ -18,7 +18,11 @@ axios.interceptors.response.use(undefined, function (error) {
       store.dispatch("logout");
       return router.push("/login");
     } else if (status === 404) {
-      return router.push("/404");
+      if (originalRequest.url == "api/v1/user/reset-password") {
+        return Promise.reject(error);
+      } else {
+        return router.push("/404");
+      }
     } else if (status == 403) {
       return router.push("/403");
     } else {

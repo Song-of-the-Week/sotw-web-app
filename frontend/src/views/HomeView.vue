@@ -69,13 +69,10 @@
 import { mapGetters, mapActions } from "vuex";
 import api from "@/shared/api";
 import store from "@/store/index.js";
-import SotwCreationModal from "@/components/SotwCreationModal.vue";
 
 export default {
   name: "HomeView",
-  components: {
-    SotwCreationModal,
-  },
+  components: {},
   data() {
     return {
       sotwCreationModal: null,
@@ -112,6 +109,19 @@ export default {
         console.log("ERROR", vm.$route.query.error);
         // TODO maybe add toastr or something to indicate spotify not linked
       }
+    } else if (vm.$route.name == "verify") {
+      // make api call to backend to verify the token and update user on front end
+      api.methods
+        .apiGetVerifyRegistration(vm.$route.params.verificationToken)
+        .then(async (res) => {
+          await vm.getCurrentUser();
+        })
+        .then((_) => {
+          vm.$router.push("/link-spotify");
+        })
+        .catch((err) => {
+          console.error("Invalid link:", err);
+        });
     }
 
     vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");

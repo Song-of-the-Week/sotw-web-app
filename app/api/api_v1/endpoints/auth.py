@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import Dict
+import json
+from typing import Any, Dict, Union
+from jose import JWTError, jwt
 
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
-from fastapi import Response
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm.session import Session
 
@@ -12,8 +11,7 @@ from app import crud
 from app import schemas
 from app.api import deps
 
-# from app.clients.email import EmailClient
-# from app.core.email import send_registration_confirmed_email
+from app.clients.email import EmailClient
 from app.clients.spotify import SpotifyClient
 from app.core.auth import authenticate
 from app.core.auth import create_access_token
@@ -94,19 +92,18 @@ async def get_current_user(
     Returns:
         schemas.User: The currently logged in user
     """
-
     return current_user
 
 
-@router.post("/register", response_model=schemas.User, status_code=201)
+@router.post("/register", status_code=200, response_model=Union[Any, schemas.User])
 async def register(
     session: Session = Depends(deps.get_session),
     *,
-    # email_client: EmailClient = Depends(deps.get_email_client),
-    # background_tasks: BackgroundTasks,
+    email_client: EmailClient = Depends(deps.get_email_client),
+    background_tasks: BackgroundTasks,
     user_in: schemas.UserCreate,
     response: Response,
-) -> schemas.User:
+) -> Any:
     """
     Register a new user.
 
@@ -117,9 +114,6 @@ async def register(
 
     Raises:
         HTTPException: 400 when the user_in.email already exists in the database for another user.
-
-    Returns:
-        User: The newly created user
     """
     user = crud.user.get_by_email(session=session, email=user_in.email)
 
@@ -128,15 +122,74 @@ async def register(
             status_code=400,
             detail="A user with this email already exists.",
         )
+
+    if cfg.SEND_REGISTRATION_EMAILS:
+        # create an email verification token
+        verification_token = create_access_token(
+            sub=user_in.model_dump_json(),
+            lifetime=cfg.VERIFICATION_TOKEN_EXPIRE_MINUTES,
+        )
+        background_tasks.add_task(
+            email_client.send_register_verification_email,
+            token_url=f"{cfg.REGISTRATION_VERIFICATION_URL}{verification_token}",
+            to=user_in.email,
+            to_name=user_in.name,
+        )
+        return {"status": 200}
+
     user = crud.user.create(session=session, object_in=user_in)
 
-    # if cfg.SEND_REGISTRATION_EMAILS:
-    #     background_tasks.add_task(send_registration_confirmed_email, user=user, client=email_client)
-
-    # WIP give the user an access token upon registering
-    # TODO: Have email verification link be used for login (spotify account linking redirects to email verification page -> loginregistration modal)
     token = create_access_token(sub=user.id, lifetime=cfg.ACCESS_TOKEN_EXPIRE_MINUTES)
+    response.set_cookie(
+        "Authorization",
+        value=f"Bearer {token}",
+        httponly=True,
+        max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
+        expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
+        samesite="Lax",
+        secure=False,
+    )
 
+    return user
+
+
+@router.get(
+    "/verify/{verification_token}", response_model=schemas.User, status_code=201
+)
+async def verify(
+    session: Session = Depends(deps.get_session),
+    *,
+    verification_token: str,
+    response: Response,
+) -> schemas.User:
+    try:
+        # decode the token
+        payload = jwt.decode(
+            verification_token,
+            cfg.JWT_SECRET,
+            algorithms=[cfg.ALGORITHM],
+            options={"verify_aud": False},
+        )
+        user_in: schemas.UserCreate = schemas.UserCreate.model_validate_json(
+            payload.get("sub")
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code=403,
+            detail=f"The token is no longer valid.",
+        )
+
+    user = crud.user.get_by_email(session=session, email=user_in.email)
+
+    if user is not None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"This email has already been verified, please sign in to continue to use Song of the Week.",
+        )
+
+    user = crud.user.create(session=session, object_in=user_in)
+
+    token = create_access_token(sub=user.id, lifetime=cfg.ACCESS_TOKEN_EXPIRE_MINUTES)
     response.set_cookie(
         "Authorization",
         value=f"Bearer {token}",

@@ -249,6 +249,17 @@ def test_get_sotw_invite_join_406(client):
 def test_get_sotw_invite_join_success(decode, client, sotw):
     # Mock
     decode.return_value = {"sub": 1}
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
+    data = response.json()
+
+    # Then
+    assert "playlists" in data.keys()
+    assert len(data["playlists"]) == 0
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 0
+
     # When
     # "link" spotify
     payload = {
@@ -272,5 +283,116 @@ def test_get_sotw_invite_join_success(decode, client, sotw):
 
     assert "playlists" in data.keys()
     assert len(data["playlists"]) == 1
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 1
+
+
+def test_get_leave_sotw_404(client, current_week):
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/4/leave")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 404
+    assert "detail" in data.keys()
+    assert data["detail"] == "Sotw with given id 4 not found."
+
+
+def test_get_leave_sotw_not_in(client, sotw):
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/1/leave")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 0
+
+
+def test_get_leave_sotw_success(client, current_week):
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
+    data = response.json()
+
+    # Then
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 1
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/1/leave")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 0
+
+
+@patch("app.api.api_v1.endpoints.sotw.jwt.decode")
+def test_get_leave_sotw_success_and_rejoin_with_same_playlist(decode, client, sotw):
+    # Mock
+    decode.return_value = {"sub": 1}
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
+    data = response.json()
+
+    # Then
+    assert "playlists" in data.keys()
+    assert len(data["playlists"]) == 0
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 0
+
+    # When
+    # "link" spotify
+    payload = {
+        "state": "admin@admin.admin-test1",
+        "code": "success",
+    }
+    response = client.put(
+        f"{cfg.API_V1_STR}/auth/spotify-access-token", data=json.dumps(payload)
+    )
+
+    response = client.get(f"{cfg.API_V1_STR}/sotw/invite/join/ABC123")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert "id" in data.keys()
+    assert data["id"] == 1
+
+    response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
+    data = response.json()
+
+    assert "playlists" in data.keys()
+    assert len(data["playlists"]) == 1
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 1
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/1/leave")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert "playlists" in data.keys()
+    assert len(data["playlists"]) == 1
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 0
+
+    playlist_id = data["playlists"][0]["id"]
+
+    # Rejoin
+    response = client.get(f"{cfg.API_V1_STR}/sotw/invite/join/ABC123")
+    data = response.json()
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
+    data = response.json()
+
+    # Then
+    assert "playlists" in data.keys()
+    assert len(data["playlists"]) == 1
+    assert data["playlists"][0]["id"] == playlist_id
     assert "sotw_list" in data.keys()
     assert len(data["sotw_list"]) == 1

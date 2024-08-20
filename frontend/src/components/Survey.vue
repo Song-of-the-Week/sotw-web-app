@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>Survey</h2>
-    <div v-if="submitted">
+    <div v-if="week.submitted">
       <div class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4">
@@ -174,7 +174,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Edit Submission</button>
           <div>
-            <button v-if="loading" type="button" class="btn btn-primary btn-spinner-create">
+            <button v-if="loading" type="button" class="btn btn-primary btn-spinner-submit">
               <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
@@ -225,29 +225,7 @@ export default {
   mounted() {
     const vm = this;
 
-    vm.submitted = vm.week.submitted;
-
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
-
-    vm.$nextTick(() => {
-      console.log("UHUHUHUHUHHU", vm.week);
-      if (vm.week.survey.length != 0) {
-        console.log("OKAY WHAT THE FUCK", vm.week.survey);
-        let surveyJson = JSON.parse(vm.week.survey);
-
-        vm.songs = surveyJson.songs;
-        vm.users = surveyJson.users;
-
-        vm.songs.forEach((song) => {
-          vm.userSongMatches.push({
-            id: song.id,
-            user: undefined,
-            song: song,
-            error: false,
-          });
-        });
-      }
-    });
   },
   methods: {
     ...mapActions(["getWeek"]),
@@ -273,6 +251,11 @@ export default {
     async submit(repeatApproved = false) {
       const vm = this;
 
+      vm.songValid = vm.nextSong.length != 0;
+      if (!vm.songValid) {
+        location.href = "#songCard";
+      }
+
       if (vm.week.week_num == 0) {
         if (vm.songValid) {
           let payload = {
@@ -285,26 +268,21 @@ export default {
         // validate song matching
         let errCount = 0;
         vm.userSongMatches.forEach((e) => {
-          if (e.user === undefined) {
-            e.error = true;
+          e.error = e.user === undefined;
+          if (e.error) {
             errCount++;
-          } else {
-            e.error = false;
           }
         });
-        if (errCount !== 0) {
-          vm.matchValid = false;
+
+        vm.matchValid = errCount == 0;
+        if (!vm.matchValid) {
           location.href = "#matchCard";
-        } else {
-          vm.matchValid = true;
         }
 
         // validate voting
-        if (vm.pickedSongs.length != 2) {
-          vm.voteValid = false;
+        vm.voteValid = vm.pickedSongs.length == 2;
+        if (!vm.voteValid) {
           location.href = "#voteCard";
-        } else {
-          vm.voteValid = true;
         }
 
         // send form data to back end
@@ -336,7 +314,7 @@ export default {
       await api.methods
         .apiPostSurveyResponse(sotwId, weekNum, payload)
         .then((res) => {
-          if (res.status == 201) {
+          if (res && res.status == 201) {
             if (!res.data.valid) {
               vm.songValid = false;
               location.href = "#songCard";
@@ -350,12 +328,38 @@ export default {
               location.href = "/sotw/" + sotwId;
             }
           }
-          vm.loading = false;
         })
         .catch((err) => {
           console.log(err);
+        })
+        .finally(() => {
           vm.loading = false;
         });
+    },
+  },
+  watch: {
+    week: {
+      immediate: true,
+      handler: function () {
+        const vm = this;
+        if (vm.week.survey.length != 0) {
+          let surveyJson = JSON.parse(vm.week.survey);
+
+          vm.userSongMatches = [];
+
+          vm.songs = surveyJson.songs;
+          vm.users = surveyJson.users;
+
+          vm.songs.forEach((song) => {
+            vm.userSongMatches.push({
+              id: song.id,
+              user: undefined,
+              song: song,
+              error: false,
+            });
+          });
+        }
+      },
     },
   },
 };
@@ -376,5 +380,9 @@ export default {
 .btn-spinner-submit {
   width: 76.36px;
   height: 38px;
+}
+.spinner-border {
+  width: 1.4rem;
+  height: 1.4rem;
 }
 </style>

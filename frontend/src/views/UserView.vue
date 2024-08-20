@@ -79,7 +79,7 @@
           </div>
           <div v-if="editingPassword" class="row mt-3">
             <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword403.length > 0 }"
+              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword400.length > 0 }"
                 >Current Password</label
               >
               <PasswordInput
@@ -90,7 +90,7 @@
                   }
                 "
               />
-              <p v-if="changePassword403" class="invalid">{{ changePassword403 }}</p>
+              <p v-if="changePassword400" class="invalid">{{ changePassword400 }}</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
               <label for="newPassword" class="form-label" :class="{ invalid: !newPasswordValid }">New Password</label>
@@ -171,18 +171,28 @@
       </div>
     </div>
   </div>
+  <AlertModal
+    header="Email Change Verification"
+    :message="
+      `You're almost there! Please verify your new email via the link that was just sent to ` +
+      userEmail +
+      ` to complete your email change. The verification link will expire in 10 minutes.`
+    "
+  ></AlertModal>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
 import api from "@/shared/api";
 import config from "@/shared/config";
+import AlertModal from "@/components/AlertModal.vue";
 import PasswordInput from "@/components/PasswordInput.vue";
 import SotwTable from "@/components/SotwTable.vue";
 
 export default {
   name: "UserView",
   components: {
+    AlertModal,
     PasswordInput,
     SotwTable,
   },
@@ -202,9 +212,10 @@ export default {
       newPasswordValid: true,
       newPasswordConfirmValid: true,
       sotwList: [],
-      changePassword403: "",
+      changePassword400: "",
       response500: false,
       sotwCreationModal: null,
+      alertModal: null,
     };
   },
   computed: {
@@ -221,6 +232,19 @@ export default {
     vm.buildSotwList();
 
     vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+    vm.alertModal = new window.bootstrap.Modal("#alertModal");
+
+    if (vm.$route.name == "email") {
+      // make api call to backend to verify the token and update user on front end
+      api.methods
+        .apiGetVerifyEmail(vm.$route.params.verificationToken)
+        .then(async (res) => {
+          await vm.getCurrentUser();
+        })
+        .catch((err) => {
+          console.error("Invalid link:", err);
+        });
+    }
   },
   methods: {
     ...mapActions(["getCurrentUser", "updateUser"]),
@@ -266,8 +290,15 @@ export default {
     },
     changeEmail() {
       const vm = this;
+      if (vm.user.email == vm.userEmail) {
+        vm.editingEmail = vm.loadingEmail = false;
+        return;
+      }
       vm.loadingEmail = true;
       vm.updateUser({ email: vm.userEmail })
+        .then((_) => {
+          vm.alertModal.show();
+        })
         .catch((err) => {
           if (err.response.status == 500) {
             vm.response500 = true;
@@ -277,7 +308,6 @@ export default {
         })
         .finally(() => {
           vm.editingEmail = vm.loadingEmail = false;
-          vm.userEmail = "";
         });
     },
     changePassword() {
@@ -285,18 +315,15 @@ export default {
       vm.loadingPassword = true;
       vm.updateUser({ current_password: vm.currentPassword, new_password: vm.newPassword })
         .then((res) => {
-          if (res.status == 200) {
+          if (res && res.status == 200) {
             vm.currentPassword = vm.newPassword = vm.newPasswordConfirm = "";
             vm.editingPassword = false;
-          } else {
-            console.error("Error: ", res);
           }
         })
         .catch((err) => {
-          console.log(err);
-          if (err.response.status == 403) {
-            vm.changePassword403 = err.response.data.detail;
-          } else if (err.response.status == 500) {
+          if (400 <= err.response.status < 500) {
+            vm.changePassword400 = err.response.data.detail;
+          } else if (err.response.status >= 500) {
             vm.response500 = true;
           }
         })

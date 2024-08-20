@@ -79,6 +79,7 @@
     </div>
   </nav>
   <!-- Modals -->
+  <SpotifyModal></SpotifyModal>
   <LoginRegisterModal
     :registering="loginRegistering"
     :login-register-modal="loginRegisterModal"
@@ -93,6 +94,7 @@ import { mapActions, mapGetters } from "vuex";
 import InviteModal from "@/components/InviteModal.vue";
 import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
 import SotwCreationModal from "@/components/SotwCreationModal.vue";
+import SpotifyModal from "@/components/SpotifyModal.vue";
 import store from "@/store/index.js";
 export default {
   name: "Navbar",
@@ -100,6 +102,7 @@ export default {
     InviteModal,
     LoginRegisterModal,
     SotwCreationModal,
+    SpotifyModal,
   },
   data: () => {
     return {
@@ -107,6 +110,7 @@ export default {
       loginRegisterModal: null,
       loginRegistering: false,
       sotwCreationModal: null,
+      spotifyModal: null,
       initialPath: "/",
     };
   },
@@ -137,6 +141,7 @@ export default {
     if (vm.isLoggedIn) {
       vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
       vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+      vm.spotifyModal = new window.bootstrap.Modal("#spotifyModal");
       vm.getCurrentUser();
     }
   },
@@ -151,7 +156,7 @@ export default {
     logoutUser() {
       const vm = this;
       vm.logout().then(() => {
-        this.$router.replace("/");
+        vm.$router.replace("/");
         vm.registering = false;
         sessionStorage.setItem("last_requested_path", "/");
       });
@@ -200,6 +205,11 @@ export default {
           if (vm.sotwCreationModal && newVal.meta.createModal) {
             if (!vm.sotwCreationModal._isShown) {
               vm.sotwCreationModal.show();
+            }
+          }
+          if (vm.spotifyModal && newVal.meta.spotifyModal) {
+            if (!vm.spotifyModal.__isShown) {
+              vm.spotifyModal.show();
             }
           }
         }

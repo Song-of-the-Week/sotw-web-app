@@ -10,6 +10,7 @@ from jose import jwt, JWTError
 from sqlalchemy.orm.session import Session
 
 from app.clients.spotify import SpotifyClient
+from app.clients.email import EmailClient
 from app.db.session import SessionLocal
 from app.db.session import AsyncSessionLocal
 from app.models.user import User
@@ -31,7 +32,7 @@ def get_session() -> Generator[Session, None, None]:
 
 
 # synchronous orm session
-def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+def get_async_session() -> AsyncGenerator[AsyncSession, None]:  # type: ignore
     session = AsyncSessionLocal()
     try:
         yield session
@@ -78,3 +79,7 @@ def get_spotify_client():
     if not client_id or not client_secret:
         raise Exception("Spotify credentials are not set in environment variables")
     return SpotifyClient(client_id, client_secret)
+
+
+def get_email_client():
+    return EmailClient()

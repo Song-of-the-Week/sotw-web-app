@@ -267,20 +267,62 @@ async def get_sotw_invite_join(
     # add current user to the sotw
     crud.user.add_user_to_sotw(session=session, db_object=current_user, object_in=sotw)
 
-    # create the user's playlist for this sotw
-    user_playlist_name = (
-        f"{current_user.spotify_user_id}'s {sotw.name} Song of the Week Playlist"
-    )
-    user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {current_user.spotify_user_id}."
-    user_playlist = spotify_client.create_playlist(
-        user_playlist_name, user_playlist_description, session, current_user.id
-    )
-    user_playlist_create = schemas.UserPlaylistCreate(
-        playlist_id=user_playlist["id"],
-        playlist_link=user_playlist["external_urls"]["spotify"],
-        sotw_id=sotw.id,
-        user_id=current_user.id,
-    )
-    crud.user_playlist.create(session, object_in=user_playlist_create)
+    if not crud.user_playlist.get_playlist_for_user_for_sotw(
+        session=session, user_id=current_user.id, sotw_id=sotw.id
+    ):
+        # create the user's playlist for this sotw if it does not already exist
+        user_playlist_name = (
+            f"{current_user.spotify_user_id}'s {sotw.name} Song of the Week Playlist"
+        )
+        user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {current_user.spotify_user_id}."
+        user_playlist = spotify_client.create_playlist(
+            user_playlist_name, user_playlist_description, session, current_user.id
+        )
+        user_playlist_create = schemas.UserPlaylistCreate(
+            playlist_id=user_playlist["id"],
+            playlist_link=user_playlist["external_urls"]["spotify"],
+            sotw_id=sotw.id,
+            user_id=current_user.id,
+        )
+        crud.user_playlist.create(session, object_in=user_playlist_create)
 
     return schemas.SotwInfo(id=sotw.id)
+
+
+@router.get("/{sotw_id}/leave", response_model=schemas.User)
+async def get_leave_sotw(
+    session: Session = Depends(deps.get_session),
+    *,
+    sotw_id: int,
+    current_user: User = Depends(deps.get_current_user),
+) -> schemas.User:
+    """
+    Retrieve a sotw object from the database.
+
+    Args:
+        sotw_id (int): ID of the sotw to retreive.
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+    Raises:
+        HTTPException: 403 for unauthorized users.
+
+    Returns:
+        schemas.User: The user object after being removed from the sotw.
+    """
+    sotw = crud.sotw.get(session=session, id=sotw_id)
+
+    if sotw is None:
+        raise HTTPException(
+            status_code=404, detail=f"Sotw with given id {sotw_id} not found."
+        )
+    if current_user not in sotw.user_list:
+        return current_user
+
+    # remove user from sotw
+    crud.user.remove_user_from_sotw(
+        session=session, db_object=current_user, object_in=sotw
+    )
+
+    session.refresh(current_user)
+    return current_user

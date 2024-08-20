@@ -22,7 +22,6 @@ export default {
             await commit("setCurrentWeekError", res.data.message);
             await commit("setCurrentWeek", res.data.week);
           } else {
-            console.log("WHAT", res.data);
             await commit("setCurrentWeekError", null);
             await commit("setCurrentWeek", res.data);
           }
