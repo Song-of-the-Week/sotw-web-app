@@ -18,20 +18,19 @@
         tabindex="-1"
         id="navbarSupportedContent"
         aria-labelledby="navbarOffcanvasLgLabel"
-        data-bs-dismiss="offcanvas"
       >
         <div class="offcanvas-header">
-          <router-link class="offcanvas-title navbar-brand" id="offcanvasNavbarLabel" :to="sotwUrl">{{
-            sotwName
-          }}</router-link>
+          <router-link class="offcanvas-title navbar-brand" id="offcanvasNavbarLabel" :to="`/`"
+            ><span data-bs-dismiss="offcanvas">Song of the Week</span></router-link
+          >
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li> -->
-            <!-- <li class="nav-item dropdown">
+            <li class="nav-item">
+              <router-link class="nav-link" :to="`/about`"><span data-bs-dismiss="offcanvas">About</span></router-link>
+            </li>
+            <li v-if="isLoggedIn" class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
@@ -40,17 +39,16 @@
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                Results
+                Sotw
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarResultsDropdown">
-                <li>
-                  <router-link class="dropdown-item" :to="`/results/...`">This Week's Results</router-link>
-                </li>
-                <li>
-                  <router-link class="dropdown-item" :to="`/results/...`">Previous Results</router-link>
+                <li v-for="sotw in user.sotw_list">
+                  <router-link class="dropdown-item" :to="`/sotw/` + sotw.id"
+                    ><span data-bs-dismiss="offcanvas">{{ sotw.name }}</span></router-link
+                  >
                 </li>
               </ul>
-            </li> -->
+            </li>
             <!-- <li class="nav-item">
               <router-link class="nav-link" :to="`/data`">Data</router-link>
             </li>
@@ -115,23 +113,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ user: "getUser" }),
+    ...mapGetters({ user: "getUser", sotw: "get" }),
     isLoggedIn: () => {
       return store.getters.isAuthenticated;
-    },
-    sotwName: () => {
-      if (store.getters.getActiveSotw) {
-        return store.getters.getActiveSotw.name;
-      } else {
-        return "Song of the Week";
-      }
-    },
-    sotwUrl: () => {
-      if (store.getters.getActiveSotw) {
-        return "/sotw/" + store.getters.getActiveSotw.id;
-      } else {
-        return "/";
-      }
     },
   },
   mounted() {
@@ -146,7 +130,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["logout", "getCurrentUser"]),
+    ...mapActions(["logout", "getCurrentUser", "getSotw"]),
     login() {
       const vm = this;
       if (!vm.loginRegisterModal._isShown) {
@@ -172,9 +156,17 @@ export default {
     $route: {
       immediate: true,
       handler: function (newVal, oldVal) {
-        // console.log("WHAT", newVal, oldVal);
+        // console.log("WHAT", newVal.path.split("/")[2]);
         const vm = this;
 
+        if (
+          oldVal &&
+          oldVal.path.startsWith("/sotw/") &&
+          newVal.path.startsWith("/sotw/") &&
+          oldVal.path.split("/")[2] != newVal.path.split("/")[2]
+        ) {
+          vm.getSotw(newVal.path.split("/")[2]);
+        }
         if (oldVal && oldVal.path != "/login" && oldVal.path != "/register" && oldVal.path != "/sotw/create") {
           vm.initialPath = oldVal.path;
         }

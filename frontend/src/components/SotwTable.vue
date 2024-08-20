@@ -3,10 +3,10 @@
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">Name</th>
-          <th scope="col" class="text"><span>Results Release</span></th>
-          <th scope="col">Invite Link</th>
-          <th scope="col">Leave</th>
+          <th scope="col" class="col-3">Name</th>
+          <th scope="col" class="col-3 text"><span>Results Release</span></th>
+          <th scope="col" class="col-3">Invite Link</th>
+          <th scope="col" class="col-3">Leave</th>
         </tr>
       </thead>
       <tbody>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 import api from "@/shared/api";
 
 export default {
@@ -61,9 +61,6 @@ export default {
     return {
       loadingLink: false,
     };
-  },
-  computed: {
-    // ...mapGetters({ sotw: "getActiveSotw" }),
   },
   mounted() {},
   methods: {
@@ -125,6 +122,7 @@ export default {
   height: 38px;
 }
 .table td.text {
+  max-width: 14rem;
   span {
     white-space: nowrap;
     overflow: hidden;
