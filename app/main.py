@@ -29,7 +29,6 @@ if cfg.BACKEND_CORS_ORIGINS:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["*"],
     )
 
 @root_router.get("/", status_code=200)
