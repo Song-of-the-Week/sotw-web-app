@@ -25,7 +25,7 @@ docker-build-backend:
 	rm app/alembic.ini
 
 docker-build-frontend:
-	cd frontend && docker build -t sotw-frontend .
+	cd frontend && docker build --no-cache -t sotw-frontend .
 
 
 # development automation

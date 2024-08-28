@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import sys
 from loguru import logger
 from sqlalchemy.orm import Session
 
@@ -405,3 +406,7 @@ def main():
     with SessionLocal() as session:
         init_db(session)
     logger.info("Initial data created")
+
+
+if __name__ == '__main__':
+    sys.exit(main())

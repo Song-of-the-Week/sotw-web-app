@@ -20,6 +20,8 @@ services:
       context: ./app
       dockerfile: ./app/Dockerfile
     image: sotw-api:latest
+    ports:
+      - "9000:8000"
     restart: always
     env_file:
       .env
@@ -33,11 +35,9 @@ services:
       context: ./frontend
       dockerfile: ./frontend/Dockerfile
     image: sotw-frontend:latest
-    command: npm run serve
+    command: npm run serve-prod
     ports:
       - "80:8080"
-    volumes:
-      - ./frontend:/frontend
     depends_on:
       - db
 

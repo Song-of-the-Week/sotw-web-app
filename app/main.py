@@ -1,4 +1,5 @@
 from curses import use_default_colors
+import sys
 import time
 import uvicorn
 from fastapi import APIRouter
@@ -63,3 +64,6 @@ def main() -> None:
         log_level=cfg.LOGGER_LEVEL,
         reload=cfg.DEBUG,
     )
+
+if __name__ == '__main__':
+    sys.exit(main())

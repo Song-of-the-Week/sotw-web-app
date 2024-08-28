@@ -54,4 +54,3 @@ nav {
   }
 }
 </style>
-./components/NavbarComponent.vue./components/Navbar.vue
