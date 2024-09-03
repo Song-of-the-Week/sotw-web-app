@@ -42,16 +42,18 @@ services:
       - db
 
   nginx:
+    build:
+      context: ./nginx
+      dockerfile: ./nginx/Dockerfile
     restart: unless-stopped
-    image: nginx
+    image: sotw-nginx:latest
     container_name: nginx
     ports:
       - "80:80"
       # - "443:443"
     # environment:
     #   - CERTBOT_EMAIL=youremail@gmail.com
-    volumes:
-      - ./nginx:/etc/nginx/user_conf.d:ro
+    # volumes:
       # - letsencrypt:/etc/letsencrypt
     depends_on:
       - api

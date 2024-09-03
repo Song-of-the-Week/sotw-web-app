@@ -47,7 +47,7 @@ class Config(BaseSettings):
     ### SPOTIFY ###
     SPOTIFY_CLIENT_ID: str = "id"
     SPOTIFY_CLIENT_SECRET: str = "secret"
-    SPOTIFY_CALLBACK_URI: str = "http://localhost:8080/"
+    SPOTIFY_CALLBACK_URI: str = "http://localhost/"
 
     ### MODEL ###
     SOTW_SHARE_ID_K: int = 12
@@ -58,6 +58,8 @@ class Config(BaseSettings):
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost",
         "http://localhost:8080",
+        "http://frontend",
+        "http://frontend:8000",
     ]
 
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = "http://localhost:8080/*"
