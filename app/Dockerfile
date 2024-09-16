@@ -33,6 +33,7 @@ COPY ./alembic.ini /alembic.ini
 WORKDIR /usr/src/app
 
 ENV PYTHONPATH="${PYTHONPATH}:/usr/src/app/"
+COPY ./root.crt ./.postgresql/root.crt
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements.txt ./requirements.txt

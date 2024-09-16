@@ -80,6 +80,7 @@ class Config(BaseSettings):
     DB_PASSWORD: str = "password"
     DB_NAME: str = "sotw"
     DB_PORT: int = 5432
+    DB_CA_PATH: str = None
     # AWS_ACCESS_KEY_ID: str = "DUMMYIDEXAMPLE"
     # AWS_SECRET_ACCESS_KEY: str = "DUMMYEXAMPLEKEY"
     # AWS_REGION: str = "us-east-1"
