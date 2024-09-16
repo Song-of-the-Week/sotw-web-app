@@ -21,14 +21,8 @@ host = os.environ['DB_HOST']
 port = os.environ['DB_PORT']
 
 try:
-    psycopg2.connect(
-        dbname=dbname,
-        user=user,
-        password=password,
-        host=host,
-        port=port
-    )
-except psycopg2.OperationalError:
+    psycopg2.connect(f"postgresql://{user}:{password}@{host}:{port}/{dbname}?sslmode=verify-full")
+except psycopg2.OperationalError as e:
     sys.exit(-1)
 sys.exit(0)
 

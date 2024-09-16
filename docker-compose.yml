@@ -1,19 +1,19 @@
 services:
   
-  db:
-    image: postgres:15.4-bullseye
-    ports:
-      - 5432:5432
-    restart: always
-    env_file:
-      .env
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 1s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
+  # db:
+  #   image: postgres:15.4-bullseye
+  #   ports:
+  #     - 5432:5432
+  #   restart: always
+  #   env_file:
+  #     .env
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready"]
+  #     interval: 1s
+  #     timeout: 5s
+  #     retries: 10
+  #   volumes:
+  #     - ./postgres:/var/lib/postgresql/data
   
   api:
     build:
@@ -27,8 +27,8 @@ services:
       .env
     volumes:
       - ./app:/app
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
 
   frontend:
     build:
@@ -38,8 +38,8 @@ services:
     command: npm run serve-prod
     ports:
       - "8080:8080"
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
 
   nginx:
     build:
@@ -64,5 +64,5 @@ services:
         max-size: "100k"
         max-file: "1"
 
-volumes:
-  postgres_data:
+# volumes:
+#   postgres_data:
