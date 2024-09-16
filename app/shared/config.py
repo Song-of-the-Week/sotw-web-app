@@ -47,7 +47,7 @@ class Config(BaseSettings):
     ### SPOTIFY ###
     SPOTIFY_CLIENT_ID: str = "id"
     SPOTIFY_CLIENT_SECRET: str = "secret"
-    SPOTIFY_CALLBACK_URI: str = "http://localhost:8080/"
+    SPOTIFY_CALLBACK_URI: str = "http://localhost/"
 
     ### MODEL ###
     SOTW_SHARE_ID_K: int = 12
@@ -56,9 +56,10 @@ class Config(BaseSettings):
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:80",
+        "http://localhost",
         "http://localhost:8080",
-        "http://localhost:8000",
+        "http://frontend",
+        "http://frontend:8000",
     ]
 
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = "http://localhost:8080/*"

@@ -37,9 +37,32 @@ services:
     image: sotw-frontend:latest
     command: npm run serve-prod
     ports:
-      - "80:8080"
+      - "8080:8080"
     depends_on:
       - db
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: ./nginx/Dockerfile
+    restart: unless-stopped
+    image: sotw-nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      # - "443:443"
+    # environment:
+    #   - CERTBOT_EMAIL=youremail@gmail.com
+    # volumes:
+      # - letsencrypt:/etc/letsencrypt
+    depends_on:
+      - api
+      - frontend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100k"
+        max-file: "1"
 
 volumes:
   postgres_data:

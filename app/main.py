@@ -31,7 +31,6 @@ if cfg.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
-
 @root_router.get("/", status_code=200)
 def root(
     request: Request,
@@ -41,7 +40,6 @@ def root(
     Root GET
     """
     return {"hello": "world"}
-
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
