@@ -14,7 +14,7 @@ engine_url = URL.create(
     host=cfg.DB_HOST,
     port=cfg.DB_PORT,
     database=cfg.DB_NAME,
-    query={'sslmode': 'verify-full'},
+    query={'sslmode': f"{'disable' if cfg.BUILD_ENV == 'dev' else 'verify-full'}"},
 )
 engine = create_engine(engine_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

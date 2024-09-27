@@ -15,6 +15,7 @@ from app.shared.logging import InterceptHandler
 class Config(BaseSettings):
 
     ### GENERAL ###
+    BUILD_ENV: str = None
     DEV: bool = True
     API_V1_STR: str = "/api/v1"
     INVITE_LINK_URL: str = "sotw/invite/"
