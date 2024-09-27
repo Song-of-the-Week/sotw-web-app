@@ -16,6 +16,8 @@ docker-down:
 
 docker-build: docker-build-nginx docker-build-backend docker-build-frontend
 
+docker-build-prod: docker-build-prod-nginx docker-build-backend docker-build-frontend
+
 # docker-build-backend:
 # 	. venv/bin/activate && ./venv/bin/pip freeze > ./app/requirements.txt
 # 	cd app && docker build --no-cache -t sotw-api .
@@ -25,6 +27,9 @@ docker-build-backend:
 	rm app/alembic.ini
 
 docker-build-nginx:
+	cd nginx && docker build -f Dockerfile.dev --no-cache -t sotw-nginx .
+
+docker-build-prod-nginx:
 	cd nginx && docker build --no-cache -t sotw-nginx .
 
 docker-build-frontend:
