@@ -145,7 +145,7 @@ async def register(
         httponly=True,
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
-        samesite="Lax",
+        samesite="none",
         secure=cfg.COOKIE_SECURE_SETTING,
     )
 
@@ -195,7 +195,7 @@ async def verify(
         httponly=True,
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
-        samesite="Lax",
+        samesite="none",
         secure=cfg.COOKIE_SECURE_SETTING,
     )
 
