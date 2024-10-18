@@ -3,6 +3,8 @@ FROM python:3.10.7-slim
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
+COPY ./ /app/
+
 RUN apt-get update && apt-get install -y \
   build-essential \
   libffi-dev \
