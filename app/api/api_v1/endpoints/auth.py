@@ -21,7 +21,6 @@ from app.shared.config import cfg
 
 router = APIRouter()
 
-
 @router.post("/login", response_model=schemas.User)
 async def login(
     session: Session = Depends(deps.get_session),
@@ -57,8 +56,8 @@ async def login(
         httponly=True,
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
-        samesite="Lax",
-        secure=False,
+        samesite="none",
+        secure=cfg.COOKIE_SECURE_SETTING,
     )
 
     return user
@@ -147,7 +146,7 @@ async def register(
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         samesite="Lax",
-        secure=False,
+        secure=cfg.COOKIE_SECURE_SETTING,
     )
 
     return user
@@ -197,7 +196,7 @@ async def verify(
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         samesite="Lax",
-        secure=False,
+        secure=cfg.COOKIE_SECURE_SETTING,
     )
 
     return user
