@@ -24,10 +24,11 @@ class Config(BaseSettings):
     LOGGER_LEVEL: int = logging.INFO
     LOGGING_CONFIG: str = "/home/clarice/sotw-web-app/app/log_conf.yaml"
     DEBUG: bool = False
-    SEND_REGISTRATION_EMAILS: bool = True
+    SEND_REGISTRATION_EMAILS: bool = False
     REGISTRATION_VERIFICATION_URL: str = "http://localhost:8080/auth/verify/"
     EMAIL_CHANGE_VERIFICATION_URL: str = "http://localhost:8080/user/email/verify/"
     PASSWORD_RESET_VERIFICATION_URL: str = "http://localhost:8080/password-reset/"
+    COOKIE_SAMESITE_SETTING: str = "Lax"
     COOKIE_SECURE_SETTING: bool = False
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  # 8 days

@@ -23,7 +23,10 @@ def test_get_current_week_403(client, sotw):
     assert response.status_code == 403
 
 
-def test_get_current_week_success_week_0(client):
+@patch("app.shared.utils.datetime")
+def test_get_current_week_success_week_0(mock_datetime, client):
+    mock_datetime.now.return_value = datetime(2024, 7, 5, 13, 20)
+    mock_datetime.side_effect = lambda *args, **kw: datetime(*args, **kw)
     # When
     # "link" spotify
     payload = {

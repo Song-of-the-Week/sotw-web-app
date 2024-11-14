@@ -166,7 +166,8 @@ def test_post_response_success_week_n_no_repeat(client, current_week_new_week):
 
     # Then
     assert response.status_code == 201
-    assert "repeat" not in data.keys()
+    assert "repeat" in data.keys()
+    assert not data["repeat"]
 
 
 def test_post_response_success_week_n_repeat(client, current_week_new_week_plus_1):
@@ -236,7 +237,8 @@ def test_post_response_success_week_n_repeat_approved(
 
     # Then
     assert response.status_code == 201
-    assert "repeat" not in data.keys()
+    assert "repeat" in data.keys()
+    assert not data["repeat"]
 
 
 def test_post_response_success_week_n_replace_existing_response(

@@ -21,6 +21,7 @@ from app.shared.config import cfg
 
 router = APIRouter()
 
+
 @router.post("/login", response_model=schemas.User)
 async def login(
     session: Session = Depends(deps.get_session),
@@ -56,7 +57,7 @@ async def login(
         httponly=True,
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
-        samesite="none",
+        samesite=cfg.COOKIE_SAMESITE_SETTING,
         secure=cfg.COOKIE_SECURE_SETTING,
     )
 
@@ -94,7 +95,7 @@ async def get_current_user(
     return current_user
 
 
-@router.post("/register", status_code=200, response_model=Union[Any, schemas.User])
+@router.post("/register", status_code=200, response_model=Union[schemas.User, Any])
 async def register(
     session: Session = Depends(deps.get_session),
     *,
