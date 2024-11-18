@@ -42,9 +42,9 @@ async def update_user(
         HTTPException: 403 for unauthorized users or for incorrect password
 
     Returns:
-        Any: the uupdated user object
+        Any: the updated user object
     """
-    if not current_user.is_superuser and user_id != current_user.id:
+    if not current_user.is_superuser or user_id != current_user.id:
         raise HTTPException(status_code=403, detail=f"Not authorized to update.")
 
     if payload.current_password is not None and payload.new_password is not None:
