@@ -57,6 +57,9 @@ class SpotifyClient:
         )
 
         if response.status_code != 200:
+            logger.error(f"ERROR STATUS: {response.status_code}")
+            logger.error(f"ERROR RESPONSE CONTENT: {response.content}")
+            logger.error(f"ERROR RESPONSE: {response}")
             logger.error(response.json())
             response.raise_for_status()
 

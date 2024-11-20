@@ -37,10 +37,10 @@ class SotwInDB(SotwInDBBase): ...
 
 # additional properties to return via API
 class Sotw(SotwInDBBase):
-    id: int
+    id: str
     name: str
     created_at: datetime
-    owner_id: int
+    owner_id: str
     results_datetime: int
 
 
@@ -51,6 +51,6 @@ class SotwInvite(Base):
 
 # info to give to invitees
 class SotwInfo(Base):
-    id: Optional[int] = 0
+    id: Optional[str] = ""
     name: Optional[str] = ""
     already_in: Optional[bool] = False

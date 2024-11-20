@@ -270,4 +270,4 @@ def test_delete_user_success(client):
 
     # Then
     assert response.status_code == 200
-    assert data["id"] == 1
+    assert int(data["id"]) == 1

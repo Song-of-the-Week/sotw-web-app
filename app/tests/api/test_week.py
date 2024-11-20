@@ -37,7 +37,12 @@ def test_get_current_week_success_week_0(mock_datetime, client):
         f"{cfg.API_V1_STR}/auth/spotify-access-token", data=json.dumps(payload)
     )
     # create sotw
-    results_time = 1720719000000 - 604800000
+    results_time = (
+        get_next_datetime(
+            datetime.now().day, datetime.now().hour, datetime.now().minute
+        )
+        - 604800000
+    )
     payload = {
         "name": "test_sotw",
         "results_datetime": results_time,

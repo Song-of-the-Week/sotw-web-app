@@ -30,6 +30,7 @@ class Config(BaseSettings):
     PASSWORD_RESET_VERIFICATION_URL: str = "http://localhost:8080/password-reset/"
     COOKIE_SAMESITE_SETTING: str = "Lax"
     COOKIE_SECURE_SETTING: bool = False
+    COOKIE_SAMESITE_SETTING: str = "Lax"
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  # 8 days
     SHARE_TOKEN_EXPIRE_MINUTES: int = 30  # 30 minutes

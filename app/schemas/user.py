@@ -58,7 +58,7 @@ class UserInDB(UserInDBBase):
 class User(UserInDBBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: str
     email: EmailStr
     name: str
     is_superuser: bool

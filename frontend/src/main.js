@@ -8,7 +8,7 @@ import axios from "axios";
 /* axios config */
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = config.API_HOSTNAME;
-axios.interceptors.response.use(undefined, function (error) {
+axios.interceptors.response.use(undefined, (error) => {
   if (error) {
     console.log("ERROR", error);
     const status = error.response !== undefined ? error.response.status : 500;

@@ -90,13 +90,29 @@ async def get_current_week(
         sotw_num_users = len(sotw.user_list)
         if sotw_num_users < 3:
             return schemas.WeekErrorResponse(
-                week=schemas.Week(submitted=submitted, **current_week.__dict__),
+                week=schemas.Week(
+                    id=current_week.id,
+                    sotw_id=str(current_week.sotw_id),
+                    week_num=current_week.week_num,
+                    playlist_link=current_week.playlist_link,
+                    next_results_release=current_week.next_results_release,
+                    survey=current_week.survey,
+                    submitted=submitted,
+                ),
                 status=406,
                 message=f"You will need at least three players in your Song of the Week competition in order to continue playing.",
             )
         if len(current_week.responses) < sotw_num_users:
             return schemas.WeekErrorResponse(
-                week=schemas.Week(submitted=submitted, **current_week.__dict__),
+                week=schemas.Week(
+                    id=current_week.id,
+                    sotw_id=str(current_week.sotw_id),
+                    week_num=current_week.week_num,
+                    playlist_link=current_week.playlist_link,
+                    next_results_release=current_week.next_results_release,
+                    survey=current_week.survey,
+                    submitted=submitted,
+                ),
                 status=406,
                 message=f"Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on {sotw_num_users - len(current_week.responses)} player{'s' if sotw_num_users - len(current_week.responses) > 1 else ''} to submit.",
             )
@@ -291,4 +307,12 @@ async def get_current_week(
         # user has not submitted for this new week
         submitted = False
 
-    return schemas.Week(submitted=submitted, **current_week.__dict__)
+    return schemas.Week(
+        id=current_week.id,
+        sotw_id=str(current_week.sotw_id),
+        week_num=current_week.week_num,
+        playlist_link=current_week.playlist_link,
+        next_results_release=current_week.next_results_release,
+        survey=current_week.survey,
+        submitted=submitted,
+    )

@@ -89,7 +89,17 @@ async def create_sotw(
     )
     crud.user_playlist.create(session, object_in=user_playlist_create)
 
-    return sotw
+    return schemas.Sotw(
+        created_at=sotw.created_at,
+        id=str(sotw.id),
+        master_playlist_id=sotw.master_playlist_id,
+        master_playlist_link=sotw.master_playlist_link,
+        name=sotw.name,
+        owner_id=str(sotw.owner_id),
+        results_datetime=sotw.results_datetime,
+        soty_playlist_id=sotw.soty_playlist_id,
+        soty_playlist_link=sotw.soty_playlist_link,
+    )
 
 
 @router.get("/{sotw_id}", response_model=schemas.Sotw)
@@ -122,7 +132,17 @@ async def get_sotw(
     if current_user not in sotw.user_list:
         raise HTTPException(status_code=403, detail=f"Not authorized.")
 
-    return sotw
+    return schemas.Sotw(
+        created_at=sotw.created_at,
+        id=str(sotw.id),
+        master_playlist_id=sotw.master_playlist_id,
+        master_playlist_link=sotw.master_playlist_link,
+        name=sotw.name,
+        owner_id=str(sotw.owner_id),
+        results_datetime=sotw.results_datetime,
+        soty_playlist_id=sotw.soty_playlist_id,
+        soty_playlist_link=sotw.soty_playlist_link,
+    )
 
 
 @router.get("/{sotw_id}/invite", response_model=schemas.SotwInvite)
@@ -209,9 +229,9 @@ async def get_sotw_invite_pending(
         )
     # don't worry about if the user's already in the sotw
     if current_user in sotw.user_list:
-        return schemas.SotwInfo(id=sotw.id, name=sotw.name, already_in=True)
+        return schemas.SotwInfo(id=str(sotw.id), name=sotw.name, already_in=True)
 
-    return schemas.SotwInfo(id=sotw.id, name=sotw.name)
+    return schemas.SotwInfo(id=str(sotw.id), name=sotw.name)
 
 
 @router.get("/invite/join/{share_token}", response_model=schemas.SotwInfo)
@@ -286,7 +306,7 @@ async def get_sotw_invite_join(
         )
         crud.user_playlist.create(session, object_in=user_playlist_create)
 
-    return schemas.SotwInfo(id=sotw.id)
+    return schemas.SotwInfo(id=str(sotw.id))
 
 
 @router.get("/{sotw_id}/leave", response_model=schemas.User)
@@ -317,7 +337,37 @@ async def get_leave_sotw(
             status_code=404, detail=f"Sotw with given id {sotw_id} not found."
         )
     if current_user not in sotw.user_list:
-        return current_user
+        return schemas.User(
+            id=str(current_user.id),
+            email=current_user.email,
+            name=current_user.name,
+            is_superuser=current_user.is_superuser,
+            spotify_linked=current_user.spotify_linked,
+            playlists=[
+                schemas.UserPlaylist(
+                    id=str(playlist.id),
+                    playlist_id=playlist.playlist_id,
+                    playlist_link=playlist.playlist_link,
+                    sotw_id=str(playlist.sotw_id),
+                    user_id=str(playlist.user_id),
+                )
+                for playlist in current_user.playlists
+            ],
+            sotw_list=[
+                schemas.Sotw(
+                    created_at=sotw.created_at,
+                    id=str(sotw.id),
+                    master_playlist_id=sotw.master_playlist_id,
+                    master_playlist_link=sotw.master_playlist_link,
+                    name=sotw.name,
+                    owner_id=str(sotw.owner_id),
+                    results_datetime=sotw.results_datetime,
+                    soty_playlist_id=sotw.soty_playlist_id,
+                    soty_playlist_link=sotw.soty_playlist_link,
+                )
+                for sotw in current_user.sotw_list
+            ],
+        )
 
     # remove user from sotw
     crud.user.remove_user_from_sotw(
@@ -325,4 +375,34 @@ async def get_leave_sotw(
     )
 
     session.refresh(current_user)
-    return current_user
+    return schemas.User(
+        id=str(current_user.id),
+        email=current_user.email,
+        name=current_user.name,
+        is_superuser=current_user.is_superuser,
+        spotify_linked=current_user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in current_user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in current_user.sotw_list
+        ],
+    )
