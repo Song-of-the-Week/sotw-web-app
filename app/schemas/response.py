@@ -50,7 +50,6 @@ class ResponseInDB(ResponseInDBBase): ...
 
 # additional properties to return via API
 class Response(ResponseInDBBase):
-    submitter_id: int
+    submitter_id: str
     user_song_matches: List[UserSongMatch]
     number_correct_matches: int
-    votes: List[int]

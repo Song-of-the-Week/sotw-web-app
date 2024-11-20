@@ -21,6 +21,7 @@ from app.shared.config import cfg
 
 router = APIRouter()
 
+
 @router.post("/login", response_model=schemas.User)
 async def login(
     session: Session = Depends(deps.get_session),
@@ -56,11 +57,41 @@ async def login(
         httponly=True,
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
-        samesite="none",
+        samesite=cfg.COOKIE_SAMESITE_SETTING,
         secure=cfg.COOKIE_SECURE_SETTING,
     )
 
-    return user
+    return schemas.User(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        is_superuser=user.is_superuser,
+        spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in user.sotw_list
+        ],
+    )
 
 
 @router.get("/logout")
@@ -91,7 +122,37 @@ async def get_current_user(
     Returns:
         schemas.User: The currently logged in user
     """
-    return current_user
+    return schemas.User(
+        id=str(current_user.id),
+        email=current_user.email,
+        name=current_user.name,
+        is_superuser=current_user.is_superuser,
+        spotify_linked=current_user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in current_user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in current_user.sotw_list
+        ],
+    )
 
 
 @router.post("/register", status_code=200, response_model=Union[Any, schemas.User])
@@ -145,11 +206,41 @@ async def register(
         httponly=True,
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
-        samesite="none",
+        samesite=cfg.COOKIE_SAMESITE_SETTING,
         secure=cfg.COOKIE_SECURE_SETTING,
     )
 
-    return user
+    return schemas.User(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        is_superuser=user.is_superuser,
+        spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in user.sotw_list
+        ],
+    )
 
 
 @router.get(
@@ -195,11 +286,41 @@ async def verify(
         httponly=True,
         max_age=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
         expires=cfg.SESSION_COOKIE_EXPIRE_SECONDS,
-        samesite="none",
+        samesite=cfg.COOKIE_SAMESITE_SETTING,
         secure=cfg.COOKIE_SECURE_SETTING,
     )
 
-    return user
+    return schemas.User(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        is_superuser=user.is_superuser,
+        spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in user.sotw_list
+        ],
+    )
 
 
 @router.get("/spotify-client-id")
@@ -259,8 +380,38 @@ async def spotify_access_token(
             spotify_accessed_date=datetime.utcnow(),
         )
 
-        return crud.user.update(
+        current_user = crud.user.update(
             session=session, db_object=current_user, object_in=object_in
         )
 
-    return current_user
+    return schemas.User(
+        id=str(current_user.id),
+        email=current_user.email,
+        name=current_user.name,
+        is_superuser=current_user.is_superuser,
+        spotify_linked=current_user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in current_user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in current_user.sotw_list
+        ],
+    )

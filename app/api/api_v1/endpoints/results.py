@@ -72,4 +72,12 @@ async def get_results(
             release_time=week.next_results_release,
         )
 
-    return results
+    return schemas.Results(
+        id=str(results.id),
+        sotw_id=str(sotw.id),
+        week_id=week.id,
+        first_place=results.first_place,
+        second_place=results.second_place,
+        all_songs=results.all_songs,
+        guessing_data=results.guessing_data,
+    )

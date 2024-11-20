@@ -44,7 +44,7 @@ def test_sotw_creation_success(client):
     assert "soty_playlist_link" in data.keys()
     assert data["soty_playlist_link"] == "www.example2.com"
     assert "owner_id" in data.keys()
-    assert data["owner_id"] == 1
+    assert int(data["owner_id"]) == 1
 
 
 def test_get_sotw_404(client):
@@ -197,7 +197,7 @@ def test_get_sotw_invite_pending_success(decode, client, sotw):
     assert "already_in" in data.keys()
     assert data["already_in"] == False
     assert "id" in data.keys()
-    assert data["id"] == 1
+    assert int(data["id"]) == 1
 
 
 def test_get_sotw_invite_join_403(client):
@@ -276,7 +276,7 @@ def test_get_sotw_invite_join_success(decode, client, sotw):
     # Then
     assert response.status_code == 200
     assert "id" in data.keys()
-    assert data["id"] == 1
+    assert int(data["id"]) == 1
 
     response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
     data = response.json()
@@ -359,7 +359,7 @@ def test_get_leave_sotw_success_and_rejoin_with_same_playlist(decode, client, so
     # Then
     assert response.status_code == 200
     assert "id" in data.keys()
-    assert data["id"] == 1
+    assert int(data["id"]) == 1
 
     response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
     data = response.json()

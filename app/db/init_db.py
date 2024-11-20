@@ -10,13 +10,24 @@ from app import schemas
 from app.shared.utils import get_next_datetime
 
 
-def _create_user(session, email, name, password, is_superuser: bool = False):
-    user_in = schemas.UserCreate(
-        email=email,
-        name=name,
-        is_superuser=is_superuser,
-        password=password,
-    )
+def _create_user(
+    session, email, name, password, is_superuser: bool = False, id: int = 0
+):
+    if not id:
+        user_in = schemas.UserCreate(
+            email=email,
+            name=name,
+            is_superuser=is_superuser,
+            password=password,
+        )
+    else:
+        user_in = schemas.UserCreate(
+            id=id,
+            email=email,
+            name=name,
+            is_superuser=is_superuser,
+            password=password,
+        )
     return crud.user.create(session, object_in=user_in)
 
 
@@ -94,6 +105,7 @@ def init_db(session: Session):
     superuser = crud.user.get_by_email(session, email="admin@admin.admin")
     if not superuser:
         superuser = _create_user(
+            id=1014942672403234817,
             session=session,
             email="admin@admin.admin",
             name="admin",
@@ -102,18 +114,21 @@ def init_db(session: Session):
         )
     # create 3 normal users
     user1 = _create_user(
+        id=1014942672403234818,
         session=session,
         email="test1@admin.admin",
         name="test1",
         password="password",
     )
     user2 = _create_user(
+        id=1014942672403234819,
         session=session,
         email="test2@admin.admin",
         name="test2",
         password="password",
     )
     user3 = _create_user(
+        id=1014942672403234820,
         session=session,
         email="test3@admin.admin",
         name="test3",
@@ -266,22 +281,22 @@ def init_db(session: Session):
         ],
         "users": [
             {
-                "id": 1,
+                "id": 1014942672403234817,
                 "name": "admin",
                 "matched": False,
             },
             {
-                "id": 2,
+                "id": 1014942672403234818,
                 "name": "test1",
                 "matched": False,
             },
             {
-                "id": 3,
+                "id": 1014942672403234819,
                 "name": "test2",
                 "matched": False,
             },
             {
-                "id": 4,
+                "id": 1014942672403234820,
                 "name": "test3",
                 "matched": False,
             },
@@ -311,16 +326,20 @@ def init_db(session: Session):
     )
     # add user_song_matches
     _create_user_song_match(
-        session=session, response=response, user_id=1, song_id=6, correct=False
+        session=session,
+        response=response,
+        user_id=superuser.id,
+        song_id=6,
+        correct=False,
     )
     _create_user_song_match(
-        session=session, response=response, user_id=2, song_id=5, correct=True
+        session=session, response=response, user_id=user1.id, song_id=5, correct=True
     )
     _create_user_song_match(
-        session=session, response=response, user_id=3, song_id=4, correct=False
+        session=session, response=response, user_id=user2.id, song_id=4, correct=False
     )
     _create_user_song_match(
-        session=session, response=response, user_id=4, song_id=7, correct=True
+        session=session, response=response, user_id=user3.id, song_id=7, correct=True
     )
     # update response
     session.refresh(response)
@@ -343,16 +362,20 @@ def init_db(session: Session):
     )
     # add user_song_matches
     _create_user_song_match(
-        session=session, response=response, user_id=1, song_id=5, correct=False
+        session=session,
+        response=response,
+        user_id=superuser.id,
+        song_id=5,
+        correct=False,
     )
     _create_user_song_match(
-        session=session, response=response, user_id=2, song_id=7, correct=False
+        session=session, response=response, user_id=user1.id, song_id=7, correct=False
     )
     _create_user_song_match(
-        session=session, response=response, user_id=3, song_id=6, correct=True
+        session=session, response=response, user_id=user2.id, song_id=6, correct=True
     )
     _create_user_song_match(
-        session=session, response=response, user_id=4, song_id=4, correct=False
+        session=session, response=response, user_id=user3.id, song_id=4, correct=False
     )
     # update response
     session.refresh(response)
@@ -375,16 +398,20 @@ def init_db(session: Session):
     )
     # add user_song_matches
     _create_user_song_match(
-        session=session, response=response, user_id=1, song_id=6, correct=False
+        session=session,
+        response=response,
+        user_id=superuser.id,
+        song_id=6,
+        correct=False,
     )
     _create_user_song_match(
-        session=session, response=response, user_id=2, song_id=4, correct=False
+        session=session, response=response, user_id=user1.id, song_id=4, correct=False
     )
     _create_user_song_match(
-        session=session, response=response, user_id=3, song_id=5, correct=False
+        session=session, response=response, user_id=user2.id, song_id=5, correct=False
     )
     _create_user_song_match(
-        session=session, response=response, user_id=4, song_id=7, correct=True
+        session=session, response=response, user_id=user3.id, song_id=7, correct=True
     )
     # update response
     session.refresh(response)
@@ -408,5 +435,5 @@ def main():
     logger.info("Initial data created")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

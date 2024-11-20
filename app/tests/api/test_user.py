@@ -162,7 +162,7 @@ def test_reset_password_change_400(client):
     # When
     payload = {}
     response = client.post(
-        f"{cfg.API_V1_STR}/user/verify/reset-password-change/exampletoken",
+        f"{cfg.API_V1_STR}/user/reset-password-change/exampletoken",
         data=json.dumps(payload),
     )
     data = response.json()
@@ -178,7 +178,7 @@ def test_reset_password_change_404(decode, client):
     # When
     payload = {"new_password": "password"}
     response = client.post(
-        f"{cfg.API_V1_STR}/user/verify/reset-password-change/exampletoken",
+        f"{cfg.API_V1_STR}/user/reset-password-change/exampletoken",
         data=json.dumps(payload),
     )
     data = response.json()
@@ -197,7 +197,7 @@ def test_reset_password_change_403(decode, client):
     # When
     payload = {"new_password": "password"}
     response = client.post(
-        f"{cfg.API_V1_STR}/user/verify/reset-password-change/exampletoken",
+        f"{cfg.API_V1_STR}/user/reset-password-change/exampletoken",
         data=json.dumps(payload),
     )
     data = response.json()
@@ -224,7 +224,7 @@ def test_reset_password_change_success(decode, client):
     # When
     payload = {"new_password": "new_password"}
     response = client.post(
-        f"{cfg.API_V1_STR}/user/verify/reset-password-change/exampletoken",
+        f"{cfg.API_V1_STR}/user/reset-password-change/exampletoken",
         data=json.dumps(payload),
     )
 
@@ -270,4 +270,4 @@ def test_delete_user_success(client):
 
     # Then
     assert response.status_code == 200
-    assert data["id"] == 1
+    assert int(data["id"]) == 1

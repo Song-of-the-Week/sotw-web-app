@@ -74,9 +74,71 @@ async def update_user(
             to=payload.email,
             to_name=current_user.name,
         )
-        return current_user
+        return schemas.User(
+            id=str(current_user.id),
+            email=current_user.email,
+            name=current_user.name,
+            is_superuser=current_user.is_superuser,
+            spotify_linked=current_user.spotify_linked,
+            playlists=[
+                schemas.UserPlaylist(
+                    id=str(playlist.id),
+                    playlist_id=playlist.playlist_id,
+                    playlist_link=playlist.playlist_link,
+                    sotw_id=str(playlist.sotw_id),
+                    user_id=str(playlist.user_id),
+                )
+                for playlist in current_user.playlists
+            ],
+            sotw_list=[
+                schemas.Sotw(
+                    created_at=sotw.created_at,
+                    id=str(sotw.id),
+                    master_playlist_id=sotw.master_playlist_id,
+                    master_playlist_link=sotw.master_playlist_link,
+                    name=sotw.name,
+                    owner_id=str(sotw.owner_id),
+                    results_datetime=sotw.results_datetime,
+                    soty_playlist_id=sotw.soty_playlist_id,
+                    soty_playlist_link=sotw.soty_playlist_link,
+                )
+                for sotw in current_user.sotw_list
+            ],
+        )
 
-    return crud.user.update(session=session, db_object=current_user, object_in=payload)
+    user = crud.user.update(session=session, db_object=current_user, object_in=payload)
+
+    return schemas.User(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        is_superuser=user.is_superuser,
+        spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in user.sotw_list
+        ],
+    )
 
 
 @router.get("/verify/{verification_token}", response_model=schemas.User)
@@ -115,7 +177,39 @@ async def verify_email_change(
             detail=f"The token is no longer valid.",
         )
 
-    return crud.user.update(session=session, db_object=current_user, object_in=user_in)
+    user = crud.user.update(session=session, db_object=current_user, object_in=user_in)
+
+    return schemas.User(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        is_superuser=user.is_superuser,
+        spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in user.sotw_list
+        ],
+    )
 
 
 @router.post("/reset-password")
@@ -141,7 +235,6 @@ async def reset_password(
     Returns:
         Any: the uupdated user object
     """
-    # TODO implement this with tests as well as other endpoint to handle token decoding "reset-password-change"
     email = payload.email
     user = crud.user.get_by_email(session=session, email=email)
     if not user:
@@ -250,4 +343,36 @@ async def delete_user(
     if not current_user.is_superuser and user_id != current_user.id:
         raise HTTPException(status_code=403, detail=f"Not authorized to delete.")
 
-    return crud.user.delete(session=session, id=user_id)
+    user = crud.user.delete(session=session, id=user_id)
+
+    return schemas.User(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        is_superuser=user.is_superuser,
+        spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in user.playlists
+        ],
+        sotw_list=[
+            schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in user.sotw_list
+        ],
+    )

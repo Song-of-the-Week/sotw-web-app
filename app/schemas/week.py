@@ -36,6 +36,7 @@ class WeekInDB(WeekInDBBase): ...
 
 # additional properties to return via API
 class Week(WeekInDBBase):
+    sotw_id: str
     week_num: int
     playlist_link: str
     next_results_release: int

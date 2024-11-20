@@ -36,7 +36,7 @@ class UserPlaylistInDB(UserPlaylistInDBBase): ...
 class UserPlaylist(UserPlaylistInDBBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: str
     playlist_link: str
-    sotw_id: int
-    user_id: int
+    sotw_id: str
+    user_id: str

@@ -34,6 +34,8 @@ class ResultsInDB(ResultsInDBBase): ...
 
 # additional properties to return via API
 class Results(ResultsInDBBase):
+    id: str
+    sotw_id: str
     first_place: str
     second_place: str
     all_songs: str

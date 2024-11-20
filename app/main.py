@@ -25,11 +25,12 @@ if cfg.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[str(origin) for origin in cfg.BACKEND_CORS_ORIGINS],
-        # allow_origin_regex=cfg.BACKEND_CORS_ORIGIN_REGEX,
+        allow_origin_regex=cfg.BACKEND_CORS_ORIGIN_REGEX,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
 
 @root_router.get("/", status_code=200)
 def root(
@@ -40,6 +41,7 @@ def root(
     Root GET
     """
     return {"hello": "world"}
+
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
@@ -63,5 +65,6 @@ def main() -> None:
         reload=cfg.DEBUG,
     )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())

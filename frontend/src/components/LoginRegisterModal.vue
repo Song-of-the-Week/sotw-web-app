@@ -531,10 +531,12 @@ export default {
         })
         .catch((err) => {
           // error handling
-          if (400 <= err.response.status < 500) {
-            vm.loginResponse400 = err.response.data.detail;
-          } else if (err.response.status >= 500) {
-            vm.loginResponse500 = true;
+          if (err.response) {
+            if (400 <= err.response.status < 500) {
+              vm.loginResponse400 = err.response.data.detail;
+            } else if (err.response.status >= 500) {
+              vm.loginResponse500 = true;
+            }
           } else {
             console.error("ERROR:", err);
           }
