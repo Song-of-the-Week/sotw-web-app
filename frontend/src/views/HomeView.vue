@@ -88,13 +88,7 @@ export default {
     const vm = this;
 
     // check for redirection from spotify
-    console.log("WHAT 1", vm.$route);
     await vm.$router.isReady().then((_) => {
-      console.log("WHAT 2", vm.$route);
-      console.log("WHAT 3", vm.$route.query);
-      console.log("WHAT 4", "state" in vm.$route.query);
-      console.log("WHAT 5", vm.$route.query.state);
-      console.log("WHAT 6", vm.user.email + "-" + vm.user.name);
       if ("state" in vm.$route.query && vm.$route.query.state == vm.user.email + "-" + vm.user.name) {
         if ("code" in vm.$route.query) {
           const payload = {

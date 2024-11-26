@@ -40,7 +40,6 @@ class SpotifyClient:
         )
 
         if response.status_code != 200:
-            logger.error(response.json())
             response.raise_for_status()
 
         data = response.json()
@@ -56,13 +55,7 @@ class SpotifyClient:
             },
         )
 
-        logger.error(f"RESPONSE STATUS: {response.status_code}")
-        logger.error(f"RESPONSE CONTENT: {response.content}")
         if response.status_code != 200:
-            logger.error(f"ERROR STATUS: {response.status_code}")
-            logger.error(f"ERROR RESPONSE CONTENT: {response.content}")
-            logger.error(f"ERROR RESPONSE: {response}")
-            logger.error(response.json())
             response.raise_for_status()
 
         data = response.json()
@@ -111,7 +104,6 @@ class SpotifyClient:
             )
 
             if response.status_code != 200:
-                logger.error(response.json())
                 response.raise_for_status()
 
             data = response.json()
@@ -126,7 +118,6 @@ class SpotifyClient:
                 session=session, db_object=user, object_in=object_in
             )
         else:
-            logger.error(response.json())
             response.raise_for_status()
 
     def create_playlist(
@@ -165,7 +156,6 @@ class SpotifyClient:
             },
         )
         if response.status_code != 201:
-            logger.error(response.json())
             response.raise_for_status()
 
         return response.json()
@@ -200,7 +190,6 @@ class SpotifyClient:
             },
         )
         if response.status_code != 201:
-            logger.error(response.json())
             response.raise_for_status()
 
         return response.json()
@@ -229,7 +218,6 @@ class SpotifyClient:
         )
 
         if response.status_code != 200:
-            logger.error(response.json())
             response.raise_for_status()
 
         return response.json()
