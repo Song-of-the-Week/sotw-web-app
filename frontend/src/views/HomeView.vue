@@ -88,46 +88,53 @@ export default {
     const vm = this;
 
     // check for redirection from spotify
-    await vm.$router.isReady();
-    if ("state" in vm.$route.query && vm.$route.query.state == vm.user.email + "-" + vm.user.name) {
-      if ("code" in vm.$route.query) {
-        const payload = {
-          code: vm.$route.query.code,
-          state: vm.$route.query.state,
-        };
-        // make api call to backend with the authorization code and update user on front end
+    console.log("WHAT 1", vm.$route);
+    await vm.$router.isReady().then((_) => {
+      console.log("WHAT 2", vm.$route);
+      console.log("WHAT 3", vm.$route.query);
+      console.log("WHAT 4", "state" in vm.$route.query);
+      console.log("WHAT 5", vm.$route.query.state);
+      console.log("WHAT 6", vm.user.email + "-" + vm.user.name);
+      if ("state" in vm.$route.query && vm.$route.query.state == vm.user.email + "-" + vm.user.name) {
+        if ("code" in vm.$route.query) {
+          const payload = {
+            code: vm.$route.query.code,
+            state: vm.$route.query.state,
+          };
+          // make api call to backend with the authorization code and update user on front end
+          api.methods
+            .apiUpdateUserSpotifyToken(payload)
+            .then(async (res) => {
+              await vm.getCurrentUser();
+            })
+            .then((_) => {
+              vm.$router.push(sessionStorage.getItem("last_requested_path"));
+            });
+          // TODO maybe add toastr or modal or something to indicate spotify linked
+        } else if ("error" in vm.$route.query) {
+          console.log("ERROR", vm.$route.query.error);
+          // TODO maybe add toastr or something to indicate spotify not linked
+        }
+      } else if (vm.$route.name == "verify") {
+        // make api call to backend to verify the token and update user on front end
         api.methods
-          .apiUpdateUserSpotifyToken(payload)
+          .apiGetVerifyRegistration(vm.$route.params.verificationToken)
           .then(async (res) => {
             await vm.getCurrentUser();
           })
           .then((_) => {
-            vm.$router.push(sessionStorage.getItem("last_requested_path"));
+            vm.$router.push("/link-spotify");
+          })
+          .catch((err) => {
+            console.error("Invalid link:", err);
           });
-        // TODO maybe add toastr or modal or something to indicate spotify linked
-      } else if ("error" in vm.$route.query) {
-        console.log("ERROR", vm.$route.query.error);
-        // TODO maybe add toastr or something to indicate spotify not linked
       }
-    } else if (vm.$route.name == "verify") {
-      // make api call to backend to verify the token and update user on front end
-      api.methods
-        .apiGetVerifyRegistration(vm.$route.params.verificationToken)
-        .then(async (res) => {
-          await vm.getCurrentUser();
-        })
-        .then((_) => {
-          vm.$router.push("/link-spotify");
-        })
-        .catch((err) => {
-          console.error("Invalid link:", err);
-        });
-    }
 
-    vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
-    if (vm.isLoggedIn) {
-      vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
-    }
+      vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
+      if (vm.isLoggedIn) {
+        vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+      }
+    });
   },
   methods: {
     ...mapActions(["getSotw", "getCurrentUser"]),
