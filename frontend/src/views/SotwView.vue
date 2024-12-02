@@ -193,11 +193,7 @@ export default {
       vm.getSotw(vm.$route.params.sotwId)
         .then(() => {
           localStorage.setItem("activeSotwId", vm.sotw.id);
-        })
-        .then(() => {
-          vm.getWeek(vm.sotw.id).then(() => {
-            vm.loading = false;
-          });
+          vm.loading = false;
         });
     }
   },

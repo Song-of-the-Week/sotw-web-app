@@ -87,7 +87,7 @@ class SpotifyClient:
         # if the user's access token is not expired, return the user with current access token
         if response.status_code == 200:
             return user
-        elif response.status_code == 401:
+        elif response.status_code == 401 or response.status_code == 400:
             # refresh the user's access token
             response = requests.post(
                 "https://accounts.spotify.com/api/token",
