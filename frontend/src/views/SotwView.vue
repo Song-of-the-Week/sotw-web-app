@@ -12,25 +12,16 @@
     <div v-else>
       <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <router-link :to="`/sotw/` + sotw.id + `/survey`" class="nav-link" :class="activeClass('survey')"
-            >Survey</router-link
-          >
+          <router-link :to="`/sotw/` + sotw.id + `/survey`" class="nav-link"
+            :class="activeClass('survey')">Survey</router-link>
         </li>
         <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            :class="activeClass('results') || activeClass('results_list')"
-            data-bs-toggle="dropdown"
-            href="#"
-            role="button"
-            aria-expanded="false"
-            >Results</a
-          >
+          <a class="nav-link dropdown-toggle" :class="activeClass('results') || activeClass('results_list')"
+            data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Results</a>
           <ul class="dropdown-menu">
             <li>
-              <router-link :to="`/sotw/` + sotw.id + `/results/` + currentWeek.week_num" class="nav-link"
-                >Results</router-link
-              >
+              <router-link :to="`/sotw/` + sotw.id + `/results/` + currentWeek.week_num"
+                class="nav-link">Results</router-link>
             </li>
             <li>
               <router-link :to="`/sotw/` + sotw.id + `/results`" class="nav-link">Previous Results</router-link>
@@ -38,65 +29,38 @@
           </ul>
         </li>
         <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
+          <a class="nav-link dropdown-toggle"
             :class="activeClass('playlist') || activeClass('soty') || activeClass('playlist_list')"
-            data-bs-toggle="dropdown"
-            href="#"
-            role="button"
-            aria-expanded="false"
-            >Playlists</a
-          >
+            data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Playlists</a>
           <ul class="dropdown-menu">
             <li>
-              <router-link :to="`/sotw/` + sotw.id + `/playlist/` + currentWeek.week_num" class="nav-link"
-                >Current Week's Playlist</router-link
-              >
+              <router-link :to="`/sotw/` + sotw.id + `/playlist/` + currentWeek.week_num" class="nav-link">Current
+                Week's Playlist</router-link>
             </li>
             <li>
-              <router-link :to="`/sotw/` + sotw.id + `/playlist/soty`" class="nav-link"
-                >Song of the Year Playlist</router-link
-              >
+              <router-link :to="`/sotw/` + sotw.id + `/playlist/soty`" class="nav-link">Song of the Year
+                Playlist</router-link>
             </li>
             <li>
-              <router-link :to="`/sotw/` + sotw.id + `/playlist/master`" class="nav-link"
-                >All Songs Playlist</router-link
-              >
+              <router-link :to="`/sotw/` + sotw.id + `/playlist/master`" class="nav-link">All Songs
+                Playlist</router-link>
             </li>
           </ul>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
-        <div
-          class="tab-pane fade"
-          :class="activeClass('survey')"
-          id="survey-tab-pane"
-          role="tabpanel"
-          aria-labelledby="survey-tab"
-          tabindex="0"
-        >
+        <div class="tab-pane fade" :class="activeClass('survey')" id="survey-tab-pane" role="tabpanel"
+          aria-labelledby="survey-tab" tabindex="0">
           <Survey :survey-string="currentWeek.survey" :week="currentWeek" :week-error="currentWeekError" />
         </div>
-        <div
-          class="tab-pane fade"
-          :class="activeClass('results')"
-          id="current-results-tab-pane"
-          role="tabpanel"
-          aria-labelledby="results-tab"
-          tabindex="0"
-        >
+        <div class="tab-pane fade" :class="activeClass('results')" id="current-results-tab-pane" role="tabpanel"
+          aria-labelledby="results-tab" tabindex="0">
           <div v-if="renderResults">
             <Results :sotw-id="sotw.id" :week-num="currentWeek.week_num" />
           </div>
         </div>
-        <div
-          class="tab-pane fade"
-          :class="activeClass('results_list')"
-          id="previous-results-tab-pane"
-          role="tabpanel"
-          aria-labelledby="results-tab"
-          tabindex="0"
-        >
+        <div class="tab-pane fade" :class="activeClass('results_list')" id="previous-results-tab-pane" role="tabpanel"
+          aria-labelledby="results-tab" tabindex="0">
           <h1>Previous Results</h1>
           <div v-if="currentWeek.week_num < 2" class="row">
             <div class="col">
@@ -107,47 +71,26 @@
             <div class="col"></div>
             <div class="col-10 col-lg-3 p-4">
               <div class="list-group">
-                <router-link
-                  v-for="n in currentWeek.week_num - 1"
-                  class="list-group-item list-group-item-action"
-                  :to="`/sotw/` + sotw.id + `/results/` + n"
-                  >week {{ n }} results</router-link
-                >
+                <router-link v-for="n in currentWeek.week_num - 1" class="list-group-item list-group-item-action"
+                  :to="`/sotw/` + sotw.id + `/results/` + n">week {{ n }} results</router-link>
               </div>
             </div>
             <div class="col"></div>
           </div>
         </div>
-        <div
-          class="tab-pane fade spotify-playlist"
-          :class="activeClass('playlist')"
-          id="current-playlist-tab-pane"
-          role="tabpanel"
-          aria-labelledby="current-playlist-tab-pane"
-          tabindex="0"
-        >
-          <h1>Current Playlist</h1>
-          <SpotifyEmbed :spotify-link="currentWeek.playlist_link" type="playlist" />
+        <div class="tab-pane fade spotify-playlist" :class="activeClass('playlist')" id="current-playlist-tab-pane"
+          role="tabpanel" aria-labelledby="current-playlist-tab-pane" tabindex="0">
+          <h1 v-if="currentWeek.week_num > 0">Current Playlist</h1>
+          <SpotifyEmbed v-if="currentWeek.week_num > 0" :spotify-link="currentWeek.playlist_link" type="playlist" />
+          <h1 v-if="currentWeek.week_num == 0">Come back next week for the first playlist!</h1>
         </div>
-        <div
-          class="tab-pane fade spotify-playlist"
-          :class="activeClass('soty')"
-          id="soty-playlist-tab-pane"
-          role="tabpanel"
-          aria-labelledby="soty-playlist-tab-pane"
-          tabindex="0"
-        >
+        <div class="tab-pane fade spotify-playlist" :class="activeClass('soty')" id="soty-playlist-tab-pane"
+          role="tabpanel" aria-labelledby="soty-playlist-tab-pane" tabindex="0">
           <h1>Soty Playlist</h1>
           <SpotifyEmbed :spotify-link="sotw.soty_playlist_link" type="playlist" />
         </div>
-        <div
-          class="tab-pane fade spotify-playlist"
-          :class="activeClass('playlist_list')"
-          id="master-playlist-tab-pane"
-          role="tabpanel"
-          aria-labelledby="master-playlist-tab-pane"
-          tabindex="0"
-        >
+        <div class="tab-pane fade spotify-playlist" :class="activeClass('playlist_list')" id="master-playlist-tab-pane"
+          role="tabpanel" aria-labelledby="master-playlist-tab-pane" tabindex="0">
           <h1>Master Playlist</h1>
           <SpotifyEmbed :spotify-link="sotw.master_playlist_link" type="playlist" />
         </div>
@@ -237,6 +180,7 @@ export default {
 .home {
   text-align: center;
 }
+
 .spotify-playlist {
   height: 70vh;
 }
