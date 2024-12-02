@@ -2,27 +2,15 @@
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <router-link class="navbar-brand ms-2" :to="`/`">Song of the Week</router-link>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div
-        class="offcanvas offcanvas-end"
-        tabindex="-1"
-        id="navbarSupportedContent"
-        aria-labelledby="navbarOffcanvasLgLabel"
-      >
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="navbarSupportedContent"
+        aria-labelledby="navbarOffcanvasLgLabel">
         <div class="offcanvas-header">
-          <router-link class="offcanvas-title navbar-brand" id="offcanvasNavbarLabel" :to="`/`"
-            ><span data-bs-dismiss="offcanvas">Song of the Week</span></router-link
-          >
+          <router-link class="offcanvas-title navbar-brand" id="offcanvasNavbarLabel" :to="`/`"><span
+              data-bs-dismiss="offcanvas">Song of the Week</span></router-link>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
@@ -31,21 +19,14 @@
               <router-link class="nav-link" :to="`/about`"><span data-bs-dismiss="offcanvas">About</span></router-link>
             </li>
             <li v-if="isLoggedIn" class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarResultsDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+              <a class="nav-link dropdown-toggle" href="#" id="navbarResultsDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
                 Sotw
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarResultsDropdown">
                 <li v-for="sotw in user.sotw_list">
-                  <router-link class="dropdown-item" :to="`/sotw/` + sotw.id"
-                    ><span data-bs-dismiss="offcanvas">{{ sotw.name }}</span></router-link
-                  >
+                  <router-link class="dropdown-item" :to="`/sotw/` + sotw.id"><span data-bs-dismiss="offcanvas">{{
+                    sotw.name }}</span></router-link>
                 </li>
               </ul>
             </li>
@@ -78,11 +59,8 @@
   </nav>
   <!-- Modals -->
   <SpotifyModal></SpotifyModal>
-  <LoginRegisterModal
-    :registering="loginRegistering"
-    :login-register-modal="loginRegisterModal"
-    :initial-path="initialPath"
-  />
+  <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal"
+    :initial-path="initialPath" />
   <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
 </template>

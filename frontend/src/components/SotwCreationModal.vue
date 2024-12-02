@@ -1,12 +1,6 @@
 <template>
-  <div
-    class="modal fade"
-    id="sotwCreationModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelby="sotwCreationModal"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="sotwCreationModal" tabindex="-1" role="dialog" aria-labelby="sotwCreationModal"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -17,33 +11,20 @@
           <form>
             <div class="mb-3">
               <label for="sotwName" class="form-label" :class="{ invalid: !sotwNameValid }">Name</label>
-              <input
-                v-model="sotwName"
-                type="text"
-                class="form-control"
-                id="sotwName"
-                aria-describedby="sotwNameHelp"
-              />
+              <input v-model="sotwName" type="text" class="form-control" id="sotwName"
+                aria-describedby="sotwNameHelp" />
               <p v-if="!sotwNameValid" class="invalid">Name must be at least two characters long.</p>
             </div>
             <div>
               <label for="resultsDayTime" class="form-label">
                 Results Release Day and Time
-                <i
-                  class="bi bi-question-circle"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="This will be the day of the week and time of day at which the results and the next survey are released each week."
-                ></i>
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip"
+                  data-bs-title="This will be the day of the week and time of day at which the results and the next survey are released each week."></i>
               </label>
-              <DayTimePicker
-                @input-day-time="
-                  (datetime) => {
-                    resultsDayTime = datetime;
-                  }
-                "
-                id="resultsDay"
-                aria-describedby="resultsDayHelp"
-              />
+              <DayTimePicker @input-day-time="(datetime) => {
+                resultsDayTime = datetime;
+              }
+                " id="resultsDay" aria-describedby="resultsDayHelp" />
             </div>
             <div v-if="createResponse400">
               <p class="invalid">{{ createResponse400 }}</p>
@@ -111,6 +92,7 @@ export default {
 
       // go back to initial path
       vm.$router.push(vm.initialPath);
+      $(".modal-backdrop").remove();
     });
 
     // submit form on enter key hit
@@ -180,13 +162,16 @@ p {
   font-size: 0.84rem;
   margin: 0;
 }
+
 .invalid {
   color: #d91313;
 }
+
 .btn-spinner-create {
   width: 73.7px;
   height: 38px;
 }
+
 .spinner-border {
   width: 1.4rem;
   height: 1.4rem;

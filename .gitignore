@@ -3,6 +3,7 @@ client_secrets.json
 venv/
 
 .env
+.python-version
 .vscode/
 postgres/
 venv/
