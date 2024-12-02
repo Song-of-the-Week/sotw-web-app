@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row mb-3">
     <div class="col">
       <h1 class="mt-3">Welcome to Song of the Week!</h1>
       <div v-if="!isLoggedIn">
@@ -46,12 +46,8 @@
             <div class="col"></div>
             <div class="col-10 col-lg-3 p-4">
               <div class="list-group">
-                <router-link
-                  v-for="sotw in user.sotw_list"
-                  class="list-group-item list-group-item-action"
-                  :to="`/sotw/` + sotw.id"
-                  >{{ sotw.name }}</router-link
-                >
+                <router-link v-for="sotw in user.sotw_list" class="list-group-item list-group-item-action"
+                  :to="`/sotw/` + sotw.id">{{ sotw.name }}</router-link>
               </div>
             </div>
             <div class="col"></div>
