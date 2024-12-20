@@ -5,13 +5,8 @@
         <div class="modal-header">
           <h5>Verify Email</h5>
           <router-link :to="initialPath">
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              @click="close()"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -30,13 +25,8 @@
         <div class="modal-header">
           <h5>Reset Password</h5>
           <router-link :to="initialPath">
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              @click="close()"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -45,16 +35,10 @@
               <p>Please enter the email associated with your account to receive a password reset link in your inbox.</p>
             </div>
             <div class="mb-3">
-              <label for="passwordResetEmail" class="form-label" :class="{ invalid: !passwordResetEmailValid }"
-                >Email Address</label
-              >
-              <input
-                v-model="passwordResetEmail"
-                type="email"
-                class="form-control"
-                id="passwordResetEmail"
-                aria-describedby="emailHelp"
-              />
+              <label for="passwordResetEmail" class="form-label" :class="{ invalid: !passwordResetEmailValid }">Email
+                Address</label>
+              <input v-model="passwordResetEmail" type="email" class="form-control" id="passwordResetEmail"
+                aria-describedby="emailHelp" />
               <p v-if="!passwordResetEmailValid" class="invalid">Email is invalid.</p>
             </div>
             <div v-if="passwordResetResponse400">
@@ -81,13 +65,8 @@
         <div class="modal-header">
           <h5>Email Sent!</h5>
           <router-link :to="initialPath">
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              @click="close()"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -107,13 +86,8 @@
           <h5 v-if="registering" class="modal-title">Register</h5>
           <h5 v-else class="modal-title">Login</h5>
           <router-link :to="initialPath">
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              @click="close()"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -122,76 +96,44 @@
             <div class="mb-3">
               <label for="registerEmail" class="form-label" :class="{ invalid: !registerEmailValid }">
                 Email Address
-                <i
-                  class="bi bi-question-circle"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Email will be used for login and password resetting."
-                ></i>
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip"
+                  data-bs-title="Email will be used for login and password resetting."></i>
               </label>
-              <input
-                v-model="registerForm.email"
-                type="email"
-                class="form-control"
-                id="registerEmail"
-                aria-describedby="emailHelp"
-              />
+              <input v-model="registerForm.email" type="email" class="form-control" id="registerEmail"
+                aria-describedby="emailHelp" />
               <p v-if="!registerEmailValid" class="invalid">Please provide a valid email address.</p>
             </div>
             <div class="mb-3">
               <label for="registerName" class="form-label" :class="{ invalid: !registerNameValid }">
                 Name
-                <i
-                  class="bi bi-question-circle"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="This name will be used publicly on the site to (potentially) announce you as a winner 
-                  for others to see when guessing names. You will be able to change your name at any time."
-                ></i>
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-title="This name will be used publicly on the site to (potentially) announce you as a winner 
+                  for others to see when guessing names. You will be able to change your name at any time."></i>
               </label>
-              <input
-                v-model="registerForm.name"
-                type="text"
-                class="form-control"
-                id="registerName"
-                aria-describedby="nameHelp"
-              />
+              <input v-model="registerForm.name" type="text" class="form-control" id="registerName"
+                aria-describedby="nameHelp" />
               <p v-if="!registerNameValid" class="invalid">Name must be at least two characters long.</p>
             </div>
             <div class="mb-3">
               <label for="registerPassword" class="form-label" :class="{ invalid: !registerPasswordValid }">
                 Password
-                <i
-                  class="bi bi-question-circle"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Password must be at least 8 characters long."
-                ></i>
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip"
+                  data-bs-title="Password must be at least 8 characters long."></i>
               </label>
-              <PasswordInput
-                id="registerPassword"
-                @input-password="
-                  (password) => {
-                    registerForm.password = password;
-                    validatePassword();
-                  }
-                "
-              />
+              <PasswordInput id="registerPassword" @input-password="(password) => {
+                  registerForm.password = password;
+                  validatePassword();
+                }
+                " />
               <p v-if="!registerPasswordValid" class="invalid">Password must be at least 8 characters long.</p>
             </div>
             <div class="mb-3">
-              <label
-                for="registerPasswordConfirm"
-                class="form-label"
-                :class="{ invalid: !registerPasswordConfirmValid }"
-                >Confirm Password</label
-              >
-              <PasswordInput
-                id="registerPasswordConfirm"
-                @input-password="
-                  (password) => {
-                    registerForm.passwordConfirm = password;
-                    validatePasswordConfirm();
-                  }
-                "
-              />
+              <label for="registerPasswordConfirm" class="form-label"
+                :class="{ invalid: !registerPasswordConfirmValid }">Confirm Password</label>
+              <PasswordInput id="registerPasswordConfirm" @input-password="(password) => {
+                  registerForm.passwordConfirm = password;
+                  validatePasswordConfirm();
+                }
+                " />
               <p v-if="!registerPasswordConfirmValid" class="invalid">Passwords must match.</p>
             </div>
             <div v-if="registerResponse400">
@@ -213,25 +155,16 @@
           <form v-else id="login-form">
             <div class="mb-3">
               <label for="loginEmail" class="form-label" :class="{ invalid: !loginEmailValid }">Email Address</label>
-              <input
-                v-model="loginForm.email"
-                type="email"
-                class="form-control"
-                id="loginEmail"
-                aria-describedby="emailHelp"
-              />
+              <input v-model="loginForm.email" type="email" class="form-control" id="loginEmail"
+                aria-describedby="emailHelp" />
               <p v-if="!loginEmailValid" class="invalid">Email is invalid.</p>
             </div>
             <div class="mb-3">
               <label for="loginPassword" class="form-label" :class="{ invalid: !loginPasswordValid }">Password</label>
-              <PasswordInput
-                id="loginPassword"
-                @input-password="
-                  (password) => {
-                    loginForm.password = password;
-                  }
-                "
-              />
+              <PasswordInput id="loginPassword" @input-password="(password) => {
+                  loginForm.password = password;
+                }
+                " />
               <p v-if="!loginPasswordValid" class="invalid">Password is invalid.</p>
             </div>
             <div v-if="loginResponse400">
@@ -494,7 +427,7 @@ export default {
           .apiPostRegister(vm.registerForm)
           .then(async (res) => {
             if (res && res.status == 200) {
-              localStorage.setItem("activeSotwId", null);
+              // localStorage.setItem("activeSotwId", null);
               vm.emailVerifyPending = true;
             }
           })
@@ -567,21 +500,26 @@ p {
   font-size: 0.84rem;
   margin: 0;
 }
+
 .invalid {
   color: #d91313;
 }
+
 .btn-spinner-register {
   width: 84.34px;
   height: 38px;
 }
+
 .btn-spinner-login {
   width: 66.3px;
   height: 38px;
 }
+
 .btn-spinner-reset {
   width: 106.02px;
   height: 38px;
 }
+
 .spinner-border {
   width: 1.4rem;
   height: 1.4rem;

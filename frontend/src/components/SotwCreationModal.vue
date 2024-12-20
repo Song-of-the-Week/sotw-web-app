@@ -123,7 +123,7 @@ export default {
         };
         vm.createSotw(payload)
           .then((_) => {
-            localStorage.setItem("activeSotwId", vm.sotw.id);
+            // localStorage.setItem("activeSotwId", vm.sotw.id);
             // refresh the user to get the new sotw in the user
             vm.getCurrentUser();
             // close the modal

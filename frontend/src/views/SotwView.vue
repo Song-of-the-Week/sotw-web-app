@@ -131,11 +131,11 @@ export default {
   beforeMount() {
     const vm = this;
 
-    if (!vm.sotw || vm.sotw.id != vm.$route.params.sotwId || vm.user.sotw_list.indexOf(vm.sotw.id) == -1) {
+    if (!vm.sotw || vm.sotw.id != vm.$route.params.sotwId) {
       vm.loading = true;
       vm.getSotw(vm.$route.params.sotwId)
         .then(() => {
-          localStorage.setItem("activeSotwId", vm.sotw.id);
+          // localStorage.setItem("activeSotwId", vm.sotw.id);
           vm.loading = false;
         });
     }

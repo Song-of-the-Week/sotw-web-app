@@ -20,7 +20,7 @@ export default {
           await dispatch("getWeek", id, { root: true });
         })
         .catch((err) => {
-          localStorage.removeItem("activeSotwId");
+          // localStorage.removeItem("activeSotwId");
         });
     },
     async createSotw({ commit }, payload) {

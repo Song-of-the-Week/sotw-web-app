@@ -62,7 +62,7 @@ export default {
       loadingLink: false,
     };
   },
-  mounted() {},
+  mounted() { },
   methods: {
     ...mapActions(["getSotw", "getCurrentUser"]),
     setSotw(sotwId) {
@@ -70,7 +70,7 @@ export default {
       // set active sotw
       vm.getSotw(sotwId).then(() => {
         // set the active sotw in local storage for persistence
-        window.localStorage.setItem("activeSotwId", sotwId);
+        // window.localStorage.setItem("activeSotwId", sotwId);
         // go to the home page
         vm.$router.push("/sotw/" + sotwId);
       });
@@ -121,8 +121,10 @@ export default {
   width: 82.04px;
   height: 38px;
 }
+
 .table td.text {
   max-width: 14rem;
+
   span {
     white-space: nowrap;
     overflow: hidden;
@@ -131,6 +133,7 @@ export default {
     max-width: 100%;
   }
 }
+
 .table th.text {
   span {
     white-space: nowrap;

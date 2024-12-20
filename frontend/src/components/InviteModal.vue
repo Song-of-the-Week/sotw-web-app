@@ -111,13 +111,13 @@ export default {
         .then((res) => {
           // set the active sotw
           let sotwId = res.data.id;
-          localStorage.setItem("activeSotwId", sotwId);
+          // localStorage.setItem("activeSotwId", sotwId);
           vm.getSotw(sotwId);
           // update the stored user in the front end
           vm.getCurrentUser();
           // close modal and redirect to the newly joined sotw
           vm.inviteModal.hide();
-          vm.$router.push("/sotw/" + localStorage.getItem("activeSotwId"));
+          vm.$router.push("/sotw/" + sotwId);
         })
         .catch((err) => {
           // error handling
@@ -159,14 +159,17 @@ p {
   font-size: 0.84rem;
   margin: 0;
 }
+
 .btn-spinner-register {
   width: 84.34px;
   height: 38px;
 }
+
 .btn-spinner-login {
   width: 66.3px;
   height: 38px;
 }
+
 .spinner-border {
   width: 1.4rem;
   height: 1.4rem;
