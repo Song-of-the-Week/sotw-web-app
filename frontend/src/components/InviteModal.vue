@@ -1,7 +1,21 @@
 <template>
   <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelby="inviteModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div v-if="response400" class="modal-content">
+      <div v-if="loadingRes" class="modal-content text-center">
+        <div class="modal-header">
+          <h5 class="modal-title">Loading...</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="spinner-border mt-5" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+      <div v-else-if="response400" class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Looks like the link you used is no longer valid.</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -49,7 +63,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <div>
-            <button v-if="loading" type="button" class="btn btn-primary btn-spinner-register">
+            <button v-if="loadingJoin" type="button" class="btn btn-primary btn-spinner-register">
               <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
@@ -75,7 +89,8 @@ export default {
   data() {
     return {
       sotwRes: { already_in: false },
-      loading: false,
+      loadingJoin: false,
+      loadingRes: true,
       response400: false,
       response500: false,
     };
@@ -90,7 +105,8 @@ export default {
 
     document.getElementById("inviteModal").addEventListener("hidden.bs.modal", function (_) {
       vm.sotwRes = { already_in: false };
-      vm.loading = false;
+      vm.loadingJoin = false;
+      vm.loadingRes = true;
       vm.response400 = vm.response500 = false;
     });
   },
@@ -105,7 +121,7 @@ export default {
       const vm = this;
 
       // join the sotw via api
-      vm.loading = true;
+      vm.loadingJoin = true;
       await api.methods
         .apiGetSotwInviteJoin(vm.$route.params.shareToken)
         .then((res) => {
@@ -136,7 +152,9 @@ export default {
       await api.methods
         .apiGetSotwInvitePending(vm.$route.params.shareToken)
         .then((res) => {
-          vm.sotwRes = res.data;
+          if (res && res.status == 200) {
+            vm.sotwRes = res.data;
+          }
         })
         .catch((err) => {
           // error handling
@@ -147,6 +165,9 @@ export default {
           } else {
             console.error("ERROR:", err);
           }
+        })
+        .finally(() => {
+          vm.loadingRes = false;
         });
     },
   },

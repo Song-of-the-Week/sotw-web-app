@@ -10,20 +10,15 @@ axios.defaults.withCredentials = true;
 axios.defaults.baseURL = config.API_HOSTNAME;
 axios.interceptors.response.use(undefined, (error) => {
   if (error) {
-    console.log("ERROR", error);
     const status = error.response !== undefined ? error.response.status : 500;
     const originalRequest = error.config;
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       store.dispatch("logout");
       return router.push("/login");
-    } else if (status === 404) {
-      if (originalRequest.url == "api/v1/user/reset-password") {
-        return Promise.reject(error);
-      } else {
-        return router.push("/404");
-      }
-    } else if (status == 403) {
+    } else if (status === 404 && originalRequest.url != "api/v1/user/reset-password") {
+      return router.push("/404");
+    } else if (status == 403 && !originalRequest.url.startsWith("api/v1/sotw/invite/pending/")) {
       return router.push("/403");
     } else {
       return Promise.reject(error);

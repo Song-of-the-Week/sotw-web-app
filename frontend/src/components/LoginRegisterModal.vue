@@ -120,9 +120,9 @@
                   data-bs-title="Password must be at least 8 characters long."></i>
               </label>
               <PasswordInput id="registerPassword" @input-password="(password) => {
-                  registerForm.password = password;
-                  validatePassword();
-                }
+                registerForm.password = password;
+                validatePassword();
+              }
                 " />
               <p v-if="!registerPasswordValid" class="invalid">Password must be at least 8 characters long.</p>
             </div>
@@ -130,9 +130,9 @@
               <label for="registerPasswordConfirm" class="form-label"
                 :class="{ invalid: !registerPasswordConfirmValid }">Confirm Password</label>
               <PasswordInput id="registerPasswordConfirm" @input-password="(password) => {
-                  registerForm.passwordConfirm = password;
-                  validatePasswordConfirm();
-                }
+                registerForm.passwordConfirm = password;
+                validatePasswordConfirm();
+              }
                 " />
               <p v-if="!registerPasswordConfirmValid" class="invalid">Passwords must match.</p>
             </div>
@@ -162,8 +162,8 @@
             <div class="mb-3">
               <label for="loginPassword" class="form-label" :class="{ invalid: !loginPasswordValid }">Password</label>
               <PasswordInput id="loginPassword" @input-password="(password) => {
-                  loginForm.password = password;
-                }
+                loginForm.password = password;
+              }
                 " />
               <p v-if="!loginPasswordValid" class="invalid">Password is invalid.</p>
             </div>
@@ -272,7 +272,7 @@ export default {
     document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
       if (!vm.isLoggedIn) {
         sessionStorage.setItem("last_requested_path", "/");
-      } else if (vm.sotw != null) {
+      } else if (vm.sotw != null && !sessionStorage.getItem("last_requested_path")) {
         sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id);
       }
       vm.loginForm = {

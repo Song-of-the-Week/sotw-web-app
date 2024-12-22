@@ -167,7 +167,7 @@ export default {
               }
             }
           }
-          if (vm.inviteModal && newVal.meta.inviteModal) {
+          if (vm.inviteModal && newVal.meta.inviteModal && vm.user) {
             if (!vm.inviteModal._isShown) {
               vm.inviteModal.show();
             }
