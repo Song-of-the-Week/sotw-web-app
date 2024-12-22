@@ -79,8 +79,6 @@ const routes = [
       const sotwId = to.params.sotwId;
 
       // Check if the sotwId exists in the user's sotw_list
-      console.log(store.getters.getUser.sotw_list);
-      console.log(store.state.user.sotw_list);
       const userSotws = store.getters.getUser.sotw_list; // Adjust based on your Vuex structure
       const hasAccess = userSotws.some((sotw) => sotw.id === sotwId);
 

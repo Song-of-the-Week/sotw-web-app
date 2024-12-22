@@ -75,9 +75,9 @@ async def create_sotw(
 
     # create the user's playlist for this sotw
     user_playlist_name = (
-        f"{current_user.spotify_user_id}'s {payload.name} Song of the Week Playlist"
+        f"{current_user.name}'s {payload.name} Song of the Week Playlist"
     )
-    user_playlist_description = f"All songs submitted for the {payload.name} Song of the Week for this year by {current_user.spotify_user_id}."
+    user_playlist_description = f"All songs submitted for the {payload.name} Song of the Week for this year by {current_user.name}."
     user_playlist = spotify_client.create_playlist(
         user_playlist_name, user_playlist_description, session, current_user.id
     )
@@ -292,9 +292,9 @@ async def get_sotw_invite_join(
     ):
         # create the user's playlist for this sotw if it does not already exist
         user_playlist_name = (
-            f"{current_user.spotify_user_id}'s {sotw.name} Song of the Week Playlist"
+            f"{current_user.name}'s {sotw.name} Song of the Week Playlist"
         )
-        user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {current_user.spotify_user_id}."
+        user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {current_user.name}."
         user_playlist = spotify_client.create_playlist(
             user_playlist_name, user_playlist_description, session, current_user.id
         )
