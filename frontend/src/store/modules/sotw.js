@@ -15,9 +15,7 @@ export default {
         .apiGetSotw(id)
         .then(async (res) => {
           await commit("setActiveSotw", res.data);
-        })
-        .then(async (res) => {
-          await dispatch("getWeek", id, { root: true });
+          await dispatch("getWeek", id, { root: true })
         })
         .catch((err) => {
           // localStorage.removeItem("activeSotwId");

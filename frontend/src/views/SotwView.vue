@@ -146,7 +146,7 @@ export default {
     vm.activeClass(vm.$route.name);
   },
   methods: {
-    ...mapActions(["getSotw", "getWeek"]),
+    ...mapActions(["getSotw"]),
     activeClass(name) {
       const vm = this;
       if (name == vm.$route.name) {

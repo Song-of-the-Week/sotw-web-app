@@ -58,14 +58,9 @@
                 <li class="list-group-item">
                   <div class="row">
                     <div class="col col-1 align-self-center">
-                      <input
-                        class="form-check-input me-3"
-                        type="checkbox"
-                        :value="song.id"
-                        v-model="pickedSongs"
+                      <input class="form-check-input me-3" type="checkbox" :value="song.id" v-model="pickedSongs"
                         :id="'vote-' + song.id"
-                        :disabled="pickedSongs.length >= 2 && pickedSongs.indexOf(song.id) === -1"
-                      />
+                        :disabled="pickedSongs.length >= 2 && pickedSongs.indexOf(song.id) === -1" />
                     </div>
                     <div class="col">
                       <label class="form-check-label text-start" :for="'vote-' + song.id">{{ song.name }}</label>
@@ -95,24 +90,15 @@
                   </h5>
                 </li>
                 <li class="list-group-item dropdown">
-                  <button
-                    class="btn btn-secondary dropdown-toggle"
-                    type="button"
-                    :id="'match-' + matchedSong.id"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <span v-if="matchedSong.user === undefined">Choose</span
-                    ><span v-else>{{ matchedSong.user.name }}</span>
+                  <button class="btn btn-secondary dropdown-toggle" type="button" :id="'match-' + matchedSong.id"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <span v-if="matchedSong.user === undefined">Choose</span><span v-else>{{ matchedSong.user.name
+                      }}</span>
                   </button>
                   <ul class="dropdown-menu" :aria-labelledby="'match-' + matchedSong.id">
                     <li v-for="user in users" :key="user.id">
-                      <a
-                        class="dropdown-item"
-                        :class="{ 'text-muted': user.matched }"
-                        @click="matchUserSong(matchedSong, user)"
-                        >{{ user.name }}</a
-                      >
+                      <a class="dropdown-item" :class="{ 'text-muted': user.matched }"
+                        @click="matchUserSong(matchedSong, user)">{{ user.name }}</a>
                     </li>
                   </ul>
                 </li>
@@ -228,7 +214,6 @@ export default {
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
   },
   methods: {
-    ...mapActions(["getWeek"]),
     matchUserSong(song, user) {
       const vm = this;
       // remove the user from any other matches it has
@@ -371,16 +356,20 @@ export default {
   color: #d91313;
   border-color: #d91313;
 }
+
 .match-invalid {
   border-color: #d91313;
 }
+
 .match-item-invalid {
   color: #d91313;
 }
+
 .btn-spinner-submit {
   width: 76.36px;
   height: 38px;
 }
+
 .spinner-border {
   width: 1.4rem;
   height: 1.4rem;
