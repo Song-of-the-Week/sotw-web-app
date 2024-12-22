@@ -143,7 +143,7 @@ async def get_current_week(
                     playlist_id=playlist.playlist_id,
                     uris=[f"spotify:track:{song.spotify_id}"],
                     session=session,
-                    user_id=current_user.id,
+                    user_id=song.submitter_id,
                 )
 
                 # add the song to the songs list
@@ -230,7 +230,7 @@ async def get_current_week(
             for song_id in first_place_ids + second_place_ids:
                 uris.append(f"spotify:track:{song_id}")
             spotify_client.add_songs_to_playlist(
-                sotw.soty_playlist_id, uris, session, current_user.id
+                sotw.soty_playlist_id, uris, session, sotw.owner_id
             )
 
         # get the next results release timestamp
@@ -242,12 +242,12 @@ async def get_current_week(
         )
 
         # create spotify playlist for this next week
-        week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num}"
+        week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num + 1}"
         week_playlist_description = (
             f"Week {current_week.week_num} for {sotw.name} Song of the Week."
         )
         week_playlist = spotify_client.create_playlist(
-            week_playlist_name, week_playlist_description, session, current_user.id
+            week_playlist_name, week_playlist_description, session, sotw.owner_id
         )
         playlist_link = week_playlist["external_urls"]["spotify"]
         playlist_id = week_playlist["id"]
@@ -258,12 +258,10 @@ async def get_current_week(
         random.shuffle(responses)
         for response in responses:
             uris.append(f"spotify:track:{response.next_song.spotify_id}")
-        spotify_client.add_songs_to_playlist(
-            playlist_id, uris, session, current_user.id
-        )
+        spotify_client.add_songs_to_playlist(playlist_id, uris, session, sotw.owner_id)
         # also add these songs to the master playlist for the sotw
         spotify_client.add_songs_to_playlist(
-            sotw.master_playlist_id, uris, session, current_user.id
+            sotw.master_playlist_id, uris, session, sotw.owner_id
         )
 
         # create survey object with the responses from `current_week`

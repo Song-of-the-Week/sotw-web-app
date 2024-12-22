@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>Survey</h2>
-    <div v-if="week.submitted">
+    <div v-if="submitted">
       <div class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4">
@@ -212,6 +212,7 @@ export default {
     const vm = this;
 
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
+    vm.submitted = vm.week.submitted;
   },
   methods: {
     matchUserSong(song, user) {
@@ -295,7 +296,6 @@ export default {
     async submitSurvey(sotwId, weekNum, payload) {
       const vm = this;
       vm.loading = true;
-      console.log(payload.repeat_approved);
       await api.methods
         .apiPostSurveyResponse(sotwId, weekNum, payload)
         .then((res) => {
