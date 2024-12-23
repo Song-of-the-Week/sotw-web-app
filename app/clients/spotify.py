@@ -3,7 +3,6 @@ import json
 import requests
 import base64
 from typing import Dict, List
-from loguru import logger
 from sqlalchemy.orm.session import Session
 from app import crud, schemas
 from app.models.user import User
@@ -84,44 +83,34 @@ class SpotifyClient:
                 "Authorization": f"Bearer {user.spotify_access_token}",
             },
         )
-        logger.error(f"GET RESPONSE {response.status_code}")
         # if the user's access token is not expired, return the user with current access token
         if response.status_code == 200:
-            logger.error(f"GET RESPONSE 200 {response.status_code}")
             return user
         elif (
             response.status_code == 401
             or response.status_code == 400
             or response.status_code == 403
         ):
-            logger.error(f"GET RESPONSE 400 {response.status_code}")
             # refresh the user's access token
             response = requests.post(
                 "https://accounts.spotify.com/api/token",
-                data=json.dumps(
-                    {
-                        "grant_type": "refresh_token",
-                        "refresh_token": user.spotify_refresh_token,
-                    }
-                ),
+                data={
+                    "grant_type": "refresh_token",
+                    "refresh_token": user.spotify_refresh_token,
+                },
                 headers={
                     "Content-Type": "application/x-www-form-urlencoded",
                     "Authorization": f"Basic {base64.urlsafe_b64encode((self.client_id + ':' + self.client_secret).encode()).decode()}",
                 },
             )
-            logger.error(f"REFRESH RESPONSE {response.status_code}")
 
             if response.status_code != 200:
                 response.raise_for_status()
 
             data = response.json()
-            logger.error(f"REFRESH DATA {data}")
-            logger.error(f"REFRESH TOKEN {data['refresh_token']}")
-            logger.error(f"ACCESS TOKEN {data['access_token']}")
             object_in = schemas.UserUpdate(
                 spotify_linked=True,
                 spotify_access_token=data["access_token"],
-                spotify_refresh_token=data["refresh_token"],
                 spotify_accessed_date=datetime.utcnow(),
             )
 
@@ -218,9 +207,6 @@ class SpotifyClient:
             Dict: The Spotify response with the track details.
         """
         user = self.get_user_access_token(session, user_id)
-        logger.error(f"USER GET TRACK INFO {user}")
-        logger.error(f"USER GET TRACK INFO ACCESS {user.spotify_access_token}")
-        logger.error(f"USER GET TRACK INFO REFRESH {user.spotify_refresh_token}")
 
         # get track info
         response = requests.get(
