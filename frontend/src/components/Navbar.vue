@@ -24,10 +24,12 @@
                 Sotw
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarResultsDropdown">
-                <li v-for="sotw in user.sotw_list">
-                  <router-link class="dropdown-item" :to="`/sotw/` + sotw.id"><span data-bs-dismiss="offcanvas">{{
-                    sotw.name }}</span></router-link>
-                </li>
+                <span data-bs-dismiss="offcanvas">
+                  <li v-for="sotw in user.sotw_list">
+                    <router-link class="dropdown-item" :to="`/sotw/` + sotw.id">{{
+                      sotw.name }}</router-link>
+                  </li>
+                </span>
               </ul>
             </li>
             <!-- <li class="nav-item">
@@ -42,7 +44,8 @@
           </ul>
           <div class="navbar-nav d-flex">
             <div class="nav-item mb-2 mb-md-0 me-md-2" v-if="isLoggedIn">
-              <router-link class="nav-link" :to="`/user`">My Profile</router-link>
+              <router-link class="nav-link" :to="`/user`"><span data-bs-dismiss="offcanvas">My
+                  Profile</span></router-link>
             </div>
             <div class="nav-item">
               <router-link v-if="isLoggedIn" :to="`/`">
