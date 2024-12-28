@@ -1,0 +1,40 @@
+Create a buildspec.yml file in the root directory of your project:
+
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com
+      - FRONTEND_REPOSITORY_URI=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<FRONTEND_REPOSITORY_NAME>
+      - API_REPOSITORY_URI=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<API_REPOSITORY_NAME>
+      - PROXY_REPOSITORY_URI=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<PROXY_REPOSITORY_NAME>
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=$(git describe --tags --match "v*.*.*" $CODEBUILD_RESOLVED_SOURCE_VERSION)
+  build:
+    commands:
+      - echo Build started at $(date)
+      - echo Building the Docker image...
+      - ENV=prod make docker-build
+      - Tagging images with version $IMAGE_TAG
+      - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-api $API_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-proxy $PROXY_REPOSITORY_URI:$IMAGE_TAG  
+  post_build:
+    commands:
+      - echo Build completed at $(date)
+      - echo Pushing frontend Docker images...
+      - docker push $FRONTEND_REPOSITORY_URI:latest
+      - docker push $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing backend (API) Docker images...
+      - docker push $API_REPOSITORY_URI:latest
+      - docker push $API_REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing proxy (nginx) Docker images...
+      - docker push $PROXY_REPOSITORY_URI:latest
+      - docker push $PROXY_REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"sotw-frontend","imageUri":"%s"},{"name":"sotw-api","imageUri":"%s"},{"name":"sotw-proxy","imageUri":"%s"}]' $FRONTEND_REPOSITORY_URI:$IMAGE_TAG $API_REPOSITORY_URI:$IMAGE_TAG $PROXY_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+    files: imagedefinitions.json
