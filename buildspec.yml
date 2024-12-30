@@ -11,7 +11,7 @@ phases:
     commands:
       - git remote -v
       - git tag -l
-      - git fetch --tags "${CODEBUILD_SOURCE_REPO_URL}" --unshallow
+      - git fetch --tags "${CODEBUILD_SOURCE_REPO_URL}"
       - git tag -l
       - cd $CODEBUILD_SRC_DIR
       - echo Logging in to Amazon ECR...
