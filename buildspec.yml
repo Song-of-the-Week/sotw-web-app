@@ -9,6 +9,9 @@ env:
 phases:
   pre_build:
     commands:
+      - git tag -l
+      - git fetch --tags
+      - git tag -l
       - cd $CODEBUILD_SRC_DIR
       - echo Logging in to Amazon ECR...
       - aws --version
