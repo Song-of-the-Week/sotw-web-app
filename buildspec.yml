@@ -16,6 +16,8 @@ phases:
       - ls -la
       - git remote -v
       - git tag -l
+      - ls -la .git/refs
+      - la -la .git/refs/tags
       - git fetch --tags
       - git tag -l
       - echo Logging in to Amazon ECR...
