@@ -9,11 +9,15 @@ env:
 phases:
   pre_build:
     commands:
+      - pwd
+      - ls -la
+      - cd $CODEBUILD_SRC_DIR
+      - pwd
+      - ls -la
       - git remote -v
       - git tag -l
-      - git fetch --tags "${CODEBUILD_SOURCE_REPO_URL}"
+      - git fetch --tags
       - git tag -l
-      - cd $CODEBUILD_SRC_DIR
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
