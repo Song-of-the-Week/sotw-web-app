@@ -14,7 +14,5 @@ To run the application locally, run the following:
 To build and deploy the application for production, run the following:
 ```bash
     make ENV=prod docker-build
-    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <aws-account-number>.dkr.ecr.us-east-1.amazonaws.com
-    docker tag <container-name> <remote-repo>
-    docker push <remote-repo>
+    ./push_new_images.sh <sotw-frontend|sotw-api|sotw-nginx>
 ```
