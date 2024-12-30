@@ -2,15 +2,18 @@ Create a buildspec.yml file in the root directory of your project:
 
 version: 0.2
 
+env:
+  variables:
+    FRONTEND_REPOSITORY_URI: "/ecr/frontend/uri"
+    API_REPOSITORY_URI: "/ecr/api/uri"
+    PROXY_REPOSITORY_URI: "/ecr/nginx/uri"
+
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com
-      - FRONTEND_REPOSITORY_URI=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<FRONTEND_REPOSITORY_NAME>
-      - API_REPOSITORY_URI=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<API_REPOSITORY_NAME>
-      - PROXY_REPOSITORY_URI=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<PROXY_REPOSITORY_NAME>
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=$(git describe --tags --match "v*.*.*" $CODEBUILD_RESOLVED_SOURCE_VERSION)
   build:
