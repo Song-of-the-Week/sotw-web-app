@@ -106,7 +106,7 @@ def test_update_user_unlink_spotify_success(client):
 
 
 def test_update_user_email_success(client):
-    # Change password
+    # Change email
     payload = {
         "email": "email@email.email",
     }
@@ -116,7 +116,7 @@ def test_update_user_email_success(client):
     # Then
     assert response.status_code == 200
     assert "email" in data.keys()
-    assert data["email"] == "admin@admin.admin"
+    assert data["email"] == "email@email.email"
 
 
 @patch("app.api.api_v1.endpoints.user.jwt.decode")
