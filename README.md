@@ -10,9 +10,3 @@ To run the application locally, run the following:
     make docker-build
     make docker-up
 ```
-
-To build and deploy the application for production, run the following:
-```bash
-    make ENV=prod docker-build
-    ./push_new_images.sh <sotw-frontend|sotw-api|sotw-nginx>
-```
