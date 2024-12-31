@@ -274,7 +274,7 @@ async def get_current_week(
             # note: the `id` is the id of the Song object in the database
             survey["songs"].append(
                 {
-                    "id": response.next_song.id,
+                    "id": str(response.next_song.id),
                     "name": response.next_song.name,
                 }
             )
@@ -282,7 +282,7 @@ async def get_current_week(
         for response in responses:
             survey["users"].append(
                 {
-                    "id": response.submitter_id,
+                    "id": str(response.submitter_id),
                     "name": response.submitter.name,
                     "matched": False,
                 }

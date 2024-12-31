@@ -167,7 +167,7 @@ async def post_survey_response(
         # create user song matches
         number_correct_matches = 0
         for match in payload.user_song_matches:
-            song = crud.song.get(session=session, id=match.song_id)
+            song = crud.song.get(session=session, id=int(match.song_id))
             # the payload has some sort of error if the song can't be found
             if not song:
                 raise HTTPException(
@@ -175,8 +175,8 @@ async def post_survey_response(
                     detail=f"There's something wrong with your request. A song with the given id {match.song_id} does not exist.",
                 )
             user_song_match_in = schemas.UserSongMatchCreate(
-                song_id=match.song_id,
-                user_id=match.user_id,
+                song_id=int(match.song_id),
+                user_id=int(match.user_id),
                 correct_guess=match.user_id == song.submitter_id,
                 response_id=response.id,
             )
