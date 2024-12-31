@@ -42,6 +42,6 @@ phases:
       - docker push $PROXY_REPOSITORY_URI:latest
       - docker push $PROXY_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"frontend","imageUri":"%s"},{"name":"api","imageUri":"%s"},{"name":"proxy","imageUri":"%s"}]' $FRONTEND_REPOSITORY_URI:$IMAGE_TAG $API_REPOSITORY_URI:$IMAGE_TAG $PROXY_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"frontend","imageUri":"%s"},{"name":"api","imageUri":"%s"},{"name":"nginx","imageUri":"%s"}]' $FRONTEND_REPOSITORY_URI:$IMAGE_TAG $API_REPOSITORY_URI:$IMAGE_TAG $PROXY_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
     files: imagedefinitions.json
