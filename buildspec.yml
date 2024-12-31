@@ -21,7 +21,7 @@ phases:
     commands:
       - echo Build started at $(date)
       - echo Building the Docker image...
-      - ENV=prod make docker-build
+      - make ENV=prod docker-build
       - echo Tagging images with version $IMAGE_TAG and latest
       - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
       - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:latest
