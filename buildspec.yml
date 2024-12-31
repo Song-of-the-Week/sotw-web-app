@@ -27,18 +27,18 @@ phases:
       - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:latest
       - docker tag sotw-api $API_REPOSITORY_URI:$IMAGE_TAG
       - docker tag sotw-api $API_REPOSITORY_URI:latest
-      - docker tag sotw-proxy $PROXY_REPOSITORY_URI:$IMAGE_TAG
-      - docker tag sotw-proxy $PROXY_REPOSITORY_URI:latest  
+      - docker tag sotw-nginx $PROXY_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-nginx $PROXY_REPOSITORY_URI:latest  
   post_build:
     commands:
       - echo Build completed at $(date)
-      - echo Pushing frontend Docker images...
+      - echo Pushing sotw-frontend Docker images...
       # - docker push $FRONTEND_REPOSITORY_URI:latest
       - docker push $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
-      - echo Pushing backend (API) Docker images...
+      - echo Pushing sotw-api Docker images...
       # - docker push $API_REPOSITORY_URI:latest
       - docker push $API_REPOSITORY_URI:$IMAGE_TAG
-      - echo Pushing proxy (nginx) Docker images...
+      - echo Pushing sotw-nginx Docker images...
       # - docker push $PROXY_REPOSITORY_URI:latest
       - docker push $PROXY_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
