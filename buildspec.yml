@@ -1,7 +1,7 @@
 version: 0.2
 
 env:
-  variables:
+  parameter-store:
     FRONTEND_REPOSITORY_URI: "/ecr/frontend/uri"
     API_REPOSITORY_URI: "/ecr/api/uri"
     PROXY_REPOSITORY_URI: "/ecr/nginx/uri"
