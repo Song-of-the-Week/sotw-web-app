@@ -43,5 +43,8 @@ phases:
       - docker push $PROXY_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
       - printf '[{"name":"frontend","imageUri":"%s"},{"name":"api","imageUri":"%s"},{"name":"nginx","imageUri":"%s"}]' $FRONTEND_REPOSITORY_URI:$IMAGE_TAG $API_REPOSITORY_URI:$IMAGE_TAG $PROXY_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - aws ssm put-parameter --name /ecs/frontend/image-version --value $IMAGE_TAG --type "String" --overwrite
+      - aws ssm put-parameter --name /ecs/api/image-version --value $IMAGE_TAG --type "String" --overwrite
+      - aws ssm put-parameter --name /ecs/nginx/image-version --value $IMAGE_TAG --type "String" --overwrite
 artifacts:
     files: imagedefinitions.json
