@@ -22,7 +22,7 @@ phases:
       - echo Build started at $(date)
       - echo Building the Docker image...
       - ENV=prod make docker-build
-      - Tagging images with version $IMAGE_TAG
+      - echo Tagging images with version $IMAGE_TAG
       - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
       - docker tag sotw-api $API_REPOSITORY_URI:$IMAGE_TAG
       - docker tag sotw-proxy $PROXY_REPOSITORY_URI:$IMAGE_TAG  
