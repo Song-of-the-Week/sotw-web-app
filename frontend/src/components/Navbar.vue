@@ -21,7 +21,7 @@
             <li v-if="isLoggedIn" class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarResultsDropdown" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                Sotw
+                SOTW
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarResultsDropdown">
                 <span data-bs-dismiss="offcanvas">
