@@ -22,21 +22,24 @@ phases:
       - echo Build started at $(date)
       - echo Building the Docker image...
       - ENV=prod make docker-build
-      - echo Tagging images with version $IMAGE_TAG
+      - echo Tagging images with version $IMAGE_TAG and latest
       - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:latest
       - docker tag sotw-api $API_REPOSITORY_URI:$IMAGE_TAG
-      - docker tag sotw-proxy $PROXY_REPOSITORY_URI:$IMAGE_TAG  
+      - docker tag sotw-api $API_REPOSITORY_URI:latest
+      - docker tag sotw-proxy $PROXY_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-proxy $PROXY_REPOSITORY_URI:latest  
   post_build:
     commands:
       - echo Build completed at $(date)
       - echo Pushing frontend Docker images...
-      - docker push $FRONTEND_REPOSITORY_URI:latest
+      # - docker push $FRONTEND_REPOSITORY_URI:latest
       - docker push $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
       - echo Pushing backend (API) Docker images...
-      - docker push $API_REPOSITORY_URI:latest
+      # - docker push $API_REPOSITORY_URI:latest
       - docker push $API_REPOSITORY_URI:$IMAGE_TAG
       - echo Pushing proxy (nginx) Docker images...
-      - docker push $PROXY_REPOSITORY_URI:latest
+      # - docker push $PROXY_REPOSITORY_URI:latest
       - docker push $PROXY_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
       - printf '[{"name":"sotw-frontend","imageUri":"%s"},{"name":"sotw-api","imageUri":"%s"},{"name":"sotw-proxy","imageUri":"%s"}]' $FRONTEND_REPOSITORY_URI:$IMAGE_TAG $API_REPOSITORY_URI:$IMAGE_TAG $PROXY_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
