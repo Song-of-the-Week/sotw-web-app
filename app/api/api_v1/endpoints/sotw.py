@@ -284,27 +284,30 @@ async def get_sotw_invite_join(
             status_code=404, detail=f"Sotw with given id {sotw_id} not found."
         )
 
-    # add current user to the sotw
-    crud.user.add_user_to_sotw(session=session, db_object=current_user, object_in=sotw)
+    with session.begin():
+        # add current user to the sotw
+        crud.user.add_user_to_sotw(
+            session=session, db_object=current_user, object_in=sotw
+        )
 
-    if not crud.user_playlist.get_playlist_for_user_for_sotw(
-        session=session, user_id=current_user.id, sotw_id=sotw.id
-    ):
-        # create the user's playlist for this sotw if it does not already exist
-        user_playlist_name = (
-            f"{current_user.name}'s {sotw.name} Song of the Week Playlist"
-        )
-        user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {current_user.name}."
-        user_playlist = spotify_client.create_playlist(
-            user_playlist_name, user_playlist_description, session, current_user.id
-        )
-        user_playlist_create = schemas.UserPlaylistCreate(
-            playlist_id=user_playlist["id"],
-            playlist_link=user_playlist["external_urls"]["spotify"],
-            sotw_id=sotw.id,
-            user_id=current_user.id,
-        )
-        crud.user_playlist.create(session, object_in=user_playlist_create)
+        if not crud.user_playlist.get_playlist_for_user_for_sotw(
+            session=session, user_id=current_user.id, sotw_id=sotw.id
+        ):
+            # create the user's playlist for this sotw if it does not already exist
+            user_playlist_name = (
+                f"{current_user.name}'s {sotw.name} Song of the Week Playlist"
+            )
+            user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {current_user.name}."
+            user_playlist = spotify_client.create_playlist(
+                user_playlist_name, user_playlist_description, session, current_user.id
+            )
+            user_playlist_create = schemas.UserPlaylistCreate(
+                playlist_id=user_playlist["id"],
+                playlist_link=user_playlist["external_urls"]["spotify"],
+                sotw_id=sotw.id,
+                user_id=current_user.id,
+            )
+            crud.user_playlist.create(session, object_in=user_playlist_create)
 
     return schemas.SotwInfo(id=str(sotw.id))
 
