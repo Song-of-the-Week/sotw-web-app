@@ -1,8 +1,13 @@
 from datetime import datetime
 import json
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from app.clients.spotify import SpotifyClient
+from app.main import app
+from app.api import deps
+from app.models.user import User
 from app.shared.config import cfg
+from app.tests.conftest import memory_session, override_session
 
 
 def test_sotw_creation_406(client):
@@ -243,6 +248,55 @@ def test_get_sotw_invite_join_406(client):
 
     # Then
     assert response.status_code == 406
+
+
+@patch("app.api.api_v1.endpoints.sotw.jwt.decode")
+def test_get_sotw_invite_join_400(decode, client, sotw):
+    # Mock
+    decode.return_value = {"sub": 1}
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
+    data = response.json()
+
+    # Then
+    assert "playlists" in data.keys()
+    assert len(data["playlists"]) == 0
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 0
+
+    # When
+    # "link" spotify
+    payload = {
+        "state": "admin@admin.admin-test1",
+        "code": "success",
+    }
+    response = client.put(
+        f"{cfg.API_V1_STR}/auth/spotify-access-token", data=json.dumps(payload)
+    )
+
+    # Override the dependencie for this test
+    mock_spotify = MagicMock()
+    mock_spotify.create_playlist.side_effect = Exception("Spotify API Error")
+
+    client.app.dependency_overrides[deps.get_spotify_client] = lambda: mock_spotify
+
+    response = client.get(f"{cfg.API_V1_STR}/sotw/invite/join/ABC123")
+
+    data = response.json()
+
+    # Then
+    assert response.status_code == 400
+    assert "detail" in data.keys()
+    assert data["detail"] == "An error occurred: 'Spotify API Error'"
+
+    response = client.get(f"{cfg.API_V1_STR}/auth/current_user")
+    data = response.json()
+
+    assert "playlists" in data.keys()
+    assert len(data["playlists"]) == 0
+    assert "sotw_list" in data.keys()
+    assert len(data["sotw_list"]) == 0
 
 
 @patch("app.api.api_v1.endpoints.sotw.jwt.decode")

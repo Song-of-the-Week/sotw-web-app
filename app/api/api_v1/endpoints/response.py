@@ -134,11 +134,13 @@ async def post_survey_response(
 
         # determine if this song has been submitted before:
         if (
-            crud.song.get_song_by_name(
-                session=session,
-                name=song_name,
-                sotw_id=sotw.id,
-                week_id=current_week.id,
+            len(
+                crud.song.get_songs_by_name(
+                    session=session,
+                    name=song_name,
+                    sotw_id=sotw.id,
+                    week_id=current_week.id,
+                )
             )
             and not payload.repeat_approved
         ):
@@ -174,10 +176,19 @@ async def post_survey_response(
                     status_code=400,
                     detail=f"There's something wrong with your request. A song with the given id {match.song_id} does not exist.",
                 )
+
+            songs = crud.song.get_songs_by_name(
+                session=session,
+                name=song.name,
+                sotw_id=sotw.id,
+                week_id=current_week.id,
+                this_week=True,
+            )
+            song_submitter_ids = [song.id for song in songs]
             user_song_match_in = schemas.UserSongMatchCreate(
                 song_id=int(match.song_id),
                 user_id=int(match.user_id),
-                correct_guess=match.user_id == song.submitter_id,
+                correct_guess=match.user_id in song_submitter_ids,
                 response_id=response.id,
             )
             number_correct_matches += 1 if user_song_match_in.correct_guess else 0
