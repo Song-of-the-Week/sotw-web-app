@@ -19,10 +19,10 @@ phases:
       - echo Building commit $COMMIT_HASH
       - git log
       - |
-        if [ "$ENV" == "prod" ]; then
-          IMAGE_TAG=$(git describe --tags --match "v*.*.*" $CODEBUILD_RESOLVED_SOURCE_VERSION)
-        else
+        if [ "$ENV" == "dev" ]; then
           IMAGE_TAG=$COMMIT_HASH
+        else
+          IMAGE_TAG=$(git describe --tags --match "v*.*.*" $CODEBUILD_RESOLVED_SOURCE_VERSION)
         fi
   build:
     commands:
