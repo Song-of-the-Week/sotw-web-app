@@ -175,12 +175,12 @@ async def get_current_week(
                             "submitter_guess": user.name,
                             "correct": match.correct_guess,
                         }
-                    )
+                    )                
                 guessing_data.append(
                     {
                         "id": response.submitter_id,
                         "name": response.submitter.name,
-                        "guesses": guesses,
+                        "guesses": sorted(guesses, key=lambda x: x["song"]),
                         "num_correct_guesses": response.number_correct_matches,
                     }
                 )
@@ -221,7 +221,7 @@ async def get_current_week(
                 first_place=json.dumps(first_place_names),
                 second_place=json.dumps(second_place_names),
                 all_songs=json.dumps(all_songs),
-                guessing_data=json.dumps(guessing_data),
+                guessing_data=json.dumps(sorted(guessing_data, key=lambda x: x["num_correct_guesses"], reverse=True),
             )
             crud.results.create(session=session, object_in=results_in)
 
