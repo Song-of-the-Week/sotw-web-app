@@ -5,6 +5,8 @@ env:
     FRONTEND_REPOSITORY_URI: "/ecr/frontend/uri"
     API_REPOSITORY_URI: "/ecr/api/uri"
     PROXY_REPOSITORY_URI: "/ecr/nginx/uri"
+  variables:
+    ENV: "prod"
 
 phases:
   pre_build:
@@ -16,7 +18,12 @@ phases:
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo Building commit $COMMIT_HASH
       - git log
-      - IMAGE_TAG=$(git describe --tags --match "v*.*.*" $CODEBUILD_RESOLVED_SOURCE_VERSION)
+      - |
+        if [ "$ENV" == "dev" ]; then
+          IMAGE_TAG=$COMMIT_HASH
+        else
+          IMAGE_TAG=$(git describe --tags --match "v*.*.*" $CODEBUILD_RESOLVED_SOURCE_VERSION)
+        fi
   build:
     commands:
       - echo Build started at $(date)
