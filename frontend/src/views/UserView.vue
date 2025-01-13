@@ -9,14 +9,8 @@
           <div v-if="editingName" class="row mt-3">
             <div class="col-3">Name:</div>
             <div class="col-6 col-md-5">
-              <input
-                type="text"
-                class="form-control"
-                v-model="userName"
-                placeholder="Name"
-                aria-label="Name"
-                aria-describedby="basic-addon1"
-              />
+              <input type="text" class="form-control" v-model="userName" placeholder="Name" aria-label="Name"
+                aria-describedby="basic-addon1" />
             </div>
             <div class="col-2 col-md-3">
               <button v-if="loadingName" type="button" class="btn btn-outline-warning btn-spinner">
@@ -39,14 +33,8 @@
           <div v-if="editingEmail" class="row mt-3">
             <div class="col-3">Email:</div>
             <div class="col-6 col-md-5">
-              <input
-                type="text"
-                class="form-control"
-                v-model="userEmail"
-                placeholder="Email"
-                aria-label="Email"
-                aria-describedby="basic-addon1"
-              />
+              <input type="text" class="form-control" v-model="userEmail" placeholder="Email" aria-label="Email"
+                aria-describedby="basic-addon1" />
             </div>
             <div class="col-2 col-md-3">
               <button v-if="loadingEmail" type="button" class="btn btn-outline-warning btn-spinner">
@@ -79,45 +67,31 @@
           </div>
           <div v-if="editingPassword" class="row mt-3">
             <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword400.length > 0 }"
-                >Current Password</label
-              >
-              <PasswordInput
-                id="currentPassword"
-                @input-password="
-                  (password) => {
-                    currentPassword = password;
-                  }
-                "
-              />
+              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword400.length > 0 }">Current
+                Password</label>
+              <PasswordInput id="currentPassword" @input-password="(password) => {
+                  currentPassword = password;
+                }
+                " />
               <p v-if="changePassword400" class="invalid">{{ changePassword400 }}</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
               <label for="newPassword" class="form-label" :class="{ invalid: !newPasswordValid }">New Password</label>
-              <PasswordInput
-                id="newPassword"
-                @input-password="
-                  (password) => {
-                    newPassword = password;
-                    validateNewPassword();
-                  }
-                "
-              />
+              <PasswordInput id="newPassword" @input-password="(password) => {
+                  newPassword = password;
+                  validateNewPassword();
+                }
+                " />
               <p v-if="!newPasswordValid" class="invalid">Password must be at least 8 characters long.</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="newPasswordConfirm" class="form-label" :class="{ invalid: !newPasswordConfirmValid }"
-                >Confirm New Password</label
-              >
-              <PasswordInput
-                id="newPasswordConfirm"
-                @input-password="
-                  (password) => {
-                    newPasswordConfirm = password;
-                    validateNewPasswordConfirm();
-                  }
-                "
-              />
+              <label for="newPasswordConfirm" class="form-label" :class="{ invalid: !newPasswordConfirmValid }">Confirm
+                New Password</label>
+              <PasswordInput id="newPasswordConfirm" @input-password="(password) => {
+                  newPasswordConfirm = password;
+                  validateNewPasswordConfirm();
+                }
+                " />
               <p v-if="!newPasswordConfirmValid" class="invalid">Passwords must match.</p>
             </div>
             <div class="col-12 col-md-1 pt-md-0 pt-2rem pe-0">
@@ -171,14 +145,10 @@
       </div>
     </div>
   </div>
-  <AlertModal
-    header="Email Change Verification"
-    :message="
-      `You're almost there! Please verify your new email via the link that was just sent to ` +
-      userEmail +
-      ` to complete your email change. The verification link will expire in 10 minutes.`
-    "
-  ></AlertModal>
+  <AlertModal header="Email Change Verification" :message="`You're almost there! Please verify your new email via the link that was just sent to ` +
+    userEmail +
+    ` to complete your email change. The verification link will expire in 10 minutes.`
+    "></AlertModal>
 </template>
 
 <script>
@@ -266,7 +236,7 @@ export default {
           client_id: res.data.client_id,
           response_type: "code",
           redirect_uri: config.SPOTIFY_CALLBACK_URI,
-          state: vm.user.email + "-" + vm.user.name,
+          state: vm.user.email + "-" + vm.user.name.replace(/\s+/g, '-'),
           scope: "playlist-modify-public",
         });
         document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
@@ -392,17 +362,21 @@ export default {
     padding-top: 2rem !important;
   }
 }
+
 .pt-2rem {
   padding-top: 1rem;
 }
+
 .btn-spinner {
   width: 82.04px;
   height: 38px;
 }
+
 .btn-spinner-password {
   width: 59.81px;
   height: 38px;
 }
+
 .invalid {
   color: #d91313;
 }

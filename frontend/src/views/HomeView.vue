@@ -85,7 +85,7 @@ export default {
 
     // check for redirection from spotify
     await vm.$router.isReady().then((_) => {
-      if ("state" in vm.$route.query && vm.$route.query.state == vm.user.email + "-" + vm.user.name) {
+      if ("state" in vm.$route.query && vm.$route.query.state == vm.user.email + "-" + vm.user.name.replace(/\s+/g, '-')) {
         if ("code" in vm.$route.query) {
           const payload = {
             code: vm.$route.query.code,
