@@ -156,7 +156,7 @@ export default {
         return "show active";
       } else if (vm.$route.name == "sotw") {
         // calculate how far we are from the next release date
-        if (Math.round((vm.currentWeek.next_results_release - new Date().getTime()) / (1000 * 3600 * 24)) < 5) {
+        if (Math.round((vm.currentWeek.next_results_release - new Date().getTime()) / (1000 * 3600 * 24)) < 5 || vm.currentWeek.week_num == 0) {
           if (name == "survey") {
             return "show active";
           }

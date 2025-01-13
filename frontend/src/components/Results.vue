@@ -5,7 +5,7 @@
         <h1>{{ errorMessage }}</h1>
       </div>
     </div>
-    <div v-else>
+    <div v-else-if="weekNum > 0">
       <div class="row">
         <div class="col">
           <h1 class="mb-5">Congratulations to our week {{ weekNum - 1 }} winners!</h1>
