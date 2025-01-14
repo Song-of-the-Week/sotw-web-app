@@ -1,7 +1,7 @@
 <template>
   <div class="input-group">
     <span class="input-group-text">Day</span>
-    <select v-model="day" class="form-control" aria-describedby="dayHelp">
+    <select v-model="day" @change="emitInput" class="form-control" aria-describedby="dayHelp">
       <option value="0">Sunday</option>
       <option value="1">Monday</option>
       <option value="2">Tuesday</option>
@@ -11,7 +11,7 @@
       <option value="6">Saturday</option>
     </select>
     <span class="input-group-text">Time</span>
-    <select v-model="hour" class="form-control" aria-describedby="hourHelp">
+    <select v-model="hour" @change="emitInput" class="form-control" aria-describedby="hourHelp">
       <option value="0">0</option>
       <option value="1">1</option>
       <option value="2">2</option>
@@ -38,7 +38,7 @@
       <option value="23">23</option>
     </select>
     <span class="input-group-text">:</span>
-    <select v-model="minute" class="form-control" aria-describedby="minuteHelp">
+    <select v-model="minute" @change="emitInput" class="form-control" aria-describedby="minuteHelp">
       <option value="0">00</option>
       <option value="1">01</option>
       <option value="2">02</option>
