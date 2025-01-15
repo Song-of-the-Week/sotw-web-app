@@ -184,7 +184,7 @@ async def post_survey_response(
                 week_id=current_week.id,
                 this_week=True,
             )
-            song_submitter_ids = [song.id for song in songs]
+            song_submitter_ids = [song.submitter_id for song in songs]
             user_song_match_in = schemas.UserSongMatchCreate(
                 song_id=int(match.song_id),
                 user_id=int(match.user_id),
