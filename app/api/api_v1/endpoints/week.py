@@ -180,7 +180,7 @@ async def get_current_week(
                     {
                         "id": response.submitter_id,
                         "name": response.submitter.name,
-                        "guesses": guesses,
+                        "guesses": sorted(guesses, key=lambda x: x["song"]),
                         "num_correct_guesses": response.number_correct_matches,
                     }
                 )
@@ -221,7 +221,13 @@ async def get_current_week(
                 first_place=json.dumps(first_place_names),
                 second_place=json.dumps(second_place_names),
                 all_songs=json.dumps(all_songs),
-                guessing_data=json.dumps(guessing_data),
+                guessing_data=json.dumps(
+                    sorted(
+                        guessing_data,
+                        key=lambda x: x["num_correct_guesses"],
+                        reverse=True,
+                    )
+                ),
             )
             crud.results.create(session=session, object_in=results_in)
 
@@ -244,7 +250,7 @@ async def get_current_week(
         # create spotify playlist for this next week
         week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num + 1}"
         week_playlist_description = (
-            f"Week {current_week.week_num} for {sotw.name} Song of the Week."
+            f"Week {current_week.week_num + 1} for {sotw.name} Song of the Week."
         )
         week_playlist = spotify_client.create_playlist(
             week_playlist_name, week_playlist_description, session, sotw.owner_id

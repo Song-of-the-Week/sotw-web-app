@@ -56,7 +56,7 @@
         <div class="tab-pane fade" :class="activeClass('results')" id="current-results-tab-pane" role="tabpanel"
           aria-labelledby="results-tab" tabindex="0">
           <div v-if="renderResults">
-            <Results :sotw-id="sotw.id" :week-num="currentWeek.week_num" />
+            <Results :sotw-id="sotw.id" :week-num="resultsWeekNum" />
           </div>
         </div>
         <div class="tab-pane fade" :class="activeClass('results_list')" id="previous-results-tab-pane" role="tabpanel"
@@ -72,7 +72,7 @@
             <div class="col-10 col-lg-3 p-4">
               <div class="list-group">
                 <router-link v-for="n in currentWeek.week_num - 1" class="list-group-item list-group-item-action"
-                  :to="`/sotw/` + sotw.id + `/results/` + n">week {{ n }} results</router-link>
+                  :to="`/sotw/` + sotw.id + `/results/` + (n + 1)">week {{ n }} results</router-link>
               </div>
             </div>
             <div class="col"></div>
@@ -118,6 +118,7 @@ export default {
     return {
       renderResults: false,
       loading: false,
+      resultsWeekNum: 0,
     };
   },
   computed: {
@@ -149,6 +150,7 @@ export default {
       const vm = this;
       if (name == vm.$route.name) {
         if (name == "results") {
+          vm.resultsWeekNum = vm.$route.params.weekNum;
           vm.renderResults = true;
         } else {
           vm.renderResults = false;
@@ -156,12 +158,13 @@ export default {
         return "show active";
       } else if (vm.$route.name == "sotw") {
         // calculate how far we are from the next release date
-        if (Math.round((vm.currentWeek.next_results_release - new Date().getTime()) / (1000 * 3600 * 24)) < 5) {
+        if (Math.round((vm.currentWeek.next_results_release - new Date().getTime()) / (1000 * 3600 * 24)) < 5 || vm.currentWeek.week_num == 0) {
           if (name == "survey") {
             return "show active";
           }
         } else {
           if (name == "results") {
+            vm.resultsWeekNum = vm.$route.params.weekNum;
             vm.renderResults = true;
             return "show active";
           } else {

@@ -44,7 +44,7 @@ export default {
           client_id: res.data.client_id,
           response_type: "code",
           redirect_uri: config.SPOTIFY_CALLBACK_URI,
-          state: vm.user.email + "-" + vm.user.name,
+          state: vm.user.email + "-" + vm.user.name.replace(/\s+/g, '-'),
           scope: "playlist-modify-public",
         });
         document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;

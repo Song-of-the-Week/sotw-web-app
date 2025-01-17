@@ -361,7 +361,8 @@ async def spotify_access_token(
 
     if (
         not payload.state
-        or current_user.email + "-" + current_user.name != payload.state
+        or current_user.email + "-" + current_user.name.replace(" ", "-")
+        != payload.state
     ):
         raise HTTPException(
             status_code=401,
