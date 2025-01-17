@@ -1,8 +1,10 @@
+import re
 from typing import Union
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from requests import HTTPError
+import requests
 from sqlalchemy.orm.session import Session
 from loguru import logger
 
@@ -79,6 +81,16 @@ async def post_survey_response(
     # validate the spotify link
     next_song_track_id = payload.next_song.split("/")[-1].split("?")[0]
     try:
+        if "//spotify.link/" in payload.next_song:
+            response = requests.get(payload.next_song)
+            html_str = str(response.content)
+            match = re.search(
+                r"https://open.spotify.com/track/([a-zA-Z0-9]+)", html_str
+            )
+            if match:
+                next_song_track_id = match.group(1)
+            else:
+                next_song_track_id = None
         song = spotify_client.get_track_info(
             next_song_track_id, session, current_user.id
         )

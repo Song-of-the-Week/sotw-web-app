@@ -94,37 +94,41 @@ export default {
       firstPlaceVotes: 0,
       secondPlaceVotes: 0,
       allSongs: [],
-      guessingData: [],
+      guessingData: [{ guesses: { song: "", submitter_guess: "" } }],
       chartOptions: {},
       errorMessage: "",
     };
   },
   mounted() {
     const vm = this;
-
-    // get results (if available)
-    let weekNum = vm.weekNum;
-    if (weekNum > 1) {
-      weekNum -= 1;
-    }
-    api.methods
-      .apiGetResults(vm.sotwId, weekNum)
-      .then((res) => {
-        if ("message" in res.data) {
-          vm.errorMessage = res.data.message;
-        } else {
-          vm.firstPlace = toRaw(JSON.parse(res.data.first_place));
-          vm.secondPlace = toRaw(JSON.parse(res.data.second_place));
-          vm.allSongs = toRaw(JSON.parse(res.data.all_songs));
-          vm.guessingData = toRaw(JSON.parse(res.data.guessing_data));
-          vm.buildChart();
-        }
-      })
-      .catch((err) => {
-        console.log("ERROR", err);
-      });
+    vm.getResults(vm.weekNum);
   },
   methods: {
+    getResults(weekNum) {
+      const vm = this;
+      // get results (if available)
+      if (weekNum > 1) {
+        weekNum -= 1;
+      }
+      api.methods
+        .apiGetResults(vm.sotwId, weekNum)
+        .then((res) => {
+          if ("message" in res.data) {
+            vm.errorMessage = res.data.message;
+          } else {
+            vm.firstPlace = toRaw(JSON.parse(res.data.first_place));
+            vm.secondPlace = toRaw(JSON.parse(res.data.second_place));
+            vm.allSongs = toRaw(JSON.parse(res.data.all_songs));
+            vm.guessingData = toRaw(JSON.parse(res.data.guessing_data));
+            vm.buildChart();
+          }
+        })
+        .catch((err) => {
+          console.log("ERROR", err);
+        });
+
+      return vm.weekNum;
+    },
     toolTipFormatter(e) {
       let content = "";
       let dataPoint = e.entries[0].dataPoint;
@@ -186,6 +190,11 @@ export default {
         ],
       };
     },
+  },
+  watch: {
+    weekNum(newVal, oldVal) {
+      this.getResults(newVal);
+    }
   },
 };
 </script>
