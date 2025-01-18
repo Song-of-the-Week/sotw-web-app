@@ -200,8 +200,10 @@ async def get_current_week(
                     first_place_ids.append(all_songs[song_id]["spotify_id"])
                 elif num_votes > first_place_votes:
                     # new first place votes
+                    second_place_votes = first_place_votes
                     first_place_votes = num_votes
                     second_place_names = first_place_names
+                    second_place_ids = first_place_ids
                     first_place_names = [all_songs[song_id]["name"]]
                     first_place_ids = [all_songs[song_id]["spotify_id"]]
                 elif num_votes == second_place_votes:
@@ -233,11 +235,18 @@ async def get_current_week(
 
             # add first and second place songs to the soty playlsit
             uris = []
-            for song_id in first_place_ids + second_place_ids:
-                uris.append(f"spotify:track:{song_id}")
-            spotify_client.add_songs_to_playlist(
-                sotw.soty_playlist_id, uris, session, sotw.owner_id
-            )
+            if len(first_place_ids) == 1:
+                for song_id in first_place_ids + second_place_ids:
+                    uris.append(f"spotify:track:{song_id}")
+                spotify_client.add_songs_to_playlist(
+                    sotw.soty_playlist_id, uris, session, sotw.owner_id
+                )
+            else:
+                for song_id in first_place_ids:
+                    uris.append(f"spotify:track:{song_id}")
+                spotify_client.add_songs_to_playlist(
+                    sotw.soty_playlist_id, uris, session, sotw.owner_id
+                )
 
         # get the next results release timestamp
         results_datetime = datetime.fromtimestamp(sotw.results_datetime / 1000.0)
