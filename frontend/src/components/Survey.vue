@@ -374,4 +374,8 @@ export default {
   width: 1.4rem;
   height: 1.4rem;
 }
+
+.text-muted {
+  color: #41a14a;
+}
 </style>

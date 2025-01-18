@@ -167,14 +167,13 @@ export default {
         backgroundColor: "transparent",
         animationsEnabled: true,
         exportEnabled: true,
-        // width: "100%",
         title: {
           text: "Voting Results",
         },
         axisX: {
           labelTextAlign: "right",
           labelFontSize: 12,
-          labelWrap: false,    // Don't allow the label to wrap to multiple lines
+          labelWrap: false,
           interval: 1,
         },
         axisY: {

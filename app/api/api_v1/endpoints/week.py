@@ -103,6 +103,24 @@ async def get_current_week(
                 message=f"You will need at least three players in your Song of the Week competition in order to continue playing.",
             )
         if len(current_week.responses) < sotw_num_users:
+            submitted_users = crud.user.get_submitted_users(
+                session=session, week_id=current_week.id
+            )
+            unsubmitted_users = []
+            for user in sotw.user_list:
+                if user not in submitted_users:
+                    unsubmitted_users.append(user.name)
+
+            if len(unsubmitted_users) == 1:
+                unsubmitted_user_string = unsubmitted_users[0]
+            elif len(unsubmitted_users) == 2:
+                unsubmitted_user_string = (
+                    f"{unsubmitted_users[0]} and {unsubmitted_users[1]}"
+                )
+            else:
+                unsubmitted_user_string = (
+                    ", ".join(unsubmitted_users[:-1]) + ", and " + unsubmitted_users[-1]
+                )
             return schemas.WeekErrorResponse(
                 week=schemas.Week(
                     id=current_week.id,
@@ -114,7 +132,7 @@ async def get_current_week(
                     submitted=submitted,
                 ),
                 status=406,
-                message=f"Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on {sotw_num_users - len(current_week.responses)} player{'s' if sotw_num_users - len(current_week.responses) > 1 else ''} to submit.",
+                message=f"Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on {sotw_num_users - len(current_week.responses)} player{'s' if sotw_num_users - len(current_week.responses) > 1 else ''} to submit: {unsubmitted_user_string}",
             )
 
         # create the results for the previous week and update user playlists
