@@ -1,9 +1,17 @@
 const { defineConfig } = require("@vue/cli-service");
+
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
   devServer: {
     allowedHosts: "all",
+    setupMiddlewares: (middlewares, devServer) => {
+      // Explicitly respond to /health requests
+      devServer.app.get('/health', (req, res) => {
+        res.send('<div>OK</div>');  // Respond with a health check message
+      });
+      return middlewares;
+    },
   },
   chainWebpack: (config) => {
     config.plugin("html").tap((args) => {

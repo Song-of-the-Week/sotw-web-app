@@ -42,6 +42,16 @@ def root(
     """
     return {"hello": "world"}
 
+@root_router.get("/health", status_code=200)
+def health(
+    request: Request,
+    session: Session = Depends(deps.get_session),
+) -> dict:
+    """
+    Root GET
+    """
+    return {"health": "ok"}
+
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
