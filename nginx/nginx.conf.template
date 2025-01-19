@@ -24,7 +24,14 @@ http {
     server {
         listen 80;
         server_name ${DOMAIN_NAME} www.${DOMAIN_NAME};
-        return 301 https://$host$request_uri;
+
+        location /health {
+            return 200 'OK'; # Simple health check response on HTTP port 80
+            add_header Content-Type text/plain;
+        }
+        location / {
+            return 301 https://$host$request_uri;
+        }
     }
 
     
@@ -49,29 +56,8 @@ http {
         }
         location /health {
             access_log off;
-            return 200;
+            return 200 'OK';
         }
     }
 
 }
-
-
-# server {
-#     listen 443 default_server ssl;
-#     server_name example.com;
-#     server_tokens off;
-
-#     ssl_certificate     /etc/letsencrypt/live/example.com/fullchain.pem;
-#     ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
-#     ssl_dhparam         /etc/letsencrypt/dhparams/dhparams.pem;
-
-#     client_max_body_size 32m;
-
-#     location / {
-#         proxy_pass http://app:8000;
-#         proxy_set_header Host $http_host;
-#         proxy_set_header X-Real-IP $remote_addr;
-#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#         proxy_set_header X-Forwarded-Proto $scheme;
-#     }
-# }
