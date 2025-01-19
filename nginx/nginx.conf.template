@@ -25,7 +25,7 @@ http {
         listen 80;
         server_name www.${DOMAIN_NAME};
 
-        return 301 https://$host$request_uri;
+        return 301 https://${DOMAIN_NAME}$request_uri;
     }
     server {
         listen 80;
@@ -36,7 +36,7 @@ http {
             add_header Content-Type text/plain;
         }
         location / {
-            return 301 https://$host$request_uri;
+            return 301 https://${DOMAIN_NAME}$request_uri;
         }
     }
 
@@ -47,12 +47,12 @@ http {
         ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
 
-        return 301 https://$host$request_uri;
+        return 301 https://${DOMAIN_NAME}$request_uri;
     }
     
     server {
         listen 443 ssl;
-        server_name ${DOMAIN_NAME} www.${DOMAIN_NAME};
+        server_name ${DOMAIN_NAME}
 
         ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
