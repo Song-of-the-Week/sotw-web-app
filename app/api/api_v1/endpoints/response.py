@@ -189,11 +189,14 @@ async def post_survey_response(
                     detail=f"There's something wrong with your request. A song with the given id {match.song_id} does not exist.",
                 )
 
+            previous_week = crud.week.get_week_by_number(
+                session=session, week_num=current_week.week_num - 1, sotw_id=sotw.id
+            )
             songs = crud.song.get_songs_by_name(
                 session=session,
                 name=song.name,
                 sotw_id=sotw.id,
-                week_id=current_week.id,
+                week_id=previous_week.id,
                 this_week=True,
             )
             song_submitter_ids = [song.submitter_id for song in songs]
