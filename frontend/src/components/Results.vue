@@ -63,6 +63,10 @@
                     {{ guess.submitter_guess }}
                   </td>
                 </tr>
+                <tr>
+                  <th scope="row">Average</th>
+                  <td>{{ avg_num_correct_guesses }}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -97,6 +101,7 @@ export default {
       guessingData: [{ guesses: { song: "", submitter_guess: "" } }],
       chartOptions: {},
       errorMessage: "",
+      avg_num_correct_guesses: 0,
     };
   },
   mounted() {
@@ -120,6 +125,12 @@ export default {
             vm.secondPlace = toRaw(JSON.parse(res.data.second_place));
             vm.allSongs = toRaw(JSON.parse(res.data.all_songs));
             vm.guessingData = toRaw(JSON.parse(res.data.guessing_data));
+            // get average guesses
+            let total_correct_guesses = 0
+            vm.guessingData.forEach(guesser => {
+              total_correct_guesses += guesser.num_correct_guesses;
+            });
+            vm.avg_num_correct_guesses = Math.round((total_correct_guesses / vm.guessingData.length) * 100) / 100;
             vm.buildChart();
           }
         })
