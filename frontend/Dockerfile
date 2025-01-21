@@ -1,4 +1,4 @@
-FROM node:18.19.1-buster-slim
+FROM public.ecr.aws/docker/library/node:18.19.1-buster-slim
 
 WORKDIR /usr/src/frontend
 

@@ -1,4 +1,4 @@
-FROM python:3.10.7-slim
+FROM public.ecr.aws/docker/library/python:3.10.7-slim
 
 ARG BUILD_ENV
 ENV BUILD_ENV=${BUILD_ENV}
