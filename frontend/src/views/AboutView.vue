@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <CContainer class="mb-4">
-      <div class="w-50 mx-auto mb-4">
+      <div class="w-50 mx-auto mb-4 text-center">
       <h1 class="mt-3">About Song of the Week</h1>
       </div>
       </CContainer>
