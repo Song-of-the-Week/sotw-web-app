@@ -272,9 +272,7 @@ export default {
     document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
       if (vm.isLoggedIn && vm.sotw != null && !sessionStorage.getItem("last_requested_path")) {
         sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id);
-      } else {
-        sessionStorage.setItem("last_requested_path", "/");
-      }
+      } 
       vm.loginForm = {
         email: "",
         password: "",
