@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@canvasjs/vue-charts": "^1.0.1",
+    "@coreui/coreui": "^5.2.0",
+    "@coreui/vue": "^5.4.1",
     "@floating-ui/vue": "^1.0.4",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.6.1",
