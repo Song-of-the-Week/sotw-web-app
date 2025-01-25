@@ -6,9 +6,9 @@
   </CContainer>
   <div v-if="!isLoggedIn">
     <CContainer class="mb-4">
-      <div class="w-50 mx-auto mb-4">
-        <CCard>
-          <CCardBody>
+      <div class="d-flex justify-content-center">
+        <CCard style="width: 24rem">
+          <CCardBody class="text-center">
             <CCardTitle>It looks like you aren't signed in</CCardTitle>
             <CCardSubtitle class="mb-2 text-body-secondary">Please sign in or register to use Song of the Week
             </CCardSubtitle>
