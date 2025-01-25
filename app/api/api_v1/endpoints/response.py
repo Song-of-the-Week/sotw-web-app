@@ -226,16 +226,3 @@ async def post_survey_response(
 
         # return a response with the current week
         return schemas.ResponseResponse(repeat=False, valid=True)
-
-@router.get(
-        "/{sotw_id}/{week_num}",
-        response_model=schemas.Response
-)
-async def get_survey_response( session: Session = Depends(deps.get_session),
-    *,
-    sotw_id: int,
-    week_id: int,
-    submitter_id: int,
-    current_user: User = Depends(deps.get_current_user),):
-        response = crud.response.get(session=session, sotw_id=sotw_id, week_id=week_id, submitter_id=submitter_id)
-        print(response)
