@@ -51,7 +51,7 @@
               <router-link v-if="isLoggedIn" :to="`/`">
                 <button class="btn btn-outline-success" @click="logoutUser()">Logout</button>
               </router-link>
-              <router-link v-else :to="`/login`">
+              <router-link v-else-if="!hideLoginButtonPaths.includes($route.path)" :to="`/login`">
                 <button class="btn btn-outline-success" @click="login()">Login</button>
               </router-link>
             </div>
@@ -91,6 +91,7 @@ export default {
       sotwCreationModal: null,
       spotifyModal: null,
       initialPath: "/",
+      hideLoginButtonPaths: ['/login', '/register', '/reset', '/'],
     };
   },
   computed: {
