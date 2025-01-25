@@ -106,8 +106,8 @@ export default {
   methods: {
     ...mapActions(["logout", "getCurrentUser", "getSotw"]),
     initializeModals() {
-      this.$nextTick(() => {
-        const vm = this;
+      const vm = this;
+      vm.$nextTick(() => {
         vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
         if (vm.isLoggedIn) {
           vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
