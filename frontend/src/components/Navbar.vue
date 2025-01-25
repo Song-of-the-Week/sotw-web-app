@@ -100,7 +100,8 @@ export default {
     },
   },
   mounted() {
-    this.initializeModals();
+    const vm = this;
+    vm.initializeModals();
   },
   methods: {
     ...mapActions(["logout", "getCurrentUser", "getSotw"]),
