@@ -64,7 +64,7 @@
   <SpotifyModal></SpotifyModal>
   <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal"
     :initial-path="initialPath" @initialize-modals="initializeModals()" />
-  <InviteModal :invite-modal="inviteModal" />
+  <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
 </template>
 
