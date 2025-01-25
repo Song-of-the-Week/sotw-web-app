@@ -109,12 +109,19 @@ export default {
       vm.loadingRes = true;
       vm.response400 = vm.response500 = false;
     });
+        
+    // Initialize modal
+    vm.modal = new bootstrap.Modal(document.getElementById("inviteModal"));
+    // Show modal if we're on the invite route
+    if (vm.$route.name === 'invite' && vm.$route.params.shareToken) {
+      vm.modal.show();
+    }
   },
   methods: {
     ...mapActions(["getSotw", "getCurrentUser"]),
     cont() {
       const vm = this;
-      vm.inviteModal.hide();
+      vm.modal.hide();
       vm.$router.push("/sotw/" + vm.sotwRes.id);
     },
     async joinSotw() {
@@ -132,7 +139,7 @@ export default {
           // update the stored user in the front end
           vm.getCurrentUser();
           // close modal and redirect to the newly joined sotw
-          vm.inviteModal.hide();
+          vm.modal.hide();
           vm.$router.push("/sotw/" + sotwId);
         })
         .catch((err) => {

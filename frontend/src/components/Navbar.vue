@@ -64,7 +64,7 @@
   <SpotifyModal></SpotifyModal>
   <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal"
     :initial-path="initialPath" />
-  <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
+  <InviteModal v-if="isLoggedIn && $route.meta.inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
 </template>
 
@@ -100,18 +100,29 @@ export default {
     },
   },
   mounted() {
-    const vm = this;
-
-    vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
-    if (vm.isLoggedIn) {
-      vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
-      vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
-      vm.spotifyModal = new window.bootstrap.Modal("#spotifyModal");
-      vm.getCurrentUser();
-    }
+    this.initializeModals();
   },
   methods: {
     ...mapActions(["logout", "getCurrentUser", "getSotw"]),
+    initializeModals() {
+      this.$nextTick(() => {
+        if (!this.loginRegisterModal && document.getElementById("loginModal")) {
+          this.loginRegisterModal = new window.bootstrap.Modal(document.getElementById("loginModal"));
+        }
+        if (this.isLoggedIn) {
+          if (!this.inviteModal && document.getElementById("inviteModal")) {
+            this.inviteModal = new window.bootstrap.Modal(document.getElementById("inviteModal"));
+          }
+          if (!this.sotwCreationModal && document.getElementById("sotwCreationModal")) {
+            this.sotwCreationModal = new window.bootstrap.Modal(document.getElementById("sotwCreationModal"));
+          }
+          if (!this.spotifyModal && document.getElementById("spotifyModal")) {
+            this.spotifyModal = new window.bootstrap.Modal(document.getElementById("spotifyModal"));
+          }
+          this.getCurrentUser();
+        }
+      });
+    },
     login() {
       const vm = this;
       if (!vm.loginRegisterModal._isShown) {
