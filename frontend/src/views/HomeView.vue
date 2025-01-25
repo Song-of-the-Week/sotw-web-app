@@ -1,38 +1,26 @@
 <template>
-  <CContainer class="mb-4">
+  <div class="container mb-4">
     <div class="w-50 mx-auto mb-4 text-center">
       <h1 class="mt-3">Welcome to Song of the Week!</h1>
     </div>
-  </CContainer>
+  </div>
   <div v-if="!isLoggedIn">
-    <CContainer class="mb-4">
+    <div class="container mb-4">
       <div class="d-flex justify-content-center">
-        <CCard style="width: 24rem">
-          <CCardBody class="text-center">
-            <CCardTitle>It looks like you aren't signed in</CCardTitle>
-            <CCardSubtitle class="mb-2 text-body-secondary">Please sign in or register to use Song of the Week
-            </CCardSubtitle>
+        <div class="card" style="width: 26rem">
+          <div class="card-body text-center">
+            <h5 class="card-title">It looks like you aren't signed in</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Please sign in or register to use Song of the Week</h6>
             <router-link :to="`/login`">
-              <CButton color="primary" class="me-2">Login</CButton>
+              <button class="btn btn-primary me-2">Login</button>
             </router-link>
             <router-link :to="`/register`">
-              <CButton color="secondary" class="me-2">Register</CButton>
+              <button class="btn btn-secondary me-2">Register</button>
             </router-link>
-          </CCardBody>
-        </CCard>
+          </div>
+        </div>
       </div>
-    </CContainer>
-
-    <h2></h2>
-    <p>
-    </p>
-    <h3></h3>
-    <p>
-
-    </p>
-
-    <p>
-    </p>
+    </div>
   </div>
   <div v-else class="text-center">
     <div v-if="user.sotw_list.length == 0">
@@ -64,25 +52,9 @@
 import { mapGetters, mapActions } from "vuex";
 import api from "@/shared/api";
 import store from "@/store/index.js";
-import {
-  CButton,
-  CContainer,
-  CCard,
-  CCardBody,
-  CCardTitle,
-  CCardSubtitle,
-} from '@coreui/vue';
 
 export default {
   name: "HomeView",
-  components: {
-    CButton,
-    CContainer,
-    CCard,
-    CCardBody,
-    CCardTitle,
-    CCardSubtitle,
-  },
   data() {
     return {
       sotwCreationModal: null,

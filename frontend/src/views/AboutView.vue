@@ -1,18 +1,21 @@
 <template>
   <div class="about">
-    <CContainer class="mb-4">
+    <div class="container mb-4">
       <div class="w-50 mx-auto mb-4 text-center">
-      <h1 class="mt-3">About Song of the Week</h1>
+        <h1 class="mt-3">About Song of the Week</h1>
       </div>
-      </CContainer>
-    <CContainer class="mb-4">
-          <div class="w-75 mx-auto mb-4">
-          <CAccordion>
-            <CAccordionItem :item-key="1">
-              <CAccordionHeader>
+    </div>
+    <div class="container mb-4">
+      <div class="w-75 mx-auto mb-4">
+        <div class="accordion" id="aboutAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
                 What is Song of the Week?
-              </CAccordionHeader>
-              <CAccordionBody>
+              </button>
+            </h2>
+            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
                 <p>
                   Song of the Week is meant to be a friendly competition where you and your friends can finally
                   determine who
@@ -23,13 +26,18 @@
                   between you,
                   forming a bond that will last lifetimes or something, but it's mostly about winning.
                 </p>
-              </CAccordionBody>
-            </CAccordionItem>
-            <CAccordionItem :item-key="2">
-              <CAccordionHeader>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
                 How Does It Work?
-              </CAccordionHeader>
-              <CAccordionBody>
+              </button>
+            </h2>
+            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
                 <p>
                   Every week, you and whoever else is a part of your Song of the Week competition submit a song
                   anonymously in a
@@ -58,103 +66,113 @@
                   previous
                   week's results, and thus, the circle of Song of the Week continues.
                 </p>
-              </CAccordionBody>
-            </CAccordionItem>
-            <CAccordionItem :item-key="3">
-              <CAccordionHeader>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
                 How Many Songs Win Each Week?
-              </CAccordionHeader>
-              <CAccordionBody>
-                <p>
-                  The top two songs every week will win, unless there are ties. If there are ties for first, all songs
+              </button>
+            </h2>
+            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
+                <p> The top two songs every week will win, unless there are ties. If there are ties for first, all songs
                   tied for first will make the
                   Song of the Year playlist, and no second place songs will be added. Likewise, if one song receives the
                   most votes but there is a tie
-                  for second, all second place songs will make the Song of the Year.
-                </p>
-              </CAccordionBody>
-            </CAccordionItem>
-
-            <CAccordionItem :item-key="4">
-              <CAccordionHeader>
-                Do I Need A Spotify Account?
-              </CAccordionHeader>
-              <CAccordionBody>
-                <p>
-                  Yes. In addition, you must make sure your account is linked before attempting to join a Song of the
-                  Week competition.
-                </p>
-              </CAccordionBody>
-            </CAccordionItem>
-
-            <CAccordionItem :item-key="5">
-              <CAccordionHeader>
-                How Much Does It Cost?
-              </CAccordionHeader>
-              <CAccordionBody>
-                <p>
-                  Nothing at all! This is a hobby project and we do not plan to monetize it. Unless...?
-                </p>
-              </CAccordionBody>
-            </CAccordionItem>
-
-            <CAccordionItem :item-key="6">
-              <CAccordionHeader>
-                Are You Going to Sell My Data?
-              </CAccordionHeader>
-              <CAccordionBody>
-                <p>
-                  Absolutely not.
-                </p>
-              </CAccordionBody>
-            </CAccordionItem>
-
-            <CAccordionItem :item-key="7">
-              <CAccordionHeader>
-                Is This Open Source?
-              </CAccordionHeader>
-              <CAccordionBody>
-                  <p>
-                    <a href="https://github.com/orgs/Song-of-the-Week/repositories" class="text-primary text-decoration-none">Yes!</a>
-                  </p>
-              </CAccordionBody>
-            </CAccordionItem>
-
-            <CAccordionItem :item-key="8">
-              <CAccordionHeader>
-                Do You Not Have Anything Better to Do With Your Time?
-              </CAccordionHeader>
-              <CAccordionBody>
-                  <p>
-                    Absolutely not.
-                  </p>
-              </CAccordionBody>
-            </CAccordionItem>
-          </CAccordion>
+                  for second, all second place songs will make the Song of the Year.</p>
+              </div>
+            </div>
           </div>
-        </CContainer>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse3">
+                Can I submit more than one song?
+              </button>
+            </h2>
+            <div id="collapse7" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
+                <p>Absolutely not.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse3">
+                Do I Need A Spotify Account?
+              </button>
+            </h2>
+            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
+                <p>Yes. In addition, you must make sure your account is linked before attempting to join a Song of the
+                  Week competition.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse3">
+                How Much Does It Cost?
+              </button>
+            </h2>
+            <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
+                <p>Nothing at all! This is a hobby project and we do not plan to monetize it. Unless...?</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse3">
+                Are You Going to Sell My Data?
+              </button>
+            </h2>
+            <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
+                <p>Absolutely not.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-expanded="false" aria-controls="collapse3">
+                Is This Open Source?
+              </button>
+            </h2>
+            <div id="collapse8" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
+                <p><a href="https://github.com/orgs/Song-of-the-Week/repositories" class="text-primary text-decoration-none">Yes!</a></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse9" aria-expanded="false" aria-controls="collapse3">
+                Do You Not Have Anything Better to Do With Your Time?
+              </button>
+            </h2>
+            <div id="collapse9" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
+              <div class="accordion-body">
+                <p>Absolutely not.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import {
-  CAccordion,
-  CAccordionItem,
-  CAccordionBody,
-  CButton,
-  CAccordionHeader,
-  CContainer,
-} from '@coreui/vue';
-
 export default {
-  name: 'ContainerExample',
-  components: {
-    CAccordion,
-    CAccordionItem,
-    CAccordionBody,
-    CButton,
-    CAccordionHeader,
-    CContainer,
-  },
+  name: 'AboutView'
 };
 </script>
