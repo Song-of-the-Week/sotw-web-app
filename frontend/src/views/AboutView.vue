@@ -10,11 +10,11 @@
         <div class="accordion" id="aboutAccordion">
           <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
-                What is Song of the Week?
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                What is Song of the Week? 🗓️
               </button>
             </h2>
-            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#aboutAccordion">
+            <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
               <div class="accordion-body">
                 <p>
                   Song of the Week is meant to be a friendly competition where you and your friends can finally
@@ -33,7 +33,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                How Does It Work?
+                How does it work? 🤨
               </button>
             </h2>
             <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
@@ -73,7 +73,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
-                How Many Songs Win Each Week?
+                How many songs win each week? 🏆
               </button>
             </h2>
             <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
@@ -83,6 +83,7 @@
                   Song of the Year playlist, and no second place songs will be added. Likewise, if one song receives the
                   most votes but there is a tie
                   for second, all second place songs will make the Song of the Year.</p>
+                <p> TL;DR - At least 2, but more if there are ties. </p>
               </div>
             </div>
           </div>
@@ -90,7 +91,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse3">
-                Can I submit more than one song?
+                Can I submit more than one song? 🤠
               </button>
             </h2>
             <div id="collapse7" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
@@ -103,7 +104,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse3">
-                Do I Need A Spotify Account?
+                Do I need a Spotify account? 🇸🇪
               </button>
             </h2>
             <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
@@ -117,7 +118,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse3">
-                How Much Does It Cost?
+                How much does it cost? 🤑
               </button>
             </h2>
             <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
@@ -130,7 +131,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse3">
-                Are You Going to Sell My Data?
+                Are you going to sell my data? 😳
               </button>
             </h2>
             <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
@@ -143,7 +144,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-expanded="false" aria-controls="collapse3">
-                Is This Open Source?
+                Is this open source? 🧑‍💻
               </button>
             </h2>
             <div id="collapse8" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
@@ -156,7 +157,7 @@
           <div class="accordion-item">
             <h2 class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse9" aria-expanded="false" aria-controls="collapse3">
-                Do You Not Have Anything Better to Do With Your Time?
+                Do you not have anything better to do with your time? 🤔
               </button>
             </h2>
             <div id="collapse9" class="accordion-collapse collapse" data-bs-parent="#aboutAccordion">
