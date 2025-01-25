@@ -106,20 +106,13 @@ export default {
     ...mapActions(["logout", "getCurrentUser", "getSotw"]),
     initializeModals() {
       this.$nextTick(() => {
-        if (!this.loginRegisterModal && document.getElementById("loginModal")) {
-          this.loginRegisterModal = new window.bootstrap.Modal(document.getElementById("loginModal"));
-        }
-        if (this.isLoggedIn) {
-          if (!this.inviteModal && document.getElementById("inviteModal")) {
-            this.inviteModal = new window.bootstrap.Modal(document.getElementById("inviteModal"));
-          }
-          if (!this.sotwCreationModal && document.getElementById("sotwCreationModal")) {
-            this.sotwCreationModal = new window.bootstrap.Modal(document.getElementById("sotwCreationModal"));
-          }
-          if (!this.spotifyModal && document.getElementById("spotifyModal")) {
-            this.spotifyModal = new window.bootstrap.Modal(document.getElementById("spotifyModal"));
-          }
-          this.getCurrentUser();
+        const vm = this;
+        vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
+        if (vm.isLoggedIn) {
+          vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
+          vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+          vm.spotifyModal = new window.bootstrap.Modal("#spotifyModal");
+          vm.getCurrentUser();
         }
       });
     },
