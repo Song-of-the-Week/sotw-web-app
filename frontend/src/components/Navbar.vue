@@ -63,8 +63,8 @@
   <!-- Modals -->
   <SpotifyModal></SpotifyModal>
   <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal"
-    :initial-path="initialPath" />
-  <InviteModal v-if="isLoggedIn && $route.meta.inviteModal" />
+    :initial-path="initialPath" @initialize-modals="initializeModals()" />
+  <InviteModal :invite-modal="inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
 </template>
 

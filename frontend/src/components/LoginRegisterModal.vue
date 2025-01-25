@@ -272,7 +272,7 @@ export default {
     document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
       if (vm.isLoggedIn && vm.sotw != null && !sessionStorage.getItem("last_requested_path")) {
         sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id);
-      } 
+      }
       vm.loginForm = {
         email: "",
         password: "",
@@ -473,11 +473,13 @@ export default {
           }
         })
         .finally(() => {
+          vm.$emit("initialize-modals");
           vm.loading = false;
         });
     },
     close() {
       const vm = this;
+      sessionStorage.setItem("last_requested_path", "/");
       vm.loginRegisterModal.hide();
     },
   },

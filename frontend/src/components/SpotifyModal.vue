@@ -26,11 +26,6 @@ import { mapGetters } from "vuex";
 import api from "@/shared/api";
 export default {
   name: "SpotifyModal",
-  props: {
-    alertModal: {
-      default: null,
-    },
-  },
   computed: {
     ...mapGetters({
       user: "getUser",
