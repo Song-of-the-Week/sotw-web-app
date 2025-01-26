@@ -7,31 +7,29 @@
     </div>
     <div v-else-if="weekNum > 0">
       <div class="row">
-        <div class="col">
+        <div class="col text-center">
           <h1 class="mb-5">Congratulations to our week {{ weekNum - 1 }} winners!</h1>
-          <h2 v-if="firstPlace.length === 2">
-            Tied for first place with {{ firstPlaceVotes }} votes each, we have {{ firstPlace[0] }} and
-            {{ firstPlace[1] }}!
-          </h2>
-          <h2 v-else-if="firstPlace.length > 2">
-            Tied for first place with {{ firstPlaceVotes }} votes each, we have
-            <span v-for="(song, index) in firstPlace" :key="index">{{ song }}<span
-                v-if="index === firstPlace.length - 1">!</span><span v-else-if="index === firstPlace.length - 2">, and
-              </span><span v-else>, </span></span>
-          </h2>
-          <div v-else>
-            <h2 class="mb-4">In first place with {{ firstPlaceVotes }} votes, we have {{ firstPlace[0] }}!</h2>
-            <h3 v-if="secondPlace.length === 2">
-              Tied for second place with {{ secondPlaceVotes }} votes each, we have {{ secondPlace[0] }} and
-              {{ secondPlace[1] }}!
-            </h3>
-            <h3 v-else-if="secondPlace.length > 2">
-              Tied for second place with {{ secondPlaceVotes }} votes each, we have
-              <span v-for="(song, index) in secondPlace" :key="index">{{ song }}<span
-                  v-if="index === secondPlace.length - 1">!</span><span v-else-if="index === secondPlace.length - 2">,
-                  and </span><span v-else>, </span></span>
-            </h3>
-            <h3 v-else>In second place with {{ secondPlaceVotes }} votes, we have {{ secondPlace[0] }}!</h3>
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-4">
+              <div class="card px-0 mb-4">
+                <div class="card-header">
+                  First Place 🏆
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li v-for="song in firstPlace" class="list-group-item">{{ song }}</li>
+                </ul>
+              </div>
+            </div>
+            <div v-if="firstPlace.length === 1" class="col-12 col-md-4">
+              <div class="card px-0 mb-4">
+                <div class="card-header">
+                  Second Place 🥈
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li v-for="song in secondPlace" class="list-group-item">{{ song }}</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -66,6 +64,27 @@
                 <tr>
                   <th scope="row">Average</th>
                   <td>{{ avg_num_correct_guesses }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-5">
+        <div class="col">
+          <h4>Who Dun It?</h4>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Submitter</th>
+                  <th scope="col">Song</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="song in allSongs" :key="song.submitter">
+                  <td>{{ song.submitter }}</td>
+                  <td>{{ song.name }}</td>
                 </tr>
               </tbody>
             </table>
@@ -227,4 +246,5 @@ td:first-child {
 .correct-guess {
   background-color: #32a852;
 }
+
 </style>
