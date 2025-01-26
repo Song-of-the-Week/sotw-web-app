@@ -34,60 +34,80 @@
         </div>
       </div>
       <div class="row mt-5">
-        <div class="col">
-          <div id="chart">
-            <CanvasJSChart :options="chartOptions" />
+        <!-- Chart Card -->
+        <div class="row-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h4>Week {{ weekNum - 1 }} Voting Results</h4>
+            </div>
+            <div class="card-body">
+              <div id="chart">
+                <CanvasJSChart :options="chartOptions" />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="row mt-5">
-        <div class="col">
-          <h4>Guessing Data</h4>
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Who ye be</th>
-                  <th scope="col">Number of Correct Guesses</th>
-                  <th scope="col" v-for="guess in guessingData[0].guesses"
-                    :key="guess.song + '-' + guess.submitter_guess">{{ guess.song }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="guesser in guessingData" :key="guesser.id">
-                  <th scope="row">{{ guesser.name }}</th>
-                  <td>{{ guesser.num_correct_guesses }}</td>
-                  <td v-for="guess in guesser.guesses" :class="{ 'correct-guess': guess.correct }">
-                    {{ guess.submitter_guess }}
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Average</th>
-                  <td>{{ avg_num_correct_guesses }}</td>
-                </tr>
-              </tbody>
-            </table>
+
+        <!-- Guessing Data Card -->
+        <div class="row-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h4>Guessing Data</h4>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Who ye be</th>
+                      <th scope="col">Number of Correct Guesses</th>
+                      <th scope="col" v-for="guess in guessingData[0].guesses"
+                        :key="guess.song + '-' + guess.submitter_guess">{{ guess.song }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="guesser in guessingData" :key="guesser.id">
+                      <th scope="row">{{ guesser.name }}</th>
+                      <td>{{ guesser.num_correct_guesses }}</td>
+                      <td v-for="guess in guesser.guesses" :class="{ 'correct-guess': guess.correct }">
+                        {{ guess.submitter_guess }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Average</th>
+                      <td>{{ avg_num_correct_guesses }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="row mt-5">
-        <div class="col">
-          <h4>Who Dun It?</h4>
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Submitter</th>
-                  <th scope="col">Song</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="song in allSongs" :key="song.submitter">
-                  <td>{{ song.submitter }}</td>
-                  <td>{{ song.name }}</td>
-                </tr>
-              </tbody>
-            </table>
+
+        <!-- Who Dun It Card -->
+        <div class="row-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header">
+              <h4>Who Dun It?</h4>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="text-start text-md-center">Submitter</th>
+                      <th scope="col" class="text-start text-md-center">Song</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="song in allSongs" :key="song.submitter">
+                      <td class="text-start text-md-center">{{ song.submitter }}</td>
+                      <td class="text-start text-md-center">{{ song.name }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -197,10 +217,6 @@ export default {
         backgroundColor: "transparent",
         animationsEnabled: true,
         exportEnabled: true,
-        title: {
-          text: "Voting Results",
-          fontFamily: "Arial",
-        },
         axisX: {
           labelTextAlign: "right",
           labelFontSize: 12,
