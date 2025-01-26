@@ -199,6 +199,7 @@ export default {
         exportEnabled: true,
         title: {
           text: "Voting Results",
+          fontFamily: "Arial",
         },
         axisX: {
           labelTextAlign: "right",
