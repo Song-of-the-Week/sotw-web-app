@@ -56,6 +56,9 @@ export default {
     apiGetSotwInviteJoin(shareToken) {
       return axios.get(config.BASE_API_V1_URL + "sotw/invite/join/" + shareToken);
     },
+    apiGetSotwMembers(sotwId) {
+      return axios.get(config.BASE_API_V1_URL + "sotw/" + sotwId + "/members");
+    },
     apiGetLeaveSotw(sotwId) {
       return axios.get(config.BASE_API_V1_URL + "sotw/" + sotwId + "/leave");
     },

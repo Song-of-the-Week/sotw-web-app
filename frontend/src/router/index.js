@@ -144,6 +144,15 @@ const routes = [
     },
   },
   {
+    path: "/sotw/:sotwId/members",
+    name: "members",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+      playlist: true,
+    },
+  },
+  {
     path: "/about",
     name: "about",
     // route level code-splitting
