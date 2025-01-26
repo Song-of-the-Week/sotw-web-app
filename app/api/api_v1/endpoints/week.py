@@ -302,7 +302,6 @@ async def get_current_week(
             "songs": [],
             "users": [],
         }
-        random.shuffle(responses)
         for response in responses:
             # note: the `id` is the id of the Song object in the database
             survey["songs"].append(

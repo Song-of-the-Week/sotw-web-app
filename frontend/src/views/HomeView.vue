@@ -24,26 +24,36 @@
   </div>
   <div v-else class="text-center">
     <div v-if="user.sotw_list.length == 0">
-      <h2>
-        It looks like you are not a part of any Song of the Week competitions :( You can create one by clicking the
-        button below, or you can join one by clicking on a share link that a friend sends you.
-      </h2>
+      <div class="card mb-4" style="width: 26rem; margin: auto;">
+        <div class="card-header">
+          It looks like you are not a part of any Song of the Week competitions :(
+        </div>
+        <div class="card-body text-center">
+          You can create one by clicking the button below, or you can join one by clicking on a share link that a friend
+          sends you.
+        </div>
+      </div>
     </div>
     <div v-else>
       <h2>Choose a Song of the Week to enter or create a new one!</h2>
       <div class="row">
         <div class="col"></div>
         <div class="col-10 col-lg-3 p-4">
-          <div class="list-group">
-            <router-link v-for="sotw in user.sotw_list" class="list-group-item list-group-item-action"
-              :to="`/sotw/` + sotw.id">{{ sotw.name }}</router-link>
+          <div class="card px-0 mb-4">
+            <div class="card-header">
+              Your Competitions
+            </div>
+            <div class="list-group">
+              <router-link v-for="sotw in user.sotw_list" class="list-group-item list-group-item-action"
+                :to="`/sotw/` + sotw.id">{{ sotw.name }}</router-link>
+            </div>
           </div>
         </div>
         <div class="col"></div>
       </div>
     </div>
     <router-link to="/sotw/create">
-      <button class="btn btn-outline-success" @click="create()">Create</button>
+      <button class="btn btn-outline-success" @click="create()">Create Competition</button>
     </router-link>
   </div>
 </template>

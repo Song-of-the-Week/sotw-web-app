@@ -21,7 +21,7 @@
             <li v-if="isLoggedIn" class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarResultsDropdown" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                SOTW
+                Competitions
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarResultsDropdown">
                 <span data-bs-dismiss="offcanvas">
@@ -63,7 +63,7 @@
   <!-- Modals -->
   <SpotifyModal></SpotifyModal>
   <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal"
-    :initial-path="initialPath" />
+    :initial-path="initialPath" @initialize-modals="initializeModals()" />
   <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
 </template>
@@ -102,17 +102,22 @@ export default {
   },
   mounted() {
     const vm = this;
-
-    vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
-    if (vm.isLoggedIn) {
-      vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
-      vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
-      vm.spotifyModal = new window.bootstrap.Modal("#spotifyModal");
-      vm.getCurrentUser();
-    }
+    vm.initializeModals();
   },
   methods: {
     ...mapActions(["logout", "getCurrentUser", "getSotw"]),
+    initializeModals() {
+      const vm = this;
+      vm.$nextTick(() => {
+        vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
+        if (vm.isLoggedIn) {
+          vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
+          vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+          vm.spotifyModal = new window.bootstrap.Modal("#spotifyModal");
+          vm.getCurrentUser();
+        }
+      });
+    },
     login() {
       const vm = this;
       if (!vm.loginRegisterModal._isShown) {
