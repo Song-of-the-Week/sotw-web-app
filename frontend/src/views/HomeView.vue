@@ -1,67 +1,60 @@
 <template>
-  <div class="row mb-3">
-    <div class="col">
+  <div class="container mb-4">
+    <div class="w-50 mx-auto mb-4 text-center">
       <h1 class="mt-3">Welcome to Song of the Week!</h1>
-      <div v-if="!isLoggedIn">
-        <h2>What is Song of the Week?</h2>
-        <p>
-          Song of the Week is meant to be a friendly competition where you and your friends can finally determine who
-          has the best music taste through democracy! I guess this also allows you to introduce your friends to new
-          music and learn more about them as you go along, creating a deeper understanding and connection between you,
-          forming a bond that will last lifetimes or something, but it's mostly about winning.
-        </p>
-        <h3>How does the competition work?</h3>
-        <p>
-          Every week, you and whoever else is a part of your Song of the Week competition submit a song anonymously in a
-          survey. Once everyone has submitted a song, a Spotify playlist composed of everyone's submission is created
-          and made available to everyone in the competition. Over the course of the next week, you and your friends will
-          listen to the playlist and fill out the next survey before the week ends. Each survey (except for the very
-          first one) will have you pick your favorite two songs from the playlist that week (votes for your own song are
-          not counted for that song), match each of the players in the competition with one of the songs in the
-          playlist, and submit a new song for next week's playlist. The results of the previous week's survey will be
-          shown on a scheduled day and time once everyone has submitted a response and it will show everyone which
-          song(s) got the most votes, which players got the most and least correct matches, and a breakdown of who voted
-          for which song and who made each guess. The top voted song(s) each week will be added to a Song of the Year
-          playlist available to everyone. The next playlist and a new survey will also be released with the previous
-          week's results, and thus, the circle of Song of the Week continues.
-        </p>
-
-        <p>
-          Anyway, it looks like you're not logged in. Please
-          <router-link :to="`/login`"><a class="">login</a></router-link> or
-          <router-link :to="`/register`"><a class="">register</a></router-link> to enter or start your own Song of the
-          Week competition!
-        </p>
-      </div>
-      <div v-else class="text-center">
-        <div v-if="user.sotw_list.length == 0">
-          <h2>
-            It looks like you are not a part of any Song of the Week competitions :( You can create one by clicking the
-            button below, or you can join one by clicking on a share link that a friend sends you.
-          </h2>
-        </div>
-        <div v-else>
-          <div class="row justify-content-center">
-            <div class="col"></div>
-            <div class="col-10 col-lg-3 p-4">
-              <div class="card px-0 mb-4">
-                <div class="card-header">
-                    Your Competitions
-                </div>
-                <div class="list-group">
-                  <router-link v-for="sotw in user.sotw_list" class="list-group-item list-group-item-action"
-                    :to="`/sotw/` + sotw.id">{{ sotw.name }}</router-link>
-                </div>
-              </div>
-            </div>
-            <div class="col"></div>
+    </div>
+  </div>
+  <div v-if="!isLoggedIn">
+    <div class="container mb-4">
+      <div class="d-flex justify-content-center">
+        <div class="card" style="width: 26rem">
+          <div class="card-body text-center">
+            <h5 class="card-title">It looks like you aren't signed in</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Please sign in or register to use Song of the Week</h6>
+            <router-link :to="`/login`">
+              <button class="btn btn-primary me-2">Login</button>
+            </router-link>
+            <router-link :to="`/register`">
+              <button class="btn btn-secondary me-2">Register</button>
+            </router-link>
           </div>
         </div>
-        <router-link to="/sotw/create">
-          <button class="btn btn-outline-success" @click="create()">Create Competition</button>
-        </router-link>
       </div>
     </div>
+  </div>
+  <div v-else class="text-center">
+    <div v-if="user.sotw_list.length == 0">
+      <div class="card mb-4" style="width: 26rem; margin: auto;">
+        <div class="card-header">
+          It looks like you are not a part of any Song of the Week competitions :(
+        </div>
+        <div class="card-body text-center">
+          You can create one by clicking the button below, or you can join one by clicking on a share link that a friend
+          sends you.
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <h2>Choose a Song of the Week to enter or create a new one!</h2>
+      <div class="row">
+        <div class="col"></div>
+        <div class="col-10 col-lg-3 p-4">
+          <div class="card px-0 mb-4">
+            <div class="card-header">
+              Your Competitions
+            </div>
+            <div class="list-group">
+              <router-link v-for="sotw in user.sotw_list" class="list-group-item list-group-item-action"
+                :to="`/sotw/` + sotw.id">{{ sotw.name }}</router-link>
+            </div>
+          </div>
+        </div>
+        <div class="col"></div>
+      </div>
+    </div>
+    <router-link to="/sotw/create">
+      <button class="btn btn-outline-success" @click="create()">Create Competition</button>
+    </router-link>
   </div>
 </template>
 
@@ -72,7 +65,6 @@ import store from "@/store/index.js";
 
 export default {
   name: "HomeView",
-  components: {},
   data() {
     return {
       sotwCreationModal: null,
