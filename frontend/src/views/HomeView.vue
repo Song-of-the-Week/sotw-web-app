@@ -41,20 +41,24 @@
           </h2>
         </div>
         <div v-else>
-          <h2>Choose a Song of the Week to enter or create a new one!</h2>
-          <div class="row">
+          <div class="row justify-content-center">
             <div class="col"></div>
             <div class="col-10 col-lg-3 p-4">
-              <div class="list-group">
-                <router-link v-for="sotw in user.sotw_list" class="list-group-item list-group-item-action"
-                  :to="`/sotw/` + sotw.id">{{ sotw.name }}</router-link>
+              <div class="card px-0 mb-4">
+                <div class="card-header">
+                    Your Competitions
+                </div>
+                <div class="list-group">
+                  <router-link v-for="sotw in user.sotw_list" class="list-group-item list-group-item-action"
+                    :to="`/sotw/` + sotw.id">{{ sotw.name }}</router-link>
+                </div>
               </div>
             </div>
             <div class="col"></div>
           </div>
         </div>
         <router-link to="/sotw/create">
-          <button class="btn btn-outline-success" @click="create()">Create</button>
+          <button class="btn btn-outline-success" @click="create()">Create Competition</button>
         </router-link>
       </div>
     </div>

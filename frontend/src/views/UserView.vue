@@ -120,7 +120,7 @@
       </div>
       <div class="row mt-3">
         <div class="col">
-          <h3>Competitions:</h3>
+          <h3>Your Competitions:</h3>
         </div>
       </div>
       <div v-if="user.sotw_list.length == 0" class="row mt-3">
