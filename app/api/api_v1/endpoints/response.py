@@ -226,3 +226,23 @@ async def post_survey_response(
 
         # return a response with the current week
         return schemas.ResponseResponse(repeat=False, valid=True)
+    
+@router.get(
+    "/{sotw_id}/{user_id}",
+    response_model=schemas.Response,
+)
+async def get_survey_response(
+    session: Session = Depends(deps.get_session),
+    *,
+    sotw_id: int,
+    user_id: str,
+    current_user: User = Depends(deps.get_current_user),
+):
+    print("HELLO")
+    logger.debug(f"Getting response for {sotw_id}, {user_id}")
+    response = crud.response.get_by_sotw_and_submitter(
+        sotw_id=sotw_id, submitter_id=user_id, session=session
+    )
+    if not response:
+        raise HTTPException(status_code=404, detail="Response not found")
+    return response
