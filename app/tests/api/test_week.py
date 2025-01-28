@@ -122,7 +122,7 @@ def test_get_current_week_n_406_not_enough_responses(
     assert "message" in data.keys()
     assert (
         data["message"]
-        == "Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on 3 players to submit."
+        == "Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on 3 players to submit: test1, test2, and test3"
     )
 
 
