@@ -32,6 +32,6 @@ class UserSongMatchInDB(UserSongMatchInDBBase):
 # additional properties to return via API
 class UserSongMatch(UserSongMatchInDBBase):
     user_id: int
-    week_id: int
+    song_id: int
     correct_guess: bool
     response_id: int
