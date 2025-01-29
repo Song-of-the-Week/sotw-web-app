@@ -238,11 +238,27 @@ async def get_survey_response(
     user_id: int,
     current_user: User = Depends(deps.get_current_user),
 ): 
+    """
+    Get the response for the given user and SOTW for the current week.
+
+    Args:
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw_id (int): ID of the sotw to query
+        user_id (int): ID of the user to query
+        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+    Raises:
+        HTTPException: 403 for unauthorized users
+
+    Returns:
+        schemas.Results: The results for the given sotw and week num.
+    """
     if user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to view this response")
-     
+    current_week = crud.week.get_current_week(session=session, sotw_id=sotw_id)
+
     response = crud.response.get_by_sotw_and_submitter(
-        sotw_id=sotw_id, submitter_id=user_id, session=session
+        sotw_id=sotw_id, submitter_id=user_id, week_id=current_week.id, session=session
     )
 
     # it is possible that the user has not submitted a response yet
