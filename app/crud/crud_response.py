@@ -14,7 +14,7 @@ class CRUDResponse(CRUDBase[Response, ResponseCreate, ResponseUpdate]):
         session: Session, 
         *, 
         sotw_id: int, 
-        submitter_id: str
+        submitter_id: int
     ) -> Optional[Response]:
         current_week = crud.week.get_current_week(session=session, sotw_id=sotw_id)
         
@@ -23,7 +23,6 @@ class CRUDResponse(CRUDBase[Response, ResponseCreate, ResponseUpdate]):
             Response.submitter_id == submitter_id,
             Response.week_id == current_week.id
         ).first()
-        response.submitter_id = str(response.submitter_id)
         return response
 
 

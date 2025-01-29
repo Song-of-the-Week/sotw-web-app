@@ -59,6 +59,9 @@ export default {
     apiGetLeaveSotw(sotwId) {
       return axios.get(config.BASE_API_V1_URL + "sotw/" + sotwId + "/leave");
     },
+    apiGetSotwResponse(sotwId, userId) {
+      return axios.get(config.BASE_API_V1_URL + "response/" + sotwId + "/" + userId);
+    },
     // WEEK
     apiGetWeek(id) {
       return axios.get(config.BASE_API_V1_URL + "week/" + id + "/current_week");

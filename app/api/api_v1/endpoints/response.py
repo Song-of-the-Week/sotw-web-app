@@ -235,14 +235,42 @@ async def get_survey_response(
     session: Session = Depends(deps.get_session),
     *,
     sotw_id: int,
-    user_id: str,
+    user_id: int,
     current_user: User = Depends(deps.get_current_user),
-):
-    print("HELLO")
-    logger.debug(f"Getting response for {sotw_id}, {user_id}")
+): 
+    if user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view this response")
+     
     response = crud.response.get_by_sotw_and_submitter(
         sotw_id=sotw_id, submitter_id=user_id, session=session
     )
-    if not response:
-        raise HTTPException(status_code=404, detail="Response not found")
-    return response
+
+    # it is possible that the user has not submitted a response yet
+    # in which case we return a response with no data instead of an error
+    if response is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Response not found for this user in this sotw.",
+        )
+
+
+    stringified_matches = [
+        schemas.UserSongMatch(
+            user_id=str(match.user_id),
+            song_id=str(match.song_id),
+            correct_guess=match.correct_guess,
+            response_id=str(match.response_id)
+        )
+        for match in response.user_song_matches
+    ]
+    return schemas.Response(
+        submitter_id=str(response.submitter_id),
+        user_song_matches=stringified_matches,
+        number_correct_matches=response.number_correct_matches,
+        next_song=response.next_song.spotify_link,
+        picked_song_1_id=str(response.picked_song_1_id),
+        picked_song_2_id=str(response.picked_song_2_id),
+        sotw_id=str(response.sotw_id),
+        week_id=str(response.week_id),
+    )
+        
