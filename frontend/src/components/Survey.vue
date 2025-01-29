@@ -245,8 +245,6 @@ export default {
           // update the userSongMatches with the previous response
           vm.userSongMatches = vm.previousResponse.user_song_matches.map(match => {
             let user = survey.users.find((user) => user.id == match.user_id);
-            // need to mark as true or the de-dup logic will fail
-            // user.matched = true;
             let song = survey.songs.find((song) => song.id == match.song_id);
             song.user = user;
             song.user.matched = true;
