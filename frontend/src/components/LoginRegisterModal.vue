@@ -458,6 +458,7 @@ export default {
             // set the user
             await vm.getCurrentUser();
             vm.loginRegisterModal.hide();
+            vm.$emit("initialize-modals");
           }
         })
         .catch((err) => {
@@ -473,7 +474,6 @@ export default {
           }
         })
         .finally(() => {
-          vm.$emit("initialize-modals");
           vm.loading = false;
         });
     },
