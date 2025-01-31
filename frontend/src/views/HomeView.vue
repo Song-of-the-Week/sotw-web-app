@@ -96,10 +96,10 @@ export default {
             .then((_) => {
               vm.$router.push(sessionStorage.getItem("last_requested_path"));
             });
-          // TODO maybe add toastr or modal or something to indicate spotify linked
+          alert("Spotify account linked! You may now participate in a Song of the Week Competition.")
         } else if ("error" in vm.$route.query) {
           console.log("ERROR", vm.$route.query.error);
-          // TODO maybe add toastr or something to indicate spotify not linked
+          alert("Something went wrong. Your spotify account was not linked.")
         }
       } else if (vm.$route.name == "verify") {
         // make api call to backend to verify the token and update user on front end

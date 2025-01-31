@@ -143,7 +143,6 @@ export default {
     $route: {
       immediate: true,
       handler: function (newVal, oldVal) {
-        // console.log("WHAT", newVal.path.split("/")[2]);
         const vm = this;
 
         if (
@@ -176,21 +175,20 @@ export default {
               }
             }
           }
-          if (vm.inviteModal && newVal.meta.inviteModal && vm.user) {
-            if (!vm.inviteModal._isShown) {
-              vm.inviteModal.show();
-            }
+          if (vm.inviteModal && newVal.meta.inviteModal && vm.user && !vm.inviteModal._isShown) {
+            vm.inviteModal.show();
           }
-          if (vm.sotwCreationModal && newVal.meta.createModal) {
-            if (!vm.sotwCreationModal._isShown) {
-              vm.sotwCreationModal.show();
-            }
+          if (vm.sotwCreationModal && newVal.meta.createModal && !vm.sotwCreationModal._isShown) {
+            vm.sotwCreationModal.show();
           }
-          if (vm.spotifyModal && newVal.meta.spotifyModal) {
-            if (!vm.spotifyModal.__isShown) {
-              vm.spotifyModal.show();
-            }
+          if (vm.spotifyModal && newVal.meta.spotifyModal && !vm.spotifyModal.__isShown) {
+            vm.spotifyModal.show();
           }
+        }
+
+        // if spotify is unlinked, always show the spotify link modal
+        if (vm.isLoggedIn && !vm.user.spotify_linked && vm.spotifyModal && !vm.spotifyModal?.__isShown && !newVal.query.code && !newVal.query.state) {
+          vm.spotifyModal.show();
         }
       },
     },
