@@ -96,10 +96,14 @@ export default {
             .then((_) => {
               vm.$router.push(sessionStorage.getItem("last_requested_path"));
             });
-          alert("Spotify account linked! You may now participate in a Song of the Week Competition.")
+          const spotifyLinkedToast = document.getElementById("spotifyLinkedToast");
+          const spotifyLinkedToastBootstrap = bootstrap.Toast.getOrCreateInstance(spotifyLinkedToast);
+          spotifyLinkedToastBootstrap.show();
         } else if ("error" in vm.$route.query) {
           console.log("ERROR", vm.$route.query.error);
-          alert("Something went wrong. Your spotify account was not linked.")
+          const spotifyNotLinkedToast = document.getElementById("spotifyNotLinkedToast");
+          const spotifyNotLinkedToastBootstrap = bootstrap.Toast.getOrCreateInstance(spotifyNotLinkedToast);
+          spotifyNotLinkedToastBootstrap.show();
         }
       } else if (vm.$route.name == "verify") {
         // make api call to backend to verify the token and update user on front end

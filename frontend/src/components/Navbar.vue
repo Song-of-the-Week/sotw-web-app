@@ -66,6 +66,32 @@
     :initial-path="initialPath" @initialize-modals="initializeModals()" />
   <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
+  <!-- Toasts -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="spotifyLinkedToast" class="toast" role="alert" delay="5000" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="bi bi-spotify me-2"></i>
+        <strong class="me-auto">Spotify Linked!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        You may now participate in a Song of the Week Competition.
+      </div>
+    </div>
+  </div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="spotifyNotLinkedToast" class="toast" role="alert" delay="5000" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="bi bi-spotify me-2"></i>
+        <strong class="me-auto">Spotify Not Linked!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Something went wrong, your Spotify account was not linked.
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script>
