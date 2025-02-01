@@ -66,6 +66,33 @@
     :initial-path="initialPath" @initialize-modals="initializeModals()" />
   <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
+  <!-- Toasts -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="spotifyLinkedToast" class="toast" role="alert" data-bs-delay='100000' aria-live="assertive"
+      aria-atomic="true">
+      <div class="toast-header text-bg-success">
+        <i class="bi bi-spotify me-2"></i>
+        <strong class="me-auto">Spotify Linked!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        You may now participate in a Song of the Week Competition.
+      </div>
+    </div>
+  </div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="spotifyNotLinkedToast" class="toast" role="alert" delay="5000" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header text-bg-danger">
+        <i class="bi bi-spotify me-2"></i>
+        <strong class="me-auto">Spotify Not Linked!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Something went wrong, your Spotify account was not linked.
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script>
@@ -143,7 +170,6 @@ export default {
     $route: {
       immediate: true,
       handler: function (newVal, oldVal) {
-        // console.log("WHAT", newVal.path.split("/")[2]);
         const vm = this;
 
         if (
@@ -176,21 +202,20 @@ export default {
               }
             }
           }
-          if (vm.inviteModal && newVal.meta.inviteModal && vm.user) {
-            if (!vm.inviteModal._isShown) {
-              vm.inviteModal.show();
-            }
+          if (vm.inviteModal && newVal.meta.inviteModal && vm.user && !vm.inviteModal._isShown) {
+            vm.inviteModal.show();
           }
-          if (vm.sotwCreationModal && newVal.meta.createModal) {
-            if (!vm.sotwCreationModal._isShown) {
-              vm.sotwCreationModal.show();
-            }
+          if (vm.sotwCreationModal && newVal.meta.createModal && !vm.sotwCreationModal._isShown) {
+            vm.sotwCreationModal.show();
           }
-          if (vm.spotifyModal && newVal.meta.spotifyModal) {
-            if (!vm.spotifyModal.__isShown) {
-              vm.spotifyModal.show();
-            }
+          if (vm.spotifyModal && newVal.meta.spotifyModal && !vm.spotifyModal.__isShown) {
+            vm.spotifyModal.show();
           }
+        }
+
+        // if spotify is unlinked, always show the spotify link modal
+        if (vm.isLoggedIn && !vm.user.spotify_linked && vm.spotifyModal && !vm.spotifyModal?.__isShown && !newVal.query.code && !newVal.query.state) {
+          vm.spotifyModal.show();
         }
       },
     },

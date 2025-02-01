@@ -96,10 +96,14 @@ export default {
             .then((_) => {
               vm.$router.push(sessionStorage.getItem("last_requested_path"));
             });
-          // TODO maybe add toastr or modal or something to indicate spotify linked
+          const spotifyLinkedToast = document.getElementById("spotifyLinkedToast");
+          const spotifyLinkedToastBootstrap = bootstrap.Toast.getOrCreateInstance(spotifyLinkedToast);
+          spotifyLinkedToastBootstrap.show();
         } else if ("error" in vm.$route.query) {
           console.log("ERROR", vm.$route.query.error);
-          // TODO maybe add toastr or something to indicate spotify not linked
+          const spotifyNotLinkedToast = document.getElementById("spotifyNotLinkedToast");
+          const spotifyNotLinkedToastBootstrap = bootstrap.Toast.getOrCreateInstance(spotifyNotLinkedToast);
+          spotifyNotLinkedToastBootstrap.show();
         }
       } else if (vm.$route.name == "verify") {
         // make api call to backend to verify the token and update user on front end
