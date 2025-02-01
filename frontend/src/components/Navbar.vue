@@ -68,8 +68,9 @@
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
   <!-- Toasts -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="spotifyLinkedToast" class="toast" role="alert" delay="5000" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
+    <div id="spotifyLinkedToast" class="toast" role="alert" data-bs-delay='100000' aria-live="assertive"
+      aria-atomic="true">
+      <div class="toast-header text-bg-success">
         <i class="bi bi-spotify me-2"></i>
         <strong class="me-auto">Spotify Linked!</strong>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -81,7 +82,7 @@
   </div>
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="spotifyNotLinkedToast" class="toast" role="alert" delay="5000" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
+      <div class="toast-header text-bg-danger">
         <i class="bi bi-spotify me-2"></i>
         <strong class="me-auto">Spotify Not Linked!</strong>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
