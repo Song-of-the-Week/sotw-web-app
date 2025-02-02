@@ -50,8 +50,8 @@
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ invalid: !voteValid }">
             <div class="card-header">
-              Pick your top 2
-              <div v-if="!voteValid"><i class="bi bi-exclamation-circle"></i> Please pick 2 songs</div>
+              Pick Your Top 2 Songs
+              <div v-if="!voteValid"><i class="bi bi-exclamation-circle"></i> Please Pick Exactly 2 Songs</div>
             </div>
             <div class="card-body">
               <ul class="list-group list-group-flush text-start" v-for="song in songs" :key="song.id">
@@ -118,7 +118,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="col col-8 offset-2">
-                  <input class="form-control" id="songInput" v-model="nextSong" />
+                  <input class="form-control" id="songInput" v-model="nextSong" :value="nextSong !== '' ? nextSong : ''" />
                 </div>
               </div>
             </div>
@@ -203,6 +203,7 @@ export default {
       alertModal: null,
       submitted: false,
       loading: false,
+      previousResponse: null,
     };
   },
   computed: {
@@ -232,6 +233,31 @@ export default {
     },
     edit() {
       const vm = this;
+      vm.getExistingResponses(vm.$route.params.sotwId).then(() => {
+        if (vm.previousResponse) {
+          vm.nextSong = vm.previousResponse.next_song;
+          vm.pickedSongs = [
+            vm.previousResponse.picked_song_1_id,
+            vm.previousResponse.picked_song_2_id,
+          ];
+          var survey = JSON.parse(vm.week.survey);
+          vm.users = [];
+          // update the userSongMatches with the previous response
+          vm.userSongMatches = vm.previousResponse.user_song_matches.map(match => {
+            let user = survey.users.find((user) => user.id == match.user_id);
+            let song = survey.songs.find((song) => song.id == match.song_id);
+            song.user = user;
+            song.user.matched = true;
+            vm.users.push(user);
+            return {
+              id: match.song_id.toString(),
+              song: song,
+              user: user,
+              response: match.response_id,
+            };
+          });
+        }
+      });
       vm.submitted = false;
     },
     async submit(repeatApproved = false) {
@@ -321,6 +347,19 @@ export default {
           vm.loading = false;
         });
     },
+    async getExistingResponses(sotw_id) {
+      const vm = this;
+      await api.methods
+        .apiGetSotwResponse(sotw_id, vm.user.id)
+        .then((res) => {
+          if (res && res.status == 200) {
+            vm.previousResponse = res.data;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   },
   watch: {
     week: {

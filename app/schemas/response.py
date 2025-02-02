@@ -53,3 +53,8 @@ class Response(ResponseInDBBase):
     submitter_id: str
     user_song_matches: List[UserSongMatch]
     number_correct_matches: int
+    next_song: str
+    picked_song_1_id: str
+    picked_song_2_id: str
+    sotw_id: str
+    week_id: str

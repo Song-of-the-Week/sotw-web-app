@@ -178,11 +178,9 @@ export default {
           }
         } else {
           if (name == "results") {
-            vm.resultsWeekNum = vm.$route.params.weekNum;
+            vm.resultsWeekNum = vm.currentWeek.week_num;
             vm.renderResults = true;
             return "show active";
-          } else {
-            vm.renderResults = false;
           }
         }
       }

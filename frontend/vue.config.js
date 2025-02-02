@@ -4,6 +4,9 @@ module.exports = defineConfig({
   lintOnSave: false,
   devServer: {
     allowedHosts: "all",
+    client: {
+      webSocketURL: 'auto://0.0.0.0:0/ws'
+    }
   },
   chainWebpack: (config) => {
     config.plugin("html").tap((args) => {

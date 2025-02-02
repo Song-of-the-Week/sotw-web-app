@@ -15,13 +15,13 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
-      <div v-else-if="response400" class="modal-content">
+      <div v-else-if="response400 != null" class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Looks like the link you used is no longer valid.</h5>
+          <h5 class="modal-title">You were unable to join this Song of the Week competition.</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>Please ask the person you got the invite link from to generate a new one for you.</p>
+          <p>{{ response400 }}</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -91,7 +91,7 @@ export default {
       sotwRes: { already_in: false },
       loadingJoin: false,
       loadingRes: true,
-      response400: false,
+      response400: null,
       response500: false,
     };
   },
@@ -107,7 +107,8 @@ export default {
       vm.sotwRes = { already_in: false };
       vm.loadingJoin = false;
       vm.loadingRes = true;
-      vm.response400 = vm.response500 = false;
+      vm.response400 = null;
+      vm.response500 = false;
     });
   },
   methods: {
@@ -137,13 +138,15 @@ export default {
         })
         .catch((err) => {
           // error handling
-          if (err.response.status == 403) {
-            vm.response400 = true;
+          if (400 <= err.response.status < 500) {
+            vm.response400 = err.response.data.detail;
           } else if (err.response.status == 500) {
             vm.response500 = true;
           } else {
             console.error("ERROR:", err);
           }
+        }).finally(() => {
+          vm.loadingJoin = false;
         });
     },
     async getSotwName() {

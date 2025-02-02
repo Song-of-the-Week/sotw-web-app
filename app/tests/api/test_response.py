@@ -306,3 +306,32 @@ def test_post_response_success_week_n_replace_existing_response(
     assert response.status_code == 201
     assert "repeat" in data.keys()
     assert data["repeat"] == False
+
+def test_get_response_success(client, current_week_new_week_new_results):
+    # When
+    url = f"{cfg.API_V1_STR}/response/1/1"
+    response = client.get(url)
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert len(data["user_song_matches"]) == 3
+    assert data["user_song_matches"][0]["song_id"] == '1'
+    assert data["user_song_matches"][0]["user_id"] == '1'
+    assert data["user_song_matches"][1]["user_id"] == '2'
+    assert data["user_song_matches"][1]["user_id"] == '2'
+    assert data["user_song_matches"][2]["user_id"] == '3'
+    assert data["user_song_matches"][2]["user_id"] == '3'
+    assert data["picked_song_1_id"] == '2'
+    assert data["picked_song_2_id"] == '3'
+    assert data["submitter_id"] == "1"
+    assert data["next_song"] == "https://open.spotify.com/track/6OmApaLQPqHZL3iI78FOUR?si=971c343da7fb4847"
+
+def test_get_response_wrong_user(client, current_week_new_week_new_results):
+    # When
+    url = f"{cfg.API_V1_STR}/response/1/2"
+    response = client.get(url)
+    data = response.json()
+
+    # Then
+    assert response.status_code == 403

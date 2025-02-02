@@ -5,8 +5,8 @@
         <div class="modal-header">
           <h5>Verify Email</h5>
           <router-link :to="initialPath">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              @click="close()"></button>
+            <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal"
+              aria-label="Close" @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -25,8 +25,8 @@
         <div class="modal-header">
           <h5>Reset Password</h5>
           <router-link :to="initialPath">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              @click="close()"></button>
+            <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal"
+              aria-label="Close" @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -65,8 +65,8 @@
         <div class="modal-header">
           <h5>Email Sent!</h5>
           <router-link :to="initialPath">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              @click="close()"></button>
+            <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal"
+              aria-label="Close" @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -86,8 +86,8 @@
           <h5 v-if="registering" class="modal-title">Register</h5>
           <h5 v-else class="modal-title">Login</h5>
           <router-link :to="initialPath">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-              @click="close()"></button>
+            <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal"
+              aria-label="Close" @click="close()"></button>
           </router-link>
         </div>
         <div class="modal-body">
@@ -272,8 +272,6 @@ export default {
     document.getElementById("loginModal").addEventListener("hidden.bs.modal", function (_) {
       if (vm.isLoggedIn && vm.sotw != null && !sessionStorage.getItem("last_requested_path")) {
         sessionStorage.setItem("last_requested_path", "/sotw/" + vm.sotw.id);
-      } else {
-        sessionStorage.setItem("last_requested_path", "/");
       }
       vm.loginForm = {
         email: "",
@@ -460,6 +458,7 @@ export default {
             // set the user
             await vm.getCurrentUser();
             vm.loginRegisterModal.hide();
+            vm.$emit("initialize-modals");
           }
         })
         .catch((err) => {
@@ -480,6 +479,7 @@ export default {
     },
     close() {
       const vm = this;
+      sessionStorage.setItem("last_requested_path", "/");
       vm.loginRegisterModal.hide();
     },
   },
