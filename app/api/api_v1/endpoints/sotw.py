@@ -356,15 +356,43 @@ async def get_sotw_members(
             detail=f"Not authorized."
         )
     logger.info(f"User {current_user.id} requested members of SOTW {sotw_id}")
-    
+    logger.info(f"{len(sotw.user_list)} members in SOTW {sotw_id}")
 
-    return [schemas.User(
+    users = [schemas.User(
         id=str(user.id),
         email=user.email,
         name=user.name,
         is_superuser=user.is_superuser,
         spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            for playlist in user.playlists
+        ],
+        sotw_list=[
+        schemas.Sotw(
+                created_at=sotw.created_at,
+                id=str(sotw.id),
+                master_playlist_id=sotw.master_playlist_id,
+                master_playlist_link=sotw.master_playlist_link,
+                name=sotw.name,
+                owner_id=str(sotw.owner_id),
+                results_datetime=sotw.results_datetime,
+                soty_playlist_id=sotw.soty_playlist_id,
+                soty_playlist_link=sotw.soty_playlist_link,
+            )
+            for sotw in user.sotw_list
+        ],
     ) for user in sotw.user_list]
+    for user in users:
+        logger.info(f"User {user.id} in SOTW {sotw_id}")
+        logger.info(user)
+    return users
 
 
 @router.get("/{sotw_id}/leave", response_model=schemas.User)

@@ -381,6 +381,18 @@ def test_get_leave_sotw_success(client, current_week):
     assert "sotw_list" in data.keys()
     assert len(data["sotw_list"]) == 0
 
+def test_get_sotw_members(client, current_week_new_week_new_results):
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/1/members")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert len(data) == 3
+    assert data[0]["id"] == '1'
+    assert data[0]["name"] == "test1"
+
 
 @patch("app.api.api_v1.endpoints.sotw.jwt.decode")
 def test_get_leave_sotw_success_and_rejoin_with_same_playlist(decode, client, sotw):
