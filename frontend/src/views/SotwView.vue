@@ -47,7 +47,7 @@
             </li>
           </ul>
         </li>
-        <li class="nav-item" role="presentation">
+        <li class="nav-item" role="tabpanel">
           <router-link :to="`/sotw/` + sotw.id + `/members`" class="nav-link"
             :class="activeClass('members')">Members</router-link>
         </li>
@@ -100,11 +100,7 @@
         </div>
         <div class="tab-pane fade" :class="activeClass('members')" id="members-tab-pane" role="tabpanel"
           aria-labelledby="members-tab" tabindex="0">
-          <h1>Current Members</h1>
-          <ul>
-            <li v-for="user in users" :key="user.id">{{ user.name }}</li>
-          </ul>
-          <!-- <Survey :survey-string="currentWeek.survey" :week="currentWeek" :week-error="currentWeekError" /> -->
+          <Members :sotw-id="sotw.id" />
         </div>
       </div>
     </div>
@@ -171,6 +167,9 @@ export default {
         }
         return "show active";
       } else if (vm.$route.name == "sotw") {
+        if (name == "members") {
+          return "show active";
+        }
         // calculate how far we are from the next release date
         if (Math.round((vm.currentWeek.next_results_release - new Date().getTime()) / (1000 * 3600 * 24)) < 5 || vm.currentWeek.week_num == 0) {
           if (name == "survey") {
