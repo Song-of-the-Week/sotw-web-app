@@ -17,7 +17,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="member in members" :key="member.id">
+              <tr v-for="member in sortedMembers" :key="member.id">
                 <td>{{ member.name }}</td>
                 <td>
                   <a :href="member.playlistLink" target="_blank" class="btn btn-primary">
@@ -43,6 +43,11 @@ export default {
     return {
       members: [],
       loading: true
+    }
+  },
+  computed: {
+    sortedMembers() {
+      return this.members.sort((a, b) => a.name.localeCompare(b.name));
     }
   },
   async created() {
