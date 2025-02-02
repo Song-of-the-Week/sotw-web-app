@@ -48,7 +48,8 @@
           </ul>
         </li>
         <li class="nav-item" role="presentation">
-          <router-link :to="`/sotw/${sotw.id}/members`" class="nav-link" :class="activeClass('members')">Members</router-link>
+          <router-link :to="`/sotw/` + sotw.id + `/members`" class="nav-link"
+            :class="activeClass('members')">Members</router-link>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
@@ -99,7 +100,11 @@
         </div>
         <div class="tab-pane fade" :class="activeClass('members')" id="members-tab-pane" role="tabpanel"
           aria-labelledby="members-tab" tabindex="0">
-          <Members />
+          <h1>Current Members</h1>
+          <ul>
+            <li v-for="user in users" :key="user.id">{{ user.name }}</li>
+          </ul>
+          <!-- <Survey :survey-string="currentWeek.survey" :week="currentWeek" :week-error="currentWeekError" /> -->
         </div>
       </div>
     </div>

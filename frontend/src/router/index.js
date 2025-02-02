@@ -108,6 +108,14 @@ const routes = [
     },
   },
   {
+    path: "/sotw/:sotwId/players",
+    name: "survey",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/sotw/:sotwId/results/:weekNum",
     name: "results",
     component: () => import("../views/SotwView.vue"),
