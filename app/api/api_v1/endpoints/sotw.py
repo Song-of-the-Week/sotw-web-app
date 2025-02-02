@@ -342,7 +342,6 @@ async def get_sotw_members(
     Returns:
         list[schemas.User]: List of users in the SOTW
     """
-    logger.info("I'M HERE")
     sotw = crud.sotw.get(session=session, id=sotw_id)
 
     if sotw is None:
@@ -355,8 +354,6 @@ async def get_sotw_members(
             status_code=403, 
             detail=f"Not authorized."
         )
-    logger.info(f"User {current_user.id} requested members of SOTW {sotw_id}")
-    logger.info(f"{len(sotw.user_list)} members in SOTW {sotw_id}")
 
     users = [schemas.User(
         id=str(user.id),
@@ -372,22 +369,11 @@ async def get_sotw_members(
                 sotw_id=str(playlist.sotw_id),
                 user_id=str(playlist.user_id),
             )
-            for playlist in user.playlists
+            # make sure we're only returning the playlists for this competition
+            for playlist in user.playlists if playlist.sotw_id == sotw_id
         ],
-        sotw_list=[
-        schemas.Sotw(
-                created_at=sotw.created_at,
-                id=str(sotw.id),
-                master_playlist_id=sotw.master_playlist_id,
-                master_playlist_link=sotw.master_playlist_link,
-                name=sotw.name,
-                owner_id=str(sotw.owner_id),
-                results_datetime=sotw.results_datetime,
-                soty_playlist_id=sotw.soty_playlist_id,
-                soty_playlist_link=sotw.soty_playlist_link,
-            )
-            for sotw in user.sotw_list
-        ],
+        # we don't need the sotw_list for members at this time
+        sotw_list=[],
     ) for user in sotw.user_list]
     for user in users:
         logger.info(f"User {user.id} in SOTW {sotw_id}")
