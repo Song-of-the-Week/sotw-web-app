@@ -393,6 +393,31 @@ def test_get_sotw_members(client, current_week_new_week_new_results):
     assert data[0]["id"] == '1'
     assert data[0]["name"] == "test1"
 
+    
+def test_get_sotw_members_not_enough_players(client, current_week_not_enough_players):
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/1/members")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert len(data) == 1
+    assert data[0]["id"] == '1'
+    assert data[0]["name"] == "test1"
+
+def test_get_sotw_members_one_member(client, current_week):
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/1/members")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert len(data) == 1
+    assert data[0]["id"] == '1'
+    assert data[0]["name"] == "test1"
+
 
 @patch("app.api.api_v1.endpoints.sotw.jwt.decode")
 def test_get_leave_sotw_success_and_rejoin_with_same_playlist(decode, client, sotw):
