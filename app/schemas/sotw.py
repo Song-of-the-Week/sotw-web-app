@@ -22,7 +22,9 @@ class SotwCreate(SotwBase):
 
 
 # properties to receive via API update
-class SotwUpdate(SotwBase): ...
+class SotwUpdate(Base):
+    name: Optional[str] = None
+    results_datetime: Optional[int] = None
 
 
 # properties shared by models stored in DB

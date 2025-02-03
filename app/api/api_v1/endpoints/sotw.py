@@ -9,6 +9,7 @@ from app import schemas
 from app.api import deps
 from app.clients.spotify import SpotifyClient
 from app.core.auth import create_access_token
+from app.models.sotw import Sotw
 from app.models.user import User
 from app.shared.config import cfg
 
@@ -56,7 +57,7 @@ async def create_sotw(
     payload.master_playlist_link = master_playlist["external_urls"]["spotify"]
     payload.master_playlist_id = master_playlist["id"]
 
-    # create the master playlist
+    # create the song of the year playlist
     soty_playlist_name = f"{payload.name} Song of the Year Playlist"
     soty_playlist_description = f"The winners from each week so far of the {payload.name} Song of the Week for this year."
     soty_playlist = spotify_client.create_playlist(
@@ -100,6 +101,167 @@ async def create_sotw(
         soty_playlist_id=sotw.soty_playlist_id,
         soty_playlist_link=sotw.soty_playlist_link,
     )
+
+
+@router.put("/{sotw_id}", response_model=schemas.Sotw)
+async def update_sotw(
+    session: Session = Depends(deps.get_session),
+    *,
+    sotw_id: int,
+    spotify_client: SpotifyClient = Depends(deps.get_spotify_client),
+    payload: schemas.SotwUpdate,
+    current_user: User = Depends(deps.get_current_user),
+) -> schemas.Sotw:
+    """
+    Update the sotw object in the db and any related playlists.
+
+    Args:
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw_id (int): ID of the sotw to update
+        spotify_client (SpotifyClient, optional): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
+        payload (schemas.SotwUpdate): Data to update sotw with.
+        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+    Raises:
+        HTTPException: 403 for unauthorized users
+
+    Returns:
+        Any: the updated sotw object
+    """
+    sotw = crud.sotw.get(session=session, id=sotw_id)
+
+    if current_user.id != sotw.owner_id:
+        raise HTTPException(status_code=403, detail=f"Not authorized to update.")
+
+    if payload.name or payload.results_datetime:
+        # update the sotw name in database
+        sotw = crud.sotw.update(session=session, db_object=sotw, object_in=payload)
+
+    if payload.name:
+        # update playlist names
+        update_master_playlist_name(session, sotw, current_user.id, spotify_client)
+        update_soty_playlist_name(session, sotw, current_user.id, spotify_client)
+        update_all_sotw_weeks_playlist_names(
+            session, sotw, current_user.id, spotify_client
+        )
+        update_all_sotw_user_playlist_names(session, sotw, spotify_client)
+
+    return schemas.Sotw(
+        created_at=sotw.created_at,
+        id=str(sotw.id),
+        master_playlist_id=sotw.master_playlist_id,
+        master_playlist_link=sotw.master_playlist_link,
+        name=sotw.name,
+        owner_id=str(sotw.owner_id),
+        results_datetime=sotw.results_datetime,
+        soty_playlist_id=sotw.soty_playlist_id,
+        soty_playlist_link=sotw.soty_playlist_link,
+    )
+
+
+def update_master_playlist_name(
+    session: Session, sotw: Sotw, user_id: int, spotify_client: SpotifyClient
+):
+    """
+    Update the master playlist name for a sotw.
+
+    Args:
+        session (Session): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw (Sotw): The sotw with the playlist to be updated.
+        user_id (int): ID of the sotw owner.
+        spotify_client (SpotifyClient): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
+    """
+    new_master_playlist_name = f"{sotw.name} Master Playlist"
+    new_master_playlist_description = (
+        f"All the songs contained in every week of the {sotw.name} song of the week."
+    )
+    spotify_client.update_playlist_details(
+        sotw.master_playlist_id,
+        new_master_playlist_name,
+        new_master_playlist_description,
+        session,
+        user_id,
+    )
+
+
+def update_soty_playlist_name(
+    session: Session, sotw: Sotw, user_id: int, spotify_client: SpotifyClient
+):
+    """
+    Update the soty playlist name for a sotw.
+
+    Args:
+        session (Session): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw (Sotw): The sotw with the playlist to be updated.
+        user_id (int): ID of the sotw owner.
+        spotify_client (SpotifyClient): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
+    """
+    new_soty_playlist_name = f"{sotw.name} Song of the Year Playlist"
+    new_soty_playlist_description = f"The winners from each week so far of the {sotw.name} Song of the Week for this year."
+    spotify_client.update_playlist_details(
+        sotw.soty_playlist_id,
+        new_soty_playlist_name,
+        new_soty_playlist_description,
+        session,
+        user_id,
+    )
+
+
+def update_all_sotw_weeks_playlist_names(
+    session: Session, sotw: Sotw, user_id: int, spotify_client: SpotifyClient
+):
+    """
+    Update all the week playlist names for a sotw.
+
+    Args:
+        session (Session): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw (Sotw): The sotw with the weeks to be updated.
+        user_id (int): ID of the sotw owner.
+        spotify_client (SpotifyClient): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
+    """
+    all_weeks = crud.week.get_all_weeks_in_sotw(session=session, sotw_id=sotw.id)
+    for week in all_weeks:
+        if week.week_num == 0:
+            continue
+        new_week_playlist_name = f"{sotw.name} SOTW #{week.week_num}"
+        new_week_playlist_desciption = (
+            f"Week {week.week_num} for {sotw.name} Song of the Week."
+        )
+        week_playlist_id = week.playlist_link.split("/")[-1]
+        spotify_client.update_playlist_details(
+            week_playlist_id,
+            new_week_playlist_name,
+            new_week_playlist_desciption,
+            session,
+            user_id,
+        )
+
+
+def update_all_sotw_user_playlist_names(
+    session: Session, sotw: Sotw, spotify_client: SpotifyClient
+):
+    """
+    Update all the user playlist names for a sotw's users.
+
+    Args:
+        session (Session): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw (Sotw): The sotw with the users playlists to be updated.
+        spotify_client (SpotifyClient): Client for Spotify interactions. Defaults to Depends(deps.get_spotify_client).
+    """
+    for user in sotw.user_list:
+        # get the user's playlist
+        user_playlist = crud.user_playlist.get_playlist_for_user_for_sotw(
+            session=session, user_id=user.id, sotw_id=sotw.id
+        )
+        new_user_playlist_name = f"{user.name}'s {sotw.name} Song of the Week Playlist"
+        new_user_playlist_description = f"All songs submitted for the {sotw.name} Song of the Week for this year by {user.name}."
+        spotify_client.update_playlist_details(
+            user_playlist.playlist_id,
+            new_user_playlist_name,
+            new_user_playlist_description,
+            session,
+            user.id,
+        )
 
 
 @router.get("/{sotw_id}", response_model=schemas.Sotw)

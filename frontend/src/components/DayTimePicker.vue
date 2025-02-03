@@ -106,19 +106,22 @@
 <script>
 export default {
   name: "DayTimePicker",
+  props: {
+    resultsDayTime: { type: Date, default: new Date() }
+  },
   data() {
     return {
-      day: new Date().getDay(),
-      hour: new Date().getHours(),
-      minute: new Date().getMinutes(),
+      day: this.resultsDayTime.getDay(),
+      hour: this.resultsDayTime.getHours(),
+      minute: this.resultsDayTime.getMinutes(),
     };
   },
   mounted() {
     const vm = this;
     document.getElementById("sotwCreationModal").addEventListener("hide.bs.modal", function (_) {
-      vm.day = new Date().getDay();
-      vm.hour = new Date().getHours();
-      vm.minute = new Date().getMinutes();
+      vm.day = vm.resultsDayTime.getDay();
+      vm.hour = vm.resultsDayTime.getHours();
+      vm.minute = vm.resultsDayTime.getMinutes();
     });
     vm.emitInput();
   },

@@ -400,17 +400,9 @@ export default {
       vm.registerResponse400 = null;
       vm.registerResponse500 = false;
       // email validation
-      if (!vm.registerForm.email.match(vm.validEmailRegex)) {
-        vm.registerEmailValid = false;
-      } else {
-        vm.registerEmailValid = true;
-      }
+      vm.registerEmailValid = vm.registerForm.email.match(vm.validEmailRegex);
       // name validation
-      if (vm.registerForm.name.length < 2) {
-        vm.registerNameValid = false;
-      } else {
-        vm.registerNameValid = true;
-      }
+      vm.registerNameValid = vm.registerForm.name.length >= 2;
       // password validation
       vm.validatePassword();
 

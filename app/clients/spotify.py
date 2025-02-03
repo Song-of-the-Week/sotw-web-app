@@ -173,7 +173,7 @@ class SpotifyClient:
             user_id (int): ID of the user who's playlist is being added to.
 
         Returns:
-            Dict: The response from Spotify after adding the tracks,
+            Dict: The response from Spotify after adding the tracks.
         """
         user = self.get_user_access_token(session, user_id)
 
@@ -193,6 +193,42 @@ class SpotifyClient:
             response.raise_for_status()
 
         return response.json()
+
+    def update_playlist_details(
+        self, playlist_id, playlist_name, playlist_description, session, user_id
+    ):
+        """
+        Update an existing playlist's name and description.
+
+        Args:
+            playlist_id (str): The Spotify ID of the playlist to add to.
+            playlist_name (str): The new name of the playlist.
+            playlist_description (str): The new description of the playlist.
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            user_id (int): ID of the user who's playlist is being updated.
+
+        Returns:
+            Dict: The response from Spotify after updating the playlist.
+        """
+        user = self.get_user_access_token(session, user_id)
+
+        response = requests.put(
+            f"https://api.spotify.com/v1/playlists/{playlist_id}",
+            data=json.dumps(
+                {
+                    "name": playlist_name,
+                    "description": playlist_description,
+                }
+            ),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {user.spotify_access_token}",
+            },
+        )
+        if response.status_code != 201:
+            response.raise_for_status()
+
+        return response
 
     def get_track_info(self, track_id: str, session: Session, user_id: int) -> Dict:
         """
