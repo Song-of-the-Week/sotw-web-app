@@ -394,29 +394,23 @@ def test_get_sotw_members(client, current_week_new_week_new_results):
     assert data[0]["name"] == "test1"
 
     
-def test_get_sotw_members_not_enough_players(client, current_week_not_enough_players):
+def test_get_sotw_members_does_not_exist(client, current_week_new_week_new_results):
+
+    # When
+    response = client.get(f"{cfg.API_V1_STR}/sotw/2/members")
+    data = response.json()
+
+    # Then
+    assert response.status_code == 404
+
+def test_get_sotw_members_not_authorized(client, sotw):
 
     # When
     response = client.get(f"{cfg.API_V1_STR}/sotw/1/members")
     data = response.json()
 
     # Then
-    assert response.status_code == 200
-    assert len(data) == 1
-    assert data[0]["id"] == '1'
-    assert data[0]["name"] == "test1"
-
-def test_get_sotw_members_one_member(client, current_week):
-
-    # When
-    response = client.get(f"{cfg.API_V1_STR}/sotw/1/members")
-    data = response.json()
-
-    # Then
-    assert response.status_code == 200
-    assert len(data) == 1
-    assert data[0]["id"] == '1'
-    assert data[0]["name"] == "test1"
+    assert response.status_code == 403
 
 
 @patch("app.api.api_v1.endpoints.sotw.jwt.decode")

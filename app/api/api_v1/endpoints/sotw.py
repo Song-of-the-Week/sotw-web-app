@@ -375,9 +375,6 @@ async def get_sotw_members(
         # we don't need the sotw_list for members at this time
         sotw_list=[],
     ) for user in sotw.user_list]
-    for user in users:
-        logger.info(f"User {user.id} in SOTW {sotw_id}")
-        logger.info(user)
     return users
 
 

@@ -19,3 +19,5 @@ __pychache__/
 ./app/models/__pycache__
 
 test.db
+
+root.crt
