@@ -278,7 +278,7 @@ export default {
 }
 
 .competition-name-input {
-  min-width: 200px; /* Roughly 20 characters at default font size */
+  min-width: 12rem; /* Roughly 20 characters at default font size */
   width: 100%;
 }
 </style>
