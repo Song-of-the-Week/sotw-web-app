@@ -22,7 +22,7 @@
                 <td>
                   <a :href="member.playlistLink" target="_blank" class="btn btn-primary">
                     <i class="bi bi-spotify me-2"></i>
-                    View Playlist
+                    View on Spotify
                   </a>
                 </td>
               </tr>
