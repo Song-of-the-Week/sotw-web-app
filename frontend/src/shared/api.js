@@ -44,6 +44,9 @@ export default {
     apiPostSotw(payload) {
       return axios.post(config.BASE_API_V1_URL + "sotw/", payload);
     },
+    apiPutSotw(id, payload) {
+      return axios.put(config.BASE_API_V1_URL + "sotw/" + id, payload);
+    },
     apiGetSotw(id) {
       return axios.get(config.BASE_API_V1_URL + "sotw/" + id);
     },

@@ -101,5 +101,18 @@ class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
         session.refresh(db_object)
         return db_object
 
+    def get_all_weeks_in_sotw(self, session: Session, *, sotw_id) -> List[Week]:
+        """
+        Session query to get the all the weeks in a sotw
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            sotw_id (int): The sotw ID to get weeks from.
+
+        Returns:
+            List[Week]: All the weeks in the sotw with the given ID.
+        """
+        return session.query(Week).filter(Week.sotw_id == sotw_id).all()
+
 
 week = CRUDWeek(Week)

@@ -11,7 +11,7 @@
       <option value="6">Saturday</option>
     </select>
     <span class="input-group-text">Time</span>
-    <select v-model="hour" @change="emitInput" class="form-control" aria-describedby="hourHelp">
+    <select v-model="hour" @change="emitInput" class="form-control hour-select" aria-describedby="hourHelp">
       <option value="0">0</option>
       <option value="1">1</option>
       <option value="2">2</option>
@@ -38,7 +38,7 @@
       <option value="23">23</option>
     </select>
     <span class="input-group-text">:</span>
-    <select v-model="minute" @change="emitInput" class="form-control" aria-describedby="minuteHelp">
+    <select v-model="minute" @change="emitInput" class="form-control minute-select" aria-describedby="minuteHelp">
       <option value="0">00</option>
       <option value="1">01</option>
       <option value="2">02</option>
@@ -106,19 +106,22 @@
 <script>
 export default {
   name: "DayTimePicker",
+  props: {
+    resultsDayTime: { type: Date, default: new Date() }
+  },
   data() {
     return {
-      day: new Date().getDay(),
-      hour: new Date().getHours(),
-      minute: new Date().getMinutes(),
+      day: this.resultsDayTime.getDay(),
+      hour: this.resultsDayTime.getHours(),
+      minute: this.resultsDayTime.getMinutes(),
     };
   },
   mounted() {
     const vm = this;
     document.getElementById("sotwCreationModal").addEventListener("hide.bs.modal", function (_) {
-      vm.day = new Date().getDay();
-      vm.hour = new Date().getHours();
-      vm.minute = new Date().getMinutes();
+      vm.day = vm.resultsDayTime.getDay();
+      vm.hour = vm.resultsDayTime.getHours();
+      vm.minute = vm.resultsDayTime.getMinutes();
     });
     vm.emitInput();
   },
@@ -135,5 +138,13 @@ export default {
 <style scoped lang="scss">
 .bi:hover {
   cursor: pointer;
+}
+
+.hour-select {
+  max-width: 3rem;
+}
+
+.minute-select {
+  max-width: 4rem;
 }
 </style>

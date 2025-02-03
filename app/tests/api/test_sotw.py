@@ -52,6 +52,52 @@ def test_sotw_creation_success(client):
     assert int(data["owner_id"]) == 1
 
 
+def test_sotw_update_403(client, sotw_other_owner):
+    # When
+    payload = {
+        "name": "new_name",
+        "results_datetime": -1980399600000,
+    }
+    response = client.put(f"{cfg.API_V1_STR}/sotw/1", data=json.dumps(payload))
+
+    # Then
+    assert response.status_code == 403
+
+
+def test_sotw_update_success(client):
+    # When
+    # "link" spotify
+    payload = {
+        "state": "admin@admin.admin-test1",
+        "code": "success",
+    }
+    response = client.put(
+        f"{cfg.API_V1_STR}/auth/spotify-access-token", data=json.dumps(payload)
+    )
+    # create sotw
+    payload = {
+        "name": "test_sotw",
+        "results_datetime": round(datetime.now().timestamp() * 1000),
+    }
+    response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
+    data = response.json()
+
+    # When
+    payload = {
+        "name": "new_name",
+        "results_datetime": -1980399600000,
+    }
+    response = client.put(f"{cfg.API_V1_STR}/sotw/1", data=json.dumps(payload))
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+    assert "name" in data.keys()
+    assert data["name"] == "new_name"
+    assert "results_datetime" in data.keys()
+    assert data["results_datetime"] == -1980399600000
+
+
 def test_get_sotw_404(client):
     # When
     response = client.get(f"{cfg.API_V1_STR}/sotw/3")

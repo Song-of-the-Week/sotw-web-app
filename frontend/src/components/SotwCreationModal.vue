@@ -21,10 +21,9 @@
                 <i class="bi bi-question-circle" data-bs-toggle="tooltip"
                   data-bs-title="This will be the day of the week and time of day at which the results and the next survey are released each week."></i>
               </label>
-              <DayTimePicker @input-day-time="(datetime) => {
+              <DayTimePicker :resultsDayTime="resultsDayTime" @input-day-time="(datetime) => {
                 resultsDayTime = datetime;
-              }
-                " id="resultsDay" aria-describedby="resultsDayHelp" />
+              }" id="resultsDay" aria-describedby="resultsDayHelp" />
             </div>
             <div v-if="createResponse400">
               <p class="invalid">{{ createResponse400 }}</p>
@@ -117,7 +116,7 @@ export default {
       vm.sotwNameValid = vm.sotwName.length > 0;
 
       if (vm.sotwNameValid) {
-        let payload = {
+        const payload = {
           name: vm.sotwName,
           results_datetime: vm.resultsDayTime.getTime(),
         };

@@ -55,6 +55,7 @@ def override_get_spotify_client() -> MagicMock:
         {"id": "abc789", "external_urls": {"spotify": "www.example3.com"}},
         {"id": "xyz123", "external_urls": {"spotify": "www.example4.com"}},
     ]
+    mock.update_playlist_details.return_value = {}
     mock.add_songs_to_playlist.return_value = {}
     mock.get_track_info.return_value = {
         "album": {
@@ -598,6 +599,25 @@ def sotw():
         name="test",
         results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
         owner_id=1,
+    )
+    sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
+    return sotw
+
+
+@pytest.fixture()
+def sotw_other_owner():
+    # create a new user and sotw that user 1 is not the owner of
+    user_in = schemas.UserCreate(
+        email="user@user.user",
+        name="test2",
+        is_superuser=False,
+        password="password",
+    )
+    user = crud.user.create(override_session, object_in=user_in)
+    sotw_in = schemas.SotwCreate(
+        name="test2",
+        results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
+        owner_id=user.id,
     )
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
     return sotw

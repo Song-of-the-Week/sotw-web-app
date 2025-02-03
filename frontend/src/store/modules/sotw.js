@@ -31,6 +31,16 @@ export default {
           throw new Error(err.response.data.detail, { cause: err.response.status });
         });
     },
+    async updateSotw({ commit }, {id, payload}) {
+      await api.methods
+        .apiPutSotw(id, payload)
+        .then(async (res) => {
+          await commit("setActiveSotw", res.data);
+        })
+        .catch((err) => {
+          throw new Error(err.response.data.detail, { cause: err.response.status });
+        });
+    }
   },
   mutations: {
     setActiveSotw(state, sotw) {
