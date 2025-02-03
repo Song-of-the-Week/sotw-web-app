@@ -27,7 +27,7 @@
               <button @click="setSotw(sotw.id)" class="btn btn-outline-primary">{{ sotw.name }}</button>
             </div>
           </td>
-          <td v-if="editing == sotw.id" style="min-width: 25rem;">
+          <td v-if="editing == sotw.id" class="day-time-picker">
             <DayTimePicker :resultsDayTime="new Date(sotw.results_datetime)" @input-day-time="(datetime) => {
               resultsDayTime = datetime;
             }" id="resultsDay" aria-describedby="resultsDayHelp" />
@@ -266,5 +266,9 @@ export default {
 
 .invalid {
   color: #d91313;
+}
+
+.day-time-picker {
+  min-width: 24rem;
 }
 </style>
