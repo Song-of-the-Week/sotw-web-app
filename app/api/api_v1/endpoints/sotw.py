@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from loguru import logger
 from sqlalchemy.orm.session import Session
 from jose import JWTError, jwt
 
@@ -480,6 +481,63 @@ async def get_sotw_invite_join(
         raise HTTPException(status_code=400, detail=f"An error occurred: '{str(e)}'")
 
     return schemas.SotwInfo(id=str(sotw.id))
+
+
+@router.get("/{sotw_id}/members", response_model=list[schemas.User])
+async def get_sotw_members(
+    session: Session = Depends(deps.get_session),
+    *,
+    sotw_id: int,
+    current_user: User = Depends(deps.get_current_user),
+) -> list[schemas.User]:
+    """
+    Get the list of members for a specific SOTW.
+
+    Args:
+        sotw_id (int): ID of the sotw to get members from
+        session (Session): Database session
+        current_user (User): Currently authenticated user
+
+    Raises:
+        HTTPException: 404 if SOTW not found, 403 if user not authorized
+
+    Returns:
+        list[schemas.User]: List of users in the SOTW
+    """
+    sotw = crud.sotw.get(session=session, id=sotw_id)
+
+    if sotw is None:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Sotw with given id {sotw_id} not found."
+        )
+    if current_user not in sotw.user_list:
+        raise HTTPException(
+            status_code=403, 
+            detail=f"Not authorized."
+        )
+
+    users = [schemas.User(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        is_superuser=user.is_superuser,
+        spotify_linked=user.spotify_linked,
+        playlists=[
+            schemas.UserPlaylist(
+                id=str(playlist.id),
+                playlist_id=playlist.playlist_id,
+                playlist_link=playlist.playlist_link,
+                sotw_id=str(playlist.sotw_id),
+                user_id=str(playlist.user_id),
+            )
+            # make sure we're only returning the playlists for this competition
+            for playlist in user.playlists if playlist.sotw_id == sotw_id
+        ],
+        # we don't need the sotw_list for members at this time
+        sotw_list=[],
+    ) for user in sotw.user_list]
+    return users
 
 
 @router.get("/{sotw_id}/leave", response_model=schemas.User)

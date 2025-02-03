@@ -47,6 +47,10 @@
             </li>
           </ul>
         </li>
+        <li class="nav-item" role="tabpanel">
+          <router-link :to="`/sotw/` + sotw.id + `/members`" class="nav-link"
+            :class="activeClass('members')">Members</router-link>
+        </li>
       </ul>
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade" :class="activeClass('survey')" id="survey-tab-pane" role="tabpanel"
@@ -94,6 +98,10 @@
           <h1>Master Playlist</h1>
           <SpotifyEmbed :spotify-link="sotw.master_playlist_link" type="playlist" />
         </div>
+        <div class="tab-pane fade" :class="activeClass('members')" id="members-tab-pane" role="tabpanel"
+          aria-labelledby="members-tab" tabindex="0">
+          <Members :sotw-id="sotw.id" />
+        </div>
       </div>
     </div>
   </div>
@@ -105,6 +113,7 @@ import Countdown from "@/components/Countdown.vue";
 import Survey from "@/components/Survey.vue";
 import Results from "@/components/Results.vue";
 import SpotifyEmbed from "@/components/SpotifyEmbed.vue";
+import Members from "@/components/Members.vue";
 
 export default {
   name: "SotwView",
@@ -113,6 +122,7 @@ export default {
     Survey,
     Results,
     SpotifyEmbed,
+    Members,
   },
   data() {
     return {
