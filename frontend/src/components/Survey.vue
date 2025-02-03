@@ -118,7 +118,8 @@
             <div class="card-body">
               <div class="row">
                 <div class="col col-8 offset-2">
-                  <input class="form-control" id="songInput" v-model="nextSong" :value="nextSong !== '' ? nextSong : ''" />
+                  <input class="form-control" id="songInput" v-model="nextSong"
+                    :value="nextSong !== '' ? nextSong : ''" />
                 </div>
               </div>
             </div>
@@ -415,6 +416,6 @@ export default {
 }
 
 .text-muted {
-  color: #41a14a;
+  color: #60656a !important;
 }
 </style>
