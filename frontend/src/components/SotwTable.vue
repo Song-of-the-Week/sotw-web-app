@@ -60,7 +60,7 @@
             </button>
           </td>
           <td>
-            <button @click="leaveSotw(sotw.id)" class="btn btn-outline-danger">Leave</button>
+            <button @click="showLeaveConfirm(sotw)" class="btn btn-outline-danger">Leave</button>
           </td>
           <td v-if="sotw.owner_id === user.id">
             <div v-if="editing == sotw.id">
@@ -86,6 +86,15 @@
         </tr>
       </tbody>
     </table>
+    <ConfirmationModal 
+      modalId="leaveConfirmModal"
+      modalTitle="Confirm Leave"
+      :modalBody="`Are you sure you want to leave &quot;${sotwToLeave?.name}&quot;?`"
+      btnClass="btn-danger"
+      buttonText="Leave"
+      v-model:shouldShow="showLeaveModal"
+      @click="confirmLeave"
+    />
   </div>
 </template>
 
@@ -93,11 +102,13 @@
 import { mapActions, mapGetters } from "vuex";
 import api from "@/shared/api";
 import DayTimePicker from "./DayTimePicker.vue";
+import ConfirmationModal from "./ConfirmationModal.vue";
 
 export default {
   name: "SotwTable",
   components: {
     DayTimePicker,
+    ConfirmationModal,
   },
   props: {
     sotwList: Array,
@@ -111,6 +122,8 @@ export default {
       resultsDayTime: null,
       sotwNameValid: true,
       updateResponse500: false,
+      showLeaveModal: false,
+      sotwToLeave: null,
     };
   },
   computed: {
@@ -164,6 +177,17 @@ export default {
         .catch((err) => {
           console.error(err);
         });
+    },
+    showLeaveConfirm(sotw) {
+      const vm = this;
+      vm.sotwToLeave = sotw;
+      vm.showLeaveModal = true;
+    },
+    async confirmLeave() {
+      const vm = this;
+      await vm.leaveSotw(this.sotwToLeave.id);
+      vm.showLeaveModal = false;
+      vm.sotwToLeave = null;
     },
     edit(sotw) {
       const vm = this;
