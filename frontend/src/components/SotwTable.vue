@@ -15,10 +15,15 @@
           <td>
             <div v-if="editing == sotw.id">
               <div class="row">
-                <div class="col-4">Edit name:</div>
-                <div class="col-8 col-md-5">
-                  <input type="text" class="form-control" v-model="sotwName" placeholder="Email" aria-label="Email"
-                    aria-describedby="basic-addon1" />
+                <div class="col">
+                  <input 
+                    type="text" 
+                    class="form-control competition-name-input" 
+                    v-model="sotwName" 
+                    placeholder="Competition Name" 
+                    aria-label="Competition Name"
+                    aria-describedby="basic-addon1" 
+                  />
                   <p v-if="!sotwNameValid" class="invalid">Name must be at least two characters long.</p>
                 </div>
               </div>
@@ -270,5 +275,10 @@ export default {
 
 .day-time-picker {
   min-width: 24rem;
+}
+
+.competition-name-input {
+  min-width: 12rem; /* Roughly 20 characters at default font size */
+  width: 100%;
 }
 </style>
