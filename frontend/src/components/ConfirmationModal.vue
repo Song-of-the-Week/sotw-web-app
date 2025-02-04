@@ -20,8 +20,6 @@
   </template>
   
   <script>
-  import { Modal } from 'bootstrap'
-
   export default {
     name: "SotwCreationModal",
     props: {
@@ -53,7 +51,6 @@
     emits: ['click', 'update:shouldShow'],
     data() {
       return {
-        loading: false,
         modal: null
       };
     },
@@ -77,7 +74,6 @@
     },
     watch: {
       shouldShow(newVal, oldVal) {
-        console.log('shouldShow', newVal)
         if (newVal && this.modal) {
           this.modal.show()
         } else if (!newVal && this.modal) {
