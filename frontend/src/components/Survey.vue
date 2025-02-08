@@ -206,6 +206,7 @@ export default {
       submitted: false,
       loading: false,
       previousResponse: null,
+      cachedResponseKey: null,
     };
   },
   computed: {
@@ -213,7 +214,10 @@ export default {
   },
   beforeMount() {
     const vm = this;
-    vm.fillCachedResponse();
+    vm.getCurrentUser().then(() => {
+      vm.cachedResponseKey = "cachedResponse+" + vm.week.id + "+" + vm.user.id;
+      vm.fillCachedResponse();
+    });
   },
   mounted() {
     const vm = this;
@@ -222,6 +226,7 @@ export default {
     vm.submitted = vm.week.submitted;
   },
   methods: {
+    ...mapActions(["getCurrentUser"]),
     matchUserSong(song, user) {
       const vm = this;
       // remove the user from any other matches it has
@@ -346,7 +351,7 @@ export default {
                 vm.alertModal.hide();
               }
               // clear the cached response upon successful submission
-              localStorage.removeItem("cachedResponse");
+              localStorage.removeItem(vm.cachedResponseKey);
               location.href = "/sotw/" + sotwId;
             }
           }
@@ -379,13 +384,13 @@ export default {
           pickedSongs: vm.pickedSongs,
           userSongMatches: vm.userSongMatches
         }
-        localStorage.setItem("cachedResponse", JSON.stringify(responseToCache));
+        localStorage.setItem(vm.cachedResponseKey, JSON.stringify(responseToCache));
       });
     },
     fillCachedResponse() {
       const vm = this;
-      if (localStorage.getItem("cachedResponse")) {
-        const cachedResponse = JSON.parse(localStorage.getItem("cachedResponse"));
+      if (localStorage.getItem(vm.cachedResponseKey)) {
+        const cachedResponse = JSON.parse(localStorage.getItem(vm.cachedResponseKey));
 
         vm.nextSong = cachedResponse.nextSong;
         vm.pickedSongs = cachedResponse.pickedSongs;
