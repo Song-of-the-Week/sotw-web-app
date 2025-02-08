@@ -76,7 +76,8 @@
             <div class="col-10 col-lg-3 p-4">
               <div class="list-group">
                 <router-link v-for="n in currentWeek.week_num - 1" class="list-group-item list-group-item-action"
-                  :to="`/sotw/` + sotw.id + `/results/` + (n + 1)">week {{ n }} results</router-link>
+                  :to="`/sotw/` + sotw.id + `/results/` + ((currentWeek.week_num - n) + 1)">Week {{
+                    (currentWeek.week_num - n) }} Results</router-link>
               </div>
             </div>
             <div class="col"></div>
