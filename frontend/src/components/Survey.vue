@@ -60,7 +60,8 @@
                     <div class="col col-1 align-self-center">
                       <input class="form-check-input me-3" type="checkbox" :value="song.id" v-model="pickedSongs"
                         :id="'vote-' + song.id"
-                        :disabled="pickedSongs.length >= 2 && pickedSongs.indexOf(song.id) === -1" />
+                        :disabled="pickedSongs.length >= 2 && pickedSongs.indexOf(song.id) === -1"
+                        @change="cacheResponse()" />
                     </div>
                     <div class="col">
                       <label class="form-check-label text-start" :for="'vote-' + song.id">{{ song.name }}</label>
@@ -118,8 +119,8 @@
             <div class="card-body">
               <div class="row">
                 <div class="col col-8 offset-2">
-                  <input class="form-control" id="songInput" v-model="nextSong"
-                    :value="nextSong !== '' ? nextSong : ''" />
+                  <input class="form-control" id="songInput" v-model="nextSong" :value="nextSong !== '' ? nextSong : ''"
+                    @change="cacheResponse()" />
                 </div>
               </div>
             </div>
@@ -205,10 +206,18 @@ export default {
       submitted: false,
       loading: false,
       previousResponse: null,
+      cachedResponseKey: null,
     };
   },
   computed: {
     ...mapGetters({ user: "getUser" }),
+  },
+  beforeMount() {
+    const vm = this;
+    vm.getCurrentUser().then(() => {
+      vm.cachedResponseKey = "cachedResponse+" + vm.week.id + "+" + vm.user.id;
+      vm.fillCachedResponse();
+    });
   },
   mounted() {
     const vm = this;
@@ -217,6 +226,7 @@ export default {
     vm.submitted = vm.week.submitted;
   },
   methods: {
+    ...mapActions(["getCurrentUser"]),
     matchUserSong(song, user) {
       const vm = this;
       // remove the user from any other matches it has
@@ -231,6 +241,9 @@ export default {
       }
       song.user = user;
       song.user.matched = true;
+
+      // cache match on input
+      vm.cacheResponse();
     },
     edit() {
       const vm = this;
@@ -337,6 +350,8 @@ export default {
               if (vm.alertModal._isShown) {
                 vm.alertModal.hide();
               }
+              // clear the cached response upon successful submission
+              localStorage.removeItem(vm.cachedResponseKey);
               location.href = "/sotw/" + sotwId;
             }
           }
@@ -360,6 +375,44 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
+    cacheResponse() {
+      const vm = this;
+      vm.$nextTick(() => {
+        let responseToCache = {
+          nextSong: vm.nextSong,
+          pickedSongs: vm.pickedSongs,
+          userSongMatches: vm.userSongMatches
+        }
+        localStorage.setItem(vm.cachedResponseKey, JSON.stringify(responseToCache));
+      });
+    },
+    fillCachedResponse() {
+      const vm = this;
+      if (localStorage.getItem(vm.cachedResponseKey)) {
+        const cachedResponse = JSON.parse(localStorage.getItem(vm.cachedResponseKey));
+
+        vm.nextSong = cachedResponse.nextSong;
+        vm.pickedSongs = cachedResponse.pickedSongs;
+        // update the userSongMatches with the cached response
+        vm.userSongMatches = cachedResponse.userSongMatches.map(match => {
+          let user = match.user;
+          let song = match.song;
+          song.user = user;
+          if (song.user) {
+            song.user.matched = true;
+
+            let existingUser = vm.users.find((eUser) => eUser.id == user.id);
+            vm.users[vm.users.indexOf(existingUser)] = user;
+          }
+          return {
+            id: match.song.id.toString(),
+            song: song,
+            user: user,
+            response: match.response_id,
+          };
+        });
+      }
     }
   },
   watch: {
