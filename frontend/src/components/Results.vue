@@ -196,7 +196,7 @@ export default {
       const vm = this;
       // data points
       let dataPoints = [];
-      for (const key in vm.allSongs) {
+      Object.keys(vm.allSongs).reverse().forEach((key) => {
         dataPoints.push({
           label: vm.allSongs[key].name,
           y: vm.allSongs[key].voters.length,
@@ -209,7 +209,7 @@ export default {
         } else if (vm.secondPlace.indexOf(vm.allSongs[key].name) != -1) {
           vm.secondPlaceVotes = vm.allSongs[key].voters.length;
         }
-      }
+      });
 
       // chart options
       vm.chartOptions = {
@@ -263,5 +263,4 @@ td:first-child {
 .correct-guess {
   background-color: #32a852;
 }
-
 </style>
