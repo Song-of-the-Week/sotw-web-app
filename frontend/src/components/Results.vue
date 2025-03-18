@@ -184,7 +184,14 @@ export default {
       let dataPoint = e.entries[0].dataPoint;
 
       content += "Votes: " + dataPoint.y + "<br/>";
-      content += "Submitter: " + dataPoint.submitter + "<br/>";
+      content += "Submitter(s): ";
+      dataPoint.submitters.forEach((s, i) => {
+        content += s
+        if (i != dataPoint.submitters.length - 1) {
+          content += ", "
+        }
+      });
+      content += "<br/>"
       content += "Voters:<br/>";
       dataPoint.voters.forEach((v) => {
         content += v + "<br/>";
@@ -196,18 +203,29 @@ export default {
       const vm = this;
       // data points
       let dataPoints = [];
-      Object.keys(vm.allSongs).reverse().forEach((key) => {
+      let chartSongs = {};
+      for (const key in vm.allSongs) {
+        if (!(vm.allSongs[key].name in chartSongs)) {
+          chartSongs[vm.allSongs[key].name] = {
+            voters: [],
+            submitters: [],
+          }
+        }
+        chartSongs[vm.allSongs[key].name].voters = chartSongs[vm.allSongs[key].name].voters.concat(vm.allSongs[key].voters);
+        chartSongs[vm.allSongs[key].name].submitters.push(vm.allSongs[key].submitter);
+      }
+      Object.keys(chartSongs).reverse().forEach((name) => {
         dataPoints.push({
-          label: vm.allSongs[key].name,
-          y: vm.allSongs[key].voters.length,
-          voters: vm.allSongs[key].voters,
-          submitter: vm.allSongs[key].submitter,
+          label: name,
+          y: chartSongs[name].voters.length,
+          voters: chartSongs[name].voters,
+          submitters: chartSongs[name].submitters,
         });
 
-        if (vm.firstPlace.indexOf(vm.allSongs[key].name) != -1) {
-          vm.firstPlaceVotes = vm.allSongs[key].voters.length;
-        } else if (vm.secondPlace.indexOf(vm.allSongs[key].name) != -1) {
-          vm.secondPlaceVotes = vm.allSongs[key].voters.length;
+        if (vm.firstPlace.indexOf(chartSongs[name].name) != -1) {
+          vm.firstPlaceVotes = chartSongs[name].voters.length;
+        } else if (vm.secondPlace.indexOf(chartSongs[name].name) != -1) {
+          vm.secondPlaceVotes = chartSongs[name].voters.length;
         }
       });
 

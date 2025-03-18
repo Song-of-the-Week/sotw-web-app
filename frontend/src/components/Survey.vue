@@ -54,7 +54,7 @@
               <div v-if="!voteValid"><i class="bi bi-exclamation-circle"></i> Please Pick Exactly 2 Songs</div>
             </div>
             <div class="card-body">
-              <ul class="list-group list-group-flush text-start" v-for="song in songs" :key="song.id">
+              <ul class="list-group list-group-flush text-start" v-for="song in votingSongs" :key="song.id">
                 <li class="list-group-item">
                   <div class="row">
                     <div class="col col-1 align-self-center">
@@ -194,7 +194,7 @@ export default {
   },
   data() {
     return {
-      songs: [],
+      votingSongs: [],
       users: [],
       pickedSongs: [],
       userSongMatches: [],
@@ -425,10 +425,12 @@ export default {
 
           vm.userSongMatches = [];
 
-          vm.songs = surveyJson.songs;
+          const songs = surveyJson.songs;
+
+          vm.votingSongs = songs.filter((song, i, self) => i === self.findIndex((s) => s.name === song.name));
           vm.users = surveyJson.users;
 
-          vm.songs.forEach((song) => {
+          songs.forEach((song) => {
             vm.userSongMatches.push({
               id: song.id,
               user: undefined,
