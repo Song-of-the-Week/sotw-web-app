@@ -185,9 +185,9 @@ export default {
 
       content += "Votes: " + dataPoint.y + "<br/>";
       content += "Submitter(s): ";
-      dataPoint.submitter.forEach((s, i) => {
+      dataPoint.submitters.forEach((s, i) => {
         content += s
-        if (i != dataPoint.submitter.length - 1) {
+        if (i != dataPoint.submitters.length - 1) {
           content += ", "
         }
       });
@@ -208,18 +208,18 @@ export default {
         if (!(vm.allSongs[key].name in chartSongs)) {
           chartSongs[vm.allSongs[key].name] = {
             voters: [],
-            submitter: [],
+            submitters: [],
           }
         }
         chartSongs[vm.allSongs[key].name].voters = chartSongs[vm.allSongs[key].name].voters.concat(vm.allSongs[key].voters);
-        chartSongs[vm.allSongs[key].name].submitter.push(vm.allSongs[key].submitter);
+        chartSongs[vm.allSongs[key].name].submitters.push(vm.allSongs[key].submitter);
       }
       Object.keys(chartSongs).reverse().forEach((name) => {
         dataPoints.push({
           label: name,
           y: chartSongs[name].voters.length,
           voters: chartSongs[name].voters,
-          submitter: chartSongs[name].submitter,
+          submitters: chartSongs[name].submitters,
         });
 
         if (vm.firstPlace.indexOf(chartSongs[name].name) != -1) {
