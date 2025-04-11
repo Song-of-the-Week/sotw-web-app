@@ -1,11 +1,11 @@
-import { createApp } from "vue";
+import { createApp } from 'vue/dist/vue.esm-bundler'
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import config from "./shared/config";
 import axios from "axios";
 
-/* axios config */
+// Axios config
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = config.API_HOSTNAME;
 axios.interceptors.response.use(undefined, (error) => {
@@ -26,21 +26,34 @@ axios.interceptors.response.use(undefined, (error) => {
   }
 });
 
-/* import bootstrap styles */
+// Import Bootstrap CSS
 import "bootstrap/dist/css/bootstrap.css";
 
-/* import bootstrap-icons styles */
+// Import Bootstrap Icons
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-/* import vue-charts from canvasjs */
+// Import CanvasJS Chart for Vue
 import CanvasJSChart from "@canvasjs/vue-charts";
 
-/* import vue-cookies */
+// Import Vue-Cookies
 import VueCookies from "vue-cookies";
 
-/* define window level variables */
-window.$ = window.jQuery = require("jquery");
-window.bootstrap = require("bootstrap/dist/js/bootstrap.bundle.js");
+// Set window-level variables
 window.config = config;
 
-createApp(App).use(store).use(router).use(CanvasJSChart).use(VueCookies).mount("#app");
+// Make jQuery and Bootstrap accessible globally via the window object
+import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Vite handles this optimally via ES modules
+import $ from "jquery"; // Import jQuery via ES modules
+import * as bootstrap from "bootstrap";
+
+window.$ = $;
+window.jQuery = $;
+window.bootstrap = window.bootstrap || bootstrap;
+
+// Create the Vue app and mount it
+createApp(App)
+  .use(store)
+  .use(router)
+  .use(CanvasJSChart)
+  .use(VueCookies)
+  .mount("#app");

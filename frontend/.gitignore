@@ -1,38 +1,22 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-app/__pycache__/
-app/alembic/__pycache__/
-app/alembic/versions/__pycache__/
-app/api/__pycache__/
-app/api/api_v1/__pycache__/
-app/api/api_v1/endpoints/__pycache__/
-app/clients/__pycache__/
-app/core/__pycache__/
-app/crud/__pycache__/
-app/db/__pycache__/
-app/models/__pycache__/
-app/schemas/__pycache__/
-app/shared/__pycache__/
-*.py[cod]
-
-.DS_Store
-node_modules
-/dist
-
-
-# local env files
-.env.local
-.env.*.local
-
-# Log files
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
 
 # Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea
-.vscode
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj

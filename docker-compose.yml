@@ -23,6 +23,8 @@ services:
     ports:
       - "9000:8000"
     restart: always
+    volumes:
+      - ./app:/usr/src/app
     env_file:
       .env
     depends_on:

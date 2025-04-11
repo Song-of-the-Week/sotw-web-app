@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from typing import Generator
 from unittest.mock import MagicMock
 
@@ -511,7 +512,7 @@ def override_get_email_client() -> MagicMock:
     return mock
 
 
-@pytest.fixture()
+@pytest.fixture(scope="function")
 def client() -> Generator:
     with TestClient(app) as client:
         app.dependency_overrides[deps.get_spotify_client] = override_get_spotify_client
@@ -600,6 +601,7 @@ def sotw():
         results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
         owner_id=1,
     )
+    override_session.expire_all()
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
     return sotw
 
@@ -777,6 +779,20 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
         sotw_id=sotw.id,
         next_results_release=next_results_release,
         responses=[],
+        survey=json.dumps(
+            {
+                "songs": [
+                    {"id": "1", "name": "Doctor Worm - They Might Be Giants"},
+                    {"id": "2", "name": "Headlock - Snail Mail"},
+                    {"id": "3", "name": "Lithonia - Childish Gambino"},
+                ],
+                "users": [
+                    {"id": "1", "name": "test1", "matched": False},
+                    {"id": "2", "name": "test2", "matched": False},
+                    {"id": "3", "name": "test3", "matched": False},
+                ],
+            }
+        ),
     )
     # create the first week of this sotw
     current_week = crud.week.create(session=override_session, object_in=week_in)
