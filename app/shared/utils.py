@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 def get_next_datetime(
@@ -20,6 +21,7 @@ def get_next_datetime(
         int: An integer representing the timestamp of the target datetime in milliseconds
     """
     # Get the current datetime
+    timezone = ZoneInfo(timezone)
     now = datetime.now(tz=timezone)
 
     # Calculate the current week day, hour, and minute

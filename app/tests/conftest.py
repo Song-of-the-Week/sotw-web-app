@@ -599,6 +599,7 @@ def sotw():
     sotw_in = schemas.SotwCreate(
         name="test",
         results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
+        results_timezone="America/New_York",
         owner_id=1,
     )
     override_session.expire_all()
@@ -619,6 +620,7 @@ def sotw_other_owner():
     sotw_in = schemas.SotwCreate(
         name="test2",
         results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
+        results_timezone="America/New_York",
         owner_id=user.id,
     )
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
@@ -637,6 +639,7 @@ def current_week(sotw):
         target_day=results_datetime.weekday(),
         target_hour=results_datetime.hour,
         target_minute=results_datetime.minute,
+        timezone="America/New_York",
     )
     first_week = schemas.WeekCreate(
         id=str(sotw.id) + "+12345678",
@@ -670,6 +673,7 @@ def current_week_not_enough_players(sotw):
             target_day=results_datetime.weekday(),
             target_hour=results_datetime.hour,
             target_minute=results_datetime.minute,
+            timezone="America/New_York",
         )
         - 604800000
     )
@@ -769,6 +773,7 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
             target_day=results_datetime.weekday(),
             target_hour=results_datetime.hour,
             target_minute=results_datetime.minute,
+            timezone="America/New_York",
         )
         - 604800000
     )
