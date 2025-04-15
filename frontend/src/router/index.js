@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 import HomeView from "@/views/HomeView.vue";
-import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
-import InviteModal from "@/components/InviteModal.vue";
-import SotwCreationModal from "@/components/SotwCreationModal.vue";
+import config from "@/shared/config";
 
 const routes = [
   {
@@ -193,7 +191,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(config.BASE_URL),
   routes,
 });
 

@@ -19,12 +19,14 @@ class SotwCreate(SotwBase):
     created_at: datetime = datetime.now()
     owner_id: Optional[int] = None
     results_datetime: int
+    results_timezone: str
 
 
 # properties to receive via API update
 class SotwUpdate(Base):
     name: Optional[str] = None
     results_datetime: Optional[int] = None
+    results_timezone: Optional[str] = None
 
 
 # properties shared by models stored in DB
@@ -44,6 +46,7 @@ class Sotw(SotwInDBBase):
     created_at: datetime
     owner_id: str
     results_datetime: int
+    results_timezone: str
 
 
 # invite link

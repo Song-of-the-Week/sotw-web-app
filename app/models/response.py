@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from sqlalchemy import DateTime
@@ -15,7 +15,7 @@ class Response(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=datetime.utcnow()
+        DateTime(timezone=True), default=datetime.now(timezone.utc)
     )
     next_song_id: Mapped[int] = mapped_column(ForeignKey("song.id"), nullable=True)
     next_song = relationship("Song", back_populates="response", uselist=False)

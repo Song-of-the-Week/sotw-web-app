@@ -86,6 +86,7 @@ async def login(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )
@@ -147,6 +148,7 @@ async def get_current_user(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )
@@ -235,6 +237,7 @@ async def register(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )
@@ -315,6 +318,7 @@ async def verify(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )
@@ -410,6 +414,7 @@ async def spotify_access_token(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )

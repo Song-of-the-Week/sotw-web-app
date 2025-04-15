@@ -21,7 +21,11 @@ export default defineConfig({
     hmr: {
       clientPort: 0, // Matches `auto://0.0.0.0:0/ws`
     },
-    allowedHosts: 'all', // Allow all hosts
+    allowedHosts: ['frontend', '0.0.0.0', 'localhost'],
+    strictPort: true,
+    watch: {
+      usePolling: true, // important for Docker volume changes
+    },
   },
   preview: {
     host: '0.0.0.0',

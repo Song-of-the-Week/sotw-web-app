@@ -16,14 +16,8 @@
             <div v-if="editing == sotw.id">
               <div class="row">
                 <div class="col">
-                  <input 
-                    type="text" 
-                    class="form-control competition-name-input" 
-                    v-model="sotwName" 
-                    placeholder="Competition Name" 
-                    aria-label="Competition Name"
-                    aria-describedby="basic-addon1" 
-                  />
+                  <input type="text" class="form-control competition-name-input" v-model="sotwName"
+                    placeholder="Competition Name" aria-label="Competition Name" aria-describedby="basic-addon1" />
                   <p v-if="!sotwNameValid" class="invalid">Name must be at least two characters long.</p>
                 </div>
               </div>
@@ -33,9 +27,11 @@
             </div>
           </td>
           <td v-if="editing == sotw.id" class="day-time-picker">
-            <DayTimePicker :resultsDayTime="new Date(sotw.results_datetime)" @input-day-time="(datetime) => {
-              resultsDayTime = datetime;
-            }" id="resultsDay" aria-describedby="resultsDayHelp" />
+            <DayTimePicker :resultsDayTime="new Date(sotw.results_datetime)" :resultsTimezone="sotw.results_timezone"
+              @input-day-time="(datetime) => {
+                resultsDayTime = datetime.date;
+                resultsTimezone = datetime.timezone;
+              }" id="resultsDay" aria-describedby="resultsDayHelp" />
           </td>
           <td v-else>
             {{ sotw.results }}
@@ -91,15 +87,9 @@
         </tr>
       </tbody>
     </table>
-    <ConfirmationModal 
-      modalId="leaveConfirmModal"
-      modalTitle="Confirm Leave"
-      :modalBody="`Are you sure you want to leave &quot;${sotwToLeave?.name}&quot;?`"
-      btnClass="btn-danger"
-      buttonText="Leave"
-      v-model:shouldShow="showLeaveModal"
-      @click="confirmLeave"
-    />
+    <ConfirmationModal modalId="leaveConfirmModal" modalTitle="Confirm Leave"
+      :modalBody="`Are you sure you want to leave &quot;${sotwToLeave?.name}&quot;?`" btnClass="btn-danger"
+      buttonText="Leave" v-model:shouldShow="showLeaveModal" @click="confirmLeave" />
   </div>
 </template>
 
@@ -125,6 +115,7 @@ export default {
       loadingEdit: false,
       sotwName: null,
       resultsDayTime: null,
+      resultsTimezone: null,
       sotwNameValid: true,
       updateResponse500: false,
       showLeaveModal: false,
@@ -196,9 +187,11 @@ export default {
     },
     edit(sotw) {
       const vm = this;
+      console.log(sotw)
       vm.editing = sotw.id;
       vm.sotwName = sotw.name;
       vm.resultsDayTime = new Date(sotw.results_datetime);
+      vm.resultsTimezone = sotw.results_timezone;
     },
     cancelEdit() {
       const vm = this;
@@ -220,8 +213,11 @@ export default {
         if (sotw.results_datetime != vm.resultsDayTime.getTime()) {
           payload.results_datetime = vm.resultsDayTime.getTime();
         }
+        if (sotw.results_timezone != vm.resultsTimezone) {
+          payload.results_timezone = vm.resultsTimezone;
+        }
 
-        if (payload.name == undefined && payload.results_datetime == undefined) {
+        if (payload.name == undefined && payload.results_datetime == undefined && payload.results_timezone == undefined) {
           vm.loadingEdit = vm.editing = false;
           return
         }
@@ -240,6 +236,7 @@ export default {
             }
             vm.sotwName = sotw.name;
             vm.resultsDayTime = new Date(sotw.results_datetime);
+            vm.resultsTimezone = sotw.results_timezone;
           })
           .finally(() => {
             vm.loadingEdit = false;
@@ -302,7 +299,8 @@ export default {
 }
 
 .competition-name-input {
-  min-width: 12rem; /* Roughly 20 characters at default font size */
+  min-width: 12rem;
+  /* Roughly 20 characters at default font size */
   width: 100%;
 }
 </style>

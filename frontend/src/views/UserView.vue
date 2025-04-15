@@ -80,7 +80,7 @@
               <PasswordInput id="currentPassword" @input-password="(password) => {
                 currentPassword = password;
               }
-                " />
+              " />
               <p v-if="changePassword400" class="invalid">{{ changePassword400 }}</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
@@ -89,7 +89,7 @@
                 newPassword = password;
                 validateNewPassword();
               }
-                " />
+              " />
               <p v-if="!newPasswordValid" class="invalid">Password must be at least 8 characters long.</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
@@ -99,7 +99,7 @@
                 newPasswordConfirm = password;
                 validateNewPasswordConfirm();
               }
-                " />
+              " />
               <p v-if="!newPasswordConfirmValid" class="invalid">Passwords must match.</p>
             </div>
             <div class="col-12 col-md-1 pt-md-0 pt-2rem pe-0">
@@ -373,6 +373,7 @@ export default {
           results:
             weekday[results.getDay()] + " at " + results.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           results_datetime: sotw.results_datetime,
+          results_timezone: sotw.results_timezone,
         });
       });
     },
