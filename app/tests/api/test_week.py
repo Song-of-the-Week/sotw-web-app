@@ -43,6 +43,7 @@ def test_get_current_week_success_week_0(client):
     payload = {
         "name": "test_sotw",
         "results_datetime": results_time,
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
     data = response.json()

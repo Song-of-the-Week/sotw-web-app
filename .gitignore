@@ -21,3 +21,4 @@ __pychache__/
 test.db
 
 root.crt
+node_modules

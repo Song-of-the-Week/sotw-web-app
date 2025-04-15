@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import random
 from typing import Union
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -80,11 +81,14 @@ async def get_current_week(
             create_results(sotw, current_week, session, spotify_client)
 
         # get the next results release timestamp
-        results_datetime = datetime.fromtimestamp(sotw.results_datetime / 1000.0)
+        results_datetime = datetime.fromtimestamp(
+            sotw.results_datetime / 1000.0, tz=ZoneInfo(sotw.results_timezone)
+        )
         next_results_release = get_next_datetime(
             target_day=results_datetime.weekday(),
             target_hour=results_datetime.hour,
             target_minute=results_datetime.minute,
+            timezone=sotw.results_timezone,
         )
 
         responses, playlist_link = create_weekly_playlist(
@@ -132,11 +136,14 @@ def create_week_zero(sotw: Sotw, session: Session):
     Returns:
         schemas.Week: A week object for week 0 of a sotw competition.
     """
-    results_datetime = datetime.fromtimestamp(sotw.results_datetime / 1000.0)
+    results_datetime = datetime.fromtimestamp(
+        sotw.results_datetime / 1000.0, tz=ZoneInfo(sotw.results_timezone)
+    )
     next_results_release = get_next_datetime(
         target_day=results_datetime.weekday(),
         target_hour=results_datetime.hour,
         target_minute=results_datetime.minute,
+        timezone=sotw.results_timezone,
     )
     first_week = schemas.WeekCreate(
         id=str(sotw.id) + "+0",

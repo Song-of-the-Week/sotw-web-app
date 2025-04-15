@@ -21,8 +21,9 @@
                 <i class="bi bi-question-circle" data-bs-toggle="tooltip"
                   data-bs-title="This will be the day of the week and time of day at which the results and the next survey are released each week."></i>
               </label>
-              <DayTimePicker :resultsDayTime="resultsDayTime" @input-day-time="(datetime) => {
-                resultsDayTime = datetime;
+              <DayTimePicker :resultsDayTime="resultsDayTime" :resultsTimezone="resultsTimezone" @input-day-time="(datetime) => {
+                resultsDayTime = datetime.date;
+                resultsTimezone = datetime.timezone;
               }" id="resultsDay" aria-describedby="resultsDayHelp" />
             </div>
             <div v-if="createResponse400">
@@ -50,6 +51,7 @@
 </template>
 
 <script>
+import moment from "moment-timezone";
 import { mapActions, mapGetters } from "vuex";
 import store from "@/store/index";
 import DayTimePicker from "@/components/DayTimePicker.vue";
@@ -71,6 +73,7 @@ export default {
     return {
       sotwName: "",
       resultsDayTime: new Date(),
+      resultsTimezone: "America/New_York",
       sotwNameValid: true,
       createResponse400: null,
       createResponse500: false,
@@ -80,10 +83,17 @@ export default {
   mounted() {
     const vm = this;
 
+    // initialize tooltips
+    setTimeout(() => {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
+    }, 0);
+
     // clean up modal form data on modal close
     document.getElementById("sotwCreationModal").addEventListener("hidden.bs.modal", function (_) {
       vm.sotwName = "";
       vm.resultsDayTime = new Date();
+      vm.resultsTimezone = moment.tz.guess();
       vm.sotwNameValid = true;
       vm.createResponse400 = null;
       vm.createResponse500 = false;
@@ -119,6 +129,7 @@ export default {
         const payload = {
           name: vm.sotwName,
           results_datetime: vm.resultsDayTime.getTime(),
+          results_timezone: vm.resultsTimezone,
         };
         vm.createSotw(payload)
           .then((_) => {
@@ -142,14 +153,6 @@ export default {
     close() {
       const vm = this;
       vm.sotwCreationModal.hide();
-    },
-  },
-  watch: {
-    registering: function () {
-      setTimeout(() => {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
-      }, 0);
     },
   },
 };

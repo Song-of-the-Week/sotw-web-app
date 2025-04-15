@@ -15,6 +15,7 @@ def test_sotw_creation_406(client):
     payload = {
         "name": "test_sotw",
         "results_datetime": round(datetime.now().timestamp() * 1000),
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
 
@@ -36,6 +37,7 @@ def test_sotw_creation_success(client):
     payload = {
         "name": "test_sotw",
         "results_datetime": round(datetime.now().timestamp() * 1000),
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
     data = response.json()
@@ -57,6 +59,7 @@ def test_sotw_update_403(client, sotw_other_owner):
     payload = {
         "name": "new_name",
         "results_datetime": -1980399600000,
+        "results_timezone": "America/New_York",
     }
     response = client.put(f"{cfg.API_V1_STR}/sotw/1", data=json.dumps(payload))
 
@@ -78,6 +81,7 @@ def test_sotw_update_success(client):
     payload = {
         "name": "test_sotw",
         "results_datetime": round(datetime.now().timestamp() * 1000),
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
     data = response.json()
@@ -86,6 +90,7 @@ def test_sotw_update_success(client):
     payload = {
         "name": "new_name",
         "results_datetime": -1980399600000,
+        "results_timezone": "test",
     }
     response = client.put(f"{cfg.API_V1_STR}/sotw/1", data=json.dumps(payload))
     data = response.json()
@@ -96,6 +101,8 @@ def test_sotw_update_success(client):
     assert data["name"] == "new_name"
     assert "results_datetime" in data.keys()
     assert data["results_datetime"] == -1980399600000
+    assert "results_timezone" in data.keys()
+    assert data["results_timezone"] == "test"
 
 
 def test_get_sotw_404(client):
@@ -128,6 +135,7 @@ def test_get_sotw_success(client):
     payload = {
         "name": "test_sotw",
         "results_datetime": round(datetime.now().timestamp() * 1000),
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
     data = response.json()
@@ -174,6 +182,7 @@ def test_get_sotw_invite_link_success(_create_token, client):
     payload = {
         "name": "test_sotw",
         "results_datetime": round(datetime.now().timestamp() * 1000),
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
     data = response.json()
@@ -223,6 +232,7 @@ def test_get_sotw_invite_pending_already_in_success(decode, client):
     payload = {
         "name": "test_sotw",
         "results_datetime": round(datetime.now().timestamp() * 1000),
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
 
@@ -427,6 +437,7 @@ def test_get_leave_sotw_success(client, current_week):
     assert "sotw_list" in data.keys()
     assert len(data["sotw_list"]) == 0
 
+
 def test_get_sotw_members(client, current_week_new_week_new_results):
 
     # When
@@ -436,10 +447,10 @@ def test_get_sotw_members(client, current_week_new_week_new_results):
     # Then
     assert response.status_code == 200
     assert len(data) == 3
-    assert data[0]["id"] == '1'
+    assert data[0]["id"] == "1"
     assert data[0]["name"] == "test1"
 
-    
+
 def test_get_sotw_members_does_not_exist(client, current_week_new_week_new_results):
 
     # When
@@ -448,6 +459,7 @@ def test_get_sotw_members_does_not_exist(client, current_week_new_week_new_resul
 
     # Then
     assert response.status_code == 404
+
 
 def test_get_sotw_members_not_authorized(client, sotw):
 

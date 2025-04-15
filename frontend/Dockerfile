@@ -6,6 +6,7 @@ COPY . .
 
 RUN apt update
 RUN apt install -y curl
+
 RUN npm install
 RUN npx update-browserslist-db@latest
 RUN npm run build-prod

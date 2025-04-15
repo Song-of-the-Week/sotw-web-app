@@ -99,6 +99,7 @@ async def create_sotw(
         name=sotw.name,
         owner_id=str(sotw.owner_id),
         results_datetime=sotw.results_datetime,
+        results_timezone=sotw.results_timezone,
         soty_playlist_id=sotw.soty_playlist_id,
         soty_playlist_link=sotw.soty_playlist_link,
     )
@@ -134,7 +135,7 @@ async def update_sotw(
     if current_user.id != sotw.owner_id:
         raise HTTPException(status_code=403, detail=f"Not authorized to update.")
 
-    if payload.name or payload.results_datetime:
+    if payload.name or payload.results_datetime or payload.results_timezone:
         # update the sotw name in database
         sotw = crud.sotw.update(session=session, db_object=sotw, object_in=payload)
 
@@ -155,6 +156,7 @@ async def update_sotw(
         name=sotw.name,
         owner_id=str(sotw.owner_id),
         results_datetime=sotw.results_datetime,
+        results_timezone=sotw.results_timezone,
         soty_playlist_id=sotw.soty_playlist_id,
         soty_playlist_link=sotw.soty_playlist_link,
     )
@@ -303,6 +305,7 @@ async def get_sotw(
         name=sotw.name,
         owner_id=str(sotw.owner_id),
         results_datetime=sotw.results_datetime,
+        results_timezone=sotw.results_timezone,
         soty_playlist_id=sotw.soty_playlist_id,
         soty_playlist_link=sotw.soty_playlist_link,
     )
@@ -508,35 +511,35 @@ async def get_sotw_members(
 
     if sotw is None:
         raise HTTPException(
-            status_code=404, 
-            detail=f"Sotw with given id {sotw_id} not found."
+            status_code=404, detail=f"Sotw with given id {sotw_id} not found."
         )
     if current_user not in sotw.user_list:
-        raise HTTPException(
-            status_code=403, 
-            detail=f"Not authorized."
-        )
+        raise HTTPException(status_code=403, detail=f"Not authorized.")
 
-    users = [schemas.User(
-        id=str(user.id),
-        email=user.email,
-        name=user.name,
-        is_superuser=user.is_superuser,
-        spotify_linked=user.spotify_linked,
-        playlists=[
-            schemas.UserPlaylist(
-                id=str(playlist.id),
-                playlist_id=playlist.playlist_id,
-                playlist_link=playlist.playlist_link,
-                sotw_id=str(playlist.sotw_id),
-                user_id=str(playlist.user_id),
-            )
-            # make sure we're only returning the playlists for this competition
-            for playlist in user.playlists if playlist.sotw_id == sotw_id
-        ],
-        # we don't need the sotw_list for members at this time
-        sotw_list=[],
-    ) for user in sotw.user_list]
+    users = [
+        schemas.User(
+            id=str(user.id),
+            email=user.email,
+            name=user.name,
+            is_superuser=user.is_superuser,
+            spotify_linked=user.spotify_linked,
+            playlists=[
+                schemas.UserPlaylist(
+                    id=str(playlist.id),
+                    playlist_id=playlist.playlist_id,
+                    playlist_link=playlist.playlist_link,
+                    sotw_id=str(playlist.sotw_id),
+                    user_id=str(playlist.user_id),
+                )
+                # make sure we're only returning the playlists for this competition
+                for playlist in user.playlists
+                if playlist.sotw_id == sotw_id
+            ],
+            # we don't need the sotw_list for members at this time
+            sotw_list=[],
+        )
+        for user in sotw.user_list
+    ]
     return users
 
 
@@ -593,6 +596,7 @@ async def get_leave_sotw(
                     name=sotw.name,
                     owner_id=str(sotw.owner_id),
                     results_datetime=sotw.results_datetime,
+                    results_timezone=sotw.results_timezone,
                     soty_playlist_id=sotw.soty_playlist_id,
                     soty_playlist_link=sotw.soty_playlist_link,
                 )
@@ -631,6 +635,7 @@ async def get_leave_sotw(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )
