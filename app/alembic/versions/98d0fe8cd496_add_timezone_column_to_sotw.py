@@ -36,9 +36,6 @@ def upgrade() -> None:
         existing_nullable=False,
     )
     op.add_column("sotw", sa.Column("results_timezone", sa.String(), nullable=True))
-    op.execute(
-        "UPDATE sotw SET results_timezone = 'America/New_York' WHERE results_timezone IS NULL"
-    )
     # ### end Alembic commands ###
 
 
