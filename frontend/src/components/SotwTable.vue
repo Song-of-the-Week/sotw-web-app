@@ -1,6 +1,6 @@
 <template>
-  <div class="table-responsive">
-    <table class="table table-sm">
+  <div>
+    <table class="table table-responsive table-sm">
       <thead>
         <tr>
           <th scope="col" class="col-3">Name</th>
