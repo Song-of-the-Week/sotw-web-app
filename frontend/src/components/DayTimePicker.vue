@@ -3,7 +3,7 @@
     <div class="col">
       <div class="input-group">
         <span class="input-group-text">Day</span>
-        <select v-model="day" @change="emitInput" class="form-control" aria-describedby="dayHelp">
+        <select v-model="day" @change="emitInput" class="form-control">
           <option value="0">Sunday</option>
           <option value="1">Monday</option>
           <option value="2">Tuesday</option>
@@ -13,7 +13,7 @@
           <option value="6">Saturday</option>
         </select>
         <span class="input-group-text">Time</span>
-        <select v-model="hour" @change="emitInput" class="form-control hour-select" aria-describedby="hourHelp">
+        <select v-model="hour" @change="emitInput" class="form-control hour-select">
           <option value="0">0</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -40,7 +40,7 @@
           <option value="23">23</option>
         </select>
         <span class="input-group-text">:</span>
-        <select v-model="minute" @change="emitInput" class="form-control minute-select" aria-describedby="minuteHelp">
+        <select v-model="minute" @change="emitInput" class="form-control minute-select">
           <option value="0">00</option>
           <option value="1">01</option>
           <option value="2">02</option>
@@ -109,8 +109,7 @@
     <div class="col">
       <div class="input-group">
         <span class="input-group-text">Timezone</span>
-        <select v-model="selectedTimezone" @change="emitInput" class="form-control timezone-select"
-          aria-describedby="minuteHelp">
+        <select v-model="selectedTimezone" @change="emitInput" class="form-control timezone-select">
           <option v-for="tz in allTimezones" :key="tz" :value="tz">{{ tz }}</option>
         </select>
       </div>

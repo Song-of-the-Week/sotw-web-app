@@ -11,7 +11,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="callback()">Okay</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="callCallback()">Okay</button>
         </div>
       </div>
     </div>
@@ -39,7 +39,7 @@ export default {
     },
   },
   methods: {
-    callback() {
+    callCallback() {
       const vm = this;
       if (vm.callback != null) {
         this.$emit(vm.callback);
