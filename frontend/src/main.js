@@ -42,7 +42,7 @@ import VueCookies from "vue-cookies";
 window.config = config;
 
 // Make jQuery and Bootstrap accessible globally via the window object
-import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Vite handles this optimally via ES modules
+// import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Vite handles this optimally via ES modules
 import $ from "jquery"; // Import jQuery via ES modules
 import * as bootstrap from "bootstrap";
 
