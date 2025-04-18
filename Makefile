@@ -31,7 +31,12 @@ else
 endif
 
 docker-build-frontend:
-	cd frontend && docker build --no-cache -t sotw-frontend .
+	cd frontend && docker build \
+		--no-cache \
+		--build-arg VITE_HOSTNAME=$(VITE_HOSTNAME) \
+		--build-arg VITE_API_HOSTNAME=$(VITE_API_HOSTNAME) \
+		--build-arg VITE_SPOTIFY_CALLBACK_URI=$(VITE_SPOTIFY_CALLBACK_URI) \
+		 -t sotw-frontend .
 
 # development automation
 dev-backend-up:
