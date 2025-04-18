@@ -119,8 +119,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="col col-8 offset-2">
-                  <input class="form-control" id="songInput" v-model="nextSong" :value="nextSong !== '' ? nextSong : ''"
-                    @change="cacheResponse()" />
+                  <input class="form-control" id="songInput" v-model="nextSong" @change="cacheResponse()" />
                 </div>
               </div>
             </div>
