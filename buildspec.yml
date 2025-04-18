@@ -5,6 +5,9 @@ env:
     FRONTEND_REPOSITORY_URI: "/ecr/frontend/uri"
     API_REPOSITORY_URI: "/ecr/api/uri"
     PROXY_REPOSITORY_URI: "/ecr/nginx/uri"
+    VITE_HOSTNAME: "/pipeline/vite-hostname"
+    VITE_API_HOSTNAME: "/pipeline/vite-api-hostname"
+    VITE_SPOTIFY_CALLBACK_URI: "/pipeline/vite-spotify-callback-uri"
   variables:
     ENV: "prod"
 
@@ -28,7 +31,7 @@ phases:
     commands:
       - echo Build started at $(date)
       - echo Building the Docker image...
-      - make ENV=prod docker-build
+      - make ENV=prod VITE_HOSTNAME=$VITE_HOSTNAME VITE_API_HOSTNAME=$VITE_API_HOSTNAME VITE_SPOTIFY_CALLBACK_URI=$VITE_SPOTIFY_CALLBACK_URI docker-build
       - echo Tagging images with version $IMAGE_TAG and latest
       - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
       - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:latest
