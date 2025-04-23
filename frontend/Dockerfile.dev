@@ -1,0 +1,12 @@
+FROM public.ecr.aws/docker/library/node:18.19.1-buster-slim AS build-stage
+
+WORKDIR /usr/src/frontend
+
+COPY . .
+
+RUN apt update
+RUN apt install -y curl
+
+RUN npm install
+RUN npx update-browserslist-db@latest
+CMD ["npm", "run", "serve-dev"]

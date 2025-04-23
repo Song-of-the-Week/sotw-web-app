@@ -8,10 +8,10 @@ DB_DEV_PASS := clarice
 ENV := dev
 # docker-compose automation
 docker-up:
-	docker-compose up -d
+	docker compose up -d
 
 docker-down:
-	docker-compose down
+	docker compose down
 
 docker-build: docker-build-nginx docker-build-backend docker-build-frontend
 
@@ -31,12 +31,19 @@ else
 endif
 
 docker-build-frontend:
+ifeq ($(ENV),prod)
 	cd frontend && npm i && docker build \
 		--no-cache \
 		--build-arg VITE_HOSTNAME=$(VITE_HOSTNAME) \
 		--build-arg VITE_API_HOSTNAME=$(VITE_API_HOSTNAME) \
 		--build-arg VITE_SPOTIFY_CALLBACK_URI=$(VITE_SPOTIFY_CALLBACK_URI) \
 		 -t sotw-frontend .
+else
+	cd frontend && npm i && docker build \
+		-f Dockerfile.dev \
+		--no-cache \
+		 -t sotw-frontend .
+endif
 
 # development automation
 dev-backend-up:

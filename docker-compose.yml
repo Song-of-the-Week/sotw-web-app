@@ -35,7 +35,7 @@ services:
       context: ./frontend
       dockerfile: ./frontend/Dockerfile
     image: sotw-frontend:latest
-    command: npm run serve-prod
+    restart: unless-stopped
     volumes:
       - ./frontend:/usr/src/frontend
       - /usr/src/frontend/node_modules
