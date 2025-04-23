@@ -144,6 +144,7 @@ def init_db(session: Session):
         master_playlist_id="3CiqmMz5FynlRAQXyexlbP",
         soty_playlist_link="https://open.spotify.com/playlist/3CiqmMz5FynlRAQXyexlbP?si=25abf5c1d8a14a7a",
         soty_playlist_id="3CiqmMz5FynlRAQXyexlbP",
+        results_timezone="America/New_York",
     )
     sotw1 = crud.sotw.create(session, object_in=sotw_in)
     crud.user.add_user_to_sotw(session=session, db_object=superuser, object_in=sotw1)
@@ -202,6 +203,7 @@ def init_db(session: Session):
         master_playlist_id="3CiqmMz5FynlRAQXyexlbP",
         soty_playlist_link="https://open.spotify.com/playlist/3CiqmMz5FynlRAQXyexlbP?si=25abf5c1d8a14a7a",
         soty_playlist_id="3CiqmMz5FynlRAQXyexlbP",
+        results_timezone="America/New_York",
     )
     sotw2 = crud.sotw.create(session, object_in=sotw_in)
     crud.user.add_user_to_sotw(session=session, db_object=superuser, object_in=sotw2)

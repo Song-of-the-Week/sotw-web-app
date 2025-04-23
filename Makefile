@@ -31,7 +31,7 @@ else
 endif
 
 docker-build-frontend:
-	cd frontend && docker build \
+	cd frontend && npm i && docker build \
 		--no-cache \
 		--build-arg VITE_HOSTNAME=$(VITE_HOSTNAME) \
 		--build-arg VITE_API_HOSTNAME=$(VITE_API_HOSTNAME) \
