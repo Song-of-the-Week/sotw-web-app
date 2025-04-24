@@ -12,17 +12,19 @@ WORKDIR /usr/src/frontend
 
 COPY . .
 
-RUN apt update
-RUN apt install -y curl
-
 RUN npm install
 RUN npx update-browserslist-db@latest
 RUN npm run build-prod
 
-FROM public.ecr.aws/docker/library/busybox:1.37.0 AS serve-stage
+FROM public.ecr.aws/docker/library/alpine:3.21 AS serve-stage
 
-RUN adduser -D static
+# darkhttpd serves the content and curl is used for health checks in AWS
+RUN adduser -D static \
+    && apk add --no-cache darkhttpd curl
+
 USER static
 WORKDIR /home/static
 COPY --from=build-stage /usr/src/frontend/dist .
-CMD ["busybox", "httpd", "-f", "-v", "-p", "8080"]
+
+EXPOSE 8080
+CMD ["darkhttpd", ".", "--port", "8080", "--no-server-id"]
