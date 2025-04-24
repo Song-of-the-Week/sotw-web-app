@@ -19,7 +19,8 @@ RUN npm install
 RUN npx update-browserslist-db@latest
 RUN npm run build-prod
 
-FROM busybox:1.37
+FROM public.ecr.aws/docker/library/busybox:1.37.0 AS serve-stage
+
 RUN adduser -D static
 USER static
 WORKDIR /home/static
