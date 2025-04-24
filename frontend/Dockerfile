@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:18.19.1-buster-slim
+FROM public.ecr.aws/docker/library/node:18.19.1-buster-slim AS build-stage
 
 ARG VITE_HOSTNAME
 ARG VITE_API_HOSTNAME
@@ -18,3 +18,11 @@ RUN apt install -y curl
 RUN npm install
 RUN npx update-browserslist-db@latest
 RUN npm run build-prod
+
+FROM public.ecr.aws/docker/library/busybox:1.37.0 AS serve-stage
+
+RUN adduser -D static
+USER static
+WORKDIR /home/static
+COPY --from=build-stage /usr/src/frontend/dist .
+CMD ["busybox", "httpd", "-f", "-v", "-p", "8080"]
