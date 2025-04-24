@@ -104,6 +104,10 @@
                   </ul>
                 </li>
               </ul>
+              <button type="button" class="btn btn-outline-warning" @click="randomizeMatches()">Guess For Me</button>
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Randomly assign available users to unmatched songs." class="ms-2">
+                <i class="bi bi-info-circle"></i>
+              </span>
             </div>
           </div>
         </div>
@@ -223,6 +227,10 @@ export default {
 
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
     vm.submitted = vm.week.submitted;
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new window.bootstrap.Tooltip(tooltipTriggerEl)
+    });
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
@@ -384,6 +392,20 @@ export default {
           userSongMatches: vm.userSongMatches
         }
         localStorage.setItem(vm.cachedResponseKey, JSON.stringify(responseToCache));
+      });
+    },
+    randomizeMatches() {
+      const vm = this;
+      let availableUsers = [...vm.users].filter(user => !vm.userSongMatches.some(match => match.user === user));
+      let availableSongs = [...vm.userSongMatches].filter(song => song.user === undefined);
+
+      availableSongs.forEach(song => {
+        if (availableUsers.length > 0) {
+          const randomIndex = Math.floor(Math.random() * availableUsers.length);
+          const user = availableUsers[randomIndex];
+          vm.matchUserSong(song, user);
+          availableUsers.splice(randomIndex, 1);
+        }
       });
     },
     fillCachedResponse() {
