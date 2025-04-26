@@ -74,8 +74,18 @@
                       </td>
                     </tr>
                     <tr>
+                      <th scope="row">Correct Guesses</th>
+                      <td></td>
+                      <td v-for="guess in guessingData[0].guesses">
+                        {{ songCorrectMatches[guess.song] }}
+                      </td>
+                    </tr>
+                    <tr>
                       <th scope="row">Average</th>
                       <td>{{ avg_num_correct_guesses }}</td>
+                      <td v-for="guess in guessingData[0].guesses">
+                        {{ ((songCorrectMatches[guess.song] / guessingData[0].guesses.length)*100).toFixed(0) + "%" }}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -141,6 +151,7 @@ export default {
       chartOptions: {},
       errorMessage: "",
       avg_num_correct_guesses: 0,
+      songCorrectMatches: {},
     };
   },
   mounted() {
@@ -170,6 +181,8 @@ export default {
               total_correct_guesses += guesser.num_correct_guesses;
             });
             vm.avg_num_correct_guesses = Math.round((total_correct_guesses / vm.guessingData.length) * 100) / 100;
+            vm.songCorrectMatches = vm.calculateCorrect(vm.allSongs, vm.guessingData)
+            
             vm.buildChart();
           }
         })
@@ -256,6 +269,22 @@ export default {
           },
         ],
       };
+    },
+    calculateCorrect(songs, guessingData) {
+      var songsCorrect = {};
+      for (const key in songs) {
+        songsCorrect[songs[key].name] = 0;
+      }
+      for (let guesser of guessingData) {
+        for (let i=0; i < guesser.guesses.length; i++) {
+          let guess = guesser.guesses[i]
+
+          if (guess.correct) {
+            songsCorrect[guess.song] += 1;
+          }
+        }
+      }
+      return songsCorrect;
     },
   },
   watch: {
