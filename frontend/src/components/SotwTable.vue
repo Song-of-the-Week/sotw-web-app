@@ -6,7 +6,7 @@
           <th scope="col" class="col-3">Name</th>
           <th scope="col" class="col-3 text">Results Release</th>
           <th scope="col" class="col-3">Invite Link</th>
-          <th scope="col" class="col-2">Leave</th>
+          <th v-if="sotwList.some((sotw) => sotw.owner_id !== user.id)" scope="col" class="col-2">Leave</th>
           <th v-if="sotwList.some((sotw) => sotw.owner_id === user.id)" scope="col" class="col-2">Edit</th>
         </tr>
       </thead>
@@ -60,8 +60,8 @@
               Generate Invite Link
             </button>
           </td>
-          <td>
-            <button @click="showLeaveConfirm(sotw)" class="btn btn-outline-danger">Leave</button>
+          <td  v-if="sotwList.some((sotw) => sotw.owner_id !== user.id)">
+            <button v-if="sotw.owner_id !== user.id" @click="showLeaveConfirm(sotw)" class="btn btn-outline-danger">Leave</button>
           </td>
           <td v-if="sotw.owner_id === user.id">
             <div v-if="editing == sotw.id">
