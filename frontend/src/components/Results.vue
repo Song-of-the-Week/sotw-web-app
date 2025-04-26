@@ -140,6 +140,23 @@ export default {
       defaut: 0,
     },
   },
+  computed: {
+    songCorrectMatches() {
+      const vm = this;
+      let songsCorrect = {};
+      for (const key in vm.allSongs) {
+        songsCorrect[vm.allSongs[key].name] = 0;
+      }
+      for (let guesser of vm.guessingData) {
+        for (let i=0; i < guesser.guesses.length; i++) {
+          let guess = guesser.guesses[i]
+
+          songsCorrect[guess.song] += guess.correct;
+        }
+      }
+      return songsCorrect;
+    }
+  },
   data() {
     return {
       firstPlace: [],
@@ -151,7 +168,6 @@ export default {
       chartOptions: {},
       errorMessage: "",
       avg_num_correct_guesses: 0,
-      songCorrectMatches: {},
     };
   },
   mounted() {
@@ -181,7 +197,6 @@ export default {
               total_correct_guesses += guesser.num_correct_guesses;
             });
             vm.avg_num_correct_guesses = Math.round((total_correct_guesses / vm.guessingData.length) * 100) / 100;
-            vm.songCorrectMatches = vm.calculateCorrect();
             
             vm.buildChart();
           }
@@ -269,21 +284,6 @@ export default {
           },
         ],
       };
-    },
-    calculateCorrect() {
-      const vm = this;
-      let songsCorrect = {};
-      for (const key in vm.allSongs) {
-        songsCorrect[vm.allSongs[key].name] = 0;
-      }
-      for (let guesser of vm.guessingData) {
-        for (let i=0; i < guesser.guesses.length; i++) {
-          let guess = guesser.guesses[i]
-
-          songsCorrect[guess.song] += guess.correct;
-        }
-      }
-      return songsCorrect;
     },
   },
   watch: {
