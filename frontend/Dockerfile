@@ -12,7 +12,7 @@ WORKDIR /usr/src/frontend
 
 COPY . .
 
-RUN npm install
+RUN npm ci
 RUN npx update-browserslist-db@latest
 RUN npm run build-prod
 
