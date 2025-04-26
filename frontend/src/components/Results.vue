@@ -181,7 +181,7 @@ export default {
               total_correct_guesses += guesser.num_correct_guesses;
             });
             vm.avg_num_correct_guesses = Math.round((total_correct_guesses / vm.guessingData.length) * 100) / 100;
-            vm.songCorrectMatches = vm.calculateCorrect(vm.allSongs, vm.guessingData)
+            vm.songCorrectMatches = vm.calculateCorrect();
             
             vm.buildChart();
           }
@@ -270,18 +270,17 @@ export default {
         ],
       };
     },
-    calculateCorrect(songs, guessingData) {
-      var songsCorrect = {};
-      for (const key in songs) {
-        songsCorrect[songs[key].name] = 0;
+    calculateCorrect() {
+      const vm = this;
+      let songsCorrect = {};
+      for (const key in vm.allSongs) {
+        songsCorrect[vm.allSongs[key].name] = 0;
       }
-      for (let guesser of guessingData) {
+      for (let guesser of vm.guessingData) {
         for (let i=0; i < guesser.guesses.length; i++) {
           let guess = guesser.guesses[i]
 
-          if (guess.correct) {
-            songsCorrect[guess.song] += 1;
-          }
+          songsCorrect[guess.song] += guess.correct;
         }
       }
       return songsCorrect;
