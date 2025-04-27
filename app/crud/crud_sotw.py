@@ -45,8 +45,8 @@ class CRUDSotw(CRUDBase[Sotw, SotwCreate, SotwUpdate]):
             Sotw: The updated sotw object.
         """
         db_object = self.get(session=session, id=sotw_id)
-        db_object.theme = theme
-        db_object.theme_description = theme_description
+        db_object.next_theme = theme
+        db_object.next_theme_description = theme_description
 
         session.commit()
 
