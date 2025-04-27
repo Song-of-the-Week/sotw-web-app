@@ -231,6 +231,7 @@ export default {
     tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new window.bootstrap.Tooltip(tooltipTriggerEl)
     });
+    vm.updateTheme(vm.$route.params.sotwId, {"next_theme": "test", "next_theme_description": "test_descripiton"});
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
@@ -369,6 +370,16 @@ export default {
         .finally(() => {
           vm.loading = false;
         });
+    },
+    async updateTheme(sotwId, payload) {
+      const vm = this;
+      await api.methods
+      .apiPutSotwNextTheme(sotwId, payload)
+      .then((res) => {
+        if (res && res.status == 200) {
+          console.log("Theme updated successfully");
+        }
+      })
     },
     async getExistingResponses(sotw_id) {
       const vm = this;
