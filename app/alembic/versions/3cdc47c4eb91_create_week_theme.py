@@ -23,6 +23,21 @@ def upgrade() -> None:
         "week",
         sa.Column("theme", sa.String(), nullable=True),
     )
+    op.add_column(
+        "week",
+        sa.Column("theme_description", sa.String(), nullable=True),
+    )
+    op.add_column(
+        "sotw",
+        sa.Column("next_theme", sa.String(), nullable=True),
+    )
+    op.add_column(
+        "sotw",
+        sa.Column("next_theme_description", sa.String(), nullable=True),
+    )
 
 def downgrade() -> None:
     op.drop_column("week", "theme")
+    op.drop_column("week", "theme_description")
+    op.drop_column("sotw", "next_theme")
+    op.drop_column("sotw", "next_theme_description")
