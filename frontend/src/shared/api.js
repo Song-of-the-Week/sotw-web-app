@@ -47,6 +47,9 @@ export default {
     apiPutSotw(id, payload) {
       return axios.put(config.BASE_API_V1_URL + "sotw/" + id, payload);
     },
+    apiPutSotwNextTheme(id, payload) {
+      return axios.put(config.BASE_API_V1_URL + "sotw/" + id + "/update_next_theme", payload);
+    },
     apiGetSotw(id) {
       return axios.get(config.BASE_API_V1_URL + "sotw/" + id);
     },

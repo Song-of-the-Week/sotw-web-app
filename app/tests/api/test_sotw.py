@@ -104,6 +104,40 @@ def test_sotw_update_success(client):
     assert "results_timezone" in data.keys()
     assert data["results_timezone"] == "test"
 
+def test_sotw_update_theme_success(client):
+    # When
+    # "link" spotify
+    payload = {
+        "state": "admin@admin.admin-test1",
+        "code": "success",
+    }
+    response = client.put(
+        f"{cfg.API_V1_STR}/auth/spotify-access-token", data=json.dumps(payload)
+    )
+    # create sotw
+    payload = {
+        "name": "test_sotw",
+        "results_datetime": round(datetime.now().timestamp() * 1000),
+        "results_timezone": "America/New_York",
+    }
+    response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
+    data = response.json()
+    sotw_id = data["id"]
+    data = response.json()
+
+    # When
+    payload = {
+        "theme": "new_theme",
+        "theme_description": "new_theme_description",
+    }
+    response = client.get(f"{cfg.API_V1_STR}/week/{sotw_id}/current_week")
+    response = client.put(f"{cfg.API_V1_STR}/sotw/1/update_next_theme", data=json.dumps(payload))
+    data = response.json()
+
+    # Then
+    assert response.status_code == 200
+
+
 
 def test_get_sotw_404(client):
     # When

@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, String
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -17,3 +17,5 @@ class Week(Base):
     next_results_release: Mapped[float]
     survey: Mapped[str] = mapped_column(default="")
     responses: Mapped[List[Response]] = relationship(back_populates="week")
+    theme = mapped_column(String, default=None)
+    theme_description = mapped_column(String, default=None)

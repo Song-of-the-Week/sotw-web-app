@@ -28,6 +28,9 @@ class SotwUpdate(Base):
     results_datetime: Optional[int] = None
     results_timezone: Optional[str] = None
 
+class SotwUpdateTheme(Base):
+    theme: Optional[str] = None
+    theme_description: Optional[str] = None
 
 # properties shared by models stored in DB
 class SotwInDBBase(SotwBase):

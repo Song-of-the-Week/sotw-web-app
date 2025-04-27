@@ -1,3 +1,4 @@
+from typing import Any
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -103,6 +104,40 @@ async def create_sotw(
         soty_playlist_id=sotw.soty_playlist_id,
         soty_playlist_link=sotw.soty_playlist_link,
     )
+
+@router.put("/{sotw_id}/update_next_theme")
+async def update_sotw_theme(
+    session: Session = Depends(deps.get_session),
+    *,
+    sotw_id: int,
+    sotw_update_theme: schemas.SotwUpdateTheme,
+    current_user: User = Depends(deps.get_current_user),
+) -> Any:
+    """
+    Update the theme for a sotw.
+
+    Args:
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw_id (int): ID of the sotw to update
+        theme (str): The new theme for the sotw.
+        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+    Raises:
+        HTTPException: 403 for unauthorized users
+
+    Returns:
+        Any: the updated sotw object
+    """
+    week = crud.week.get_current_week(session=session, sotw_id=sotw_id)
+    sotw = crud.sotw.get(session=session, id=sotw_id)
+
+    if current_user.id != sotw.owner_id:
+        raise HTTPException(status_code=403, detail=f"Not authorized to update.")
+
+    # update the theme in the database
+    crud.week.add_theme_to_week(session=session, db_object=week, theme=sotw_update_theme.theme, theme_description=sotw_update_theme.theme_description)
+
+    return {"status": 200}
 
 
 @router.put("/{sotw_id}", response_model=schemas.Sotw)

@@ -6,7 +6,7 @@ from app.schemas.response import (
     ResponseResponse,
 )
 from app.schemas.song import Song, SongCreate, SongUpdate
-from app.schemas.sotw import Sotw, SotwCreate, SotwUpdate, SotwInvite, SotwInfo
+from app.schemas.sotw import Sotw, SotwCreate, SotwUpdate, SotwUpdateTheme, SotwInvite, SotwInfo
 from app.schemas.user_playlist import UserPlaylistCreate, UserPlaylist
 from app.schemas.user_song_match import (
     UserSongMatch,

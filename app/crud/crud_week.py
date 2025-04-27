@@ -113,6 +113,27 @@ class CRUDWeek(CRUDBase[Week, WeekCreate, WeekUpdate]):
             List[Week]: All the weeks in the sotw with the given ID.
         """
         return session.query(Week).filter(Week.sotw_id == sotw_id).all()
+    def add_theme_to_week(
+        self, session: Session, *, db_object: Week, theme: str, theme_description: str
+    ) -> Week:
+        """
+        Adds the theme to the week (and vice versa via model relationship)
+
+        Args:
+            session (Session): a SQLAlchemy Session object that is connected to the database.
+            db_object (Week): a model object of the week to update.
+            theme (str): The theme to add to the week.
+
+        Returns:
+            Week: The week given with the new theme in it's theme attribute.
+        """
+        db_object.theme = theme
+        db_object.theme_description = theme_description
+        session.add(db_object)
+        session.commit()
+        session.refresh(db_object)
+        return db_object
+    
 
 
 week = CRUDWeek(Week)
