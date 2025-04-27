@@ -156,3 +156,7 @@ def test_get_current_week_success_week_n_new_week(client, current_week_new_week)
     assert "survey" in data.keys()
     assert "submitted" in data.keys()
     assert data["submitted"] == False
+    assert "theme" in data.keys()
+    assert data["theme"] == "test theme"
+    assert "theme_description" in data.keys()
+    assert data["theme_description"] == "test theme description"

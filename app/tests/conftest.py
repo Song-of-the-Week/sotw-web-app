@@ -601,9 +601,12 @@ def sotw():
         results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
         results_timezone="America/New_York",
         owner_id=1,
+        next_theme="test theme",
+        next_theme_description="test theme description",
     )
     override_session.expire_all()
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
+
     return sotw
 
 
@@ -625,7 +628,6 @@ def sotw_other_owner():
     )
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
     return sotw
-
 
 @pytest.fixture()
 def current_week(sotw):
@@ -651,7 +653,6 @@ def current_week(sotw):
     )
     # create the first week of this sotw
     current_week = crud.week.create(session=override_session, object_in=first_week)
-
 
 @pytest.fixture()
 def current_week_not_enough_players(sotw):
@@ -762,7 +763,6 @@ def current_week_new_week(sotw, current_week_not_enough_responses):
     )
 
     return current_week_not_enough_responses
-
 
 @pytest.fixture()
 def current_week_new_week_new_results(sotw, current_week_new_week):

@@ -128,14 +128,13 @@ async def update_sotw_theme(
     Returns:
         Any: the updated sotw object
     """
-    week = crud.week.get_current_week(session=session, sotw_id=sotw_id)
     sotw = crud.sotw.get(session=session, id=sotw_id)
 
     if current_user.id != sotw.owner_id:
         raise HTTPException(status_code=403, detail=f"Not authorized to update.")
 
     # update the theme in the database
-    crud.week.add_theme_to_week(session=session, db_object=week, theme=sotw_update_theme.theme, theme_description=sotw_update_theme.theme_description)
+    crud.sotw.add_next_theme_to_sotw(session=session, sotw_id=sotw_id, theme=sotw_update_theme.next_theme, theme_description=sotw_update_theme.next_theme_description)
 
     return {"status": 200}
 

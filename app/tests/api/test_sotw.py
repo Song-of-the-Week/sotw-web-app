@@ -127,8 +127,8 @@ def test_sotw_update_theme_success(client):
 
     # When
     payload = {
-        "theme": "new_theme",
-        "theme_description": "new_theme_description",
+        "next_theme": "new_theme",
+        "next_theme_description": "new_theme_description",
     }
     response = client.get(f"{cfg.API_V1_STR}/week/{sotw_id}/current_week")
     response = client.put(f"{cfg.API_V1_STR}/sotw/1/update_next_theme", data=json.dumps(payload))

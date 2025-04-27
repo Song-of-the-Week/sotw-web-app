@@ -26,3 +26,5 @@ class Sotw(Base):
     user_list = relationship(
         "User", secondary=sotw_user_association_table, back_populates="sotw_list"
     )
+    next_theme = mapped_column(String, default=None)
+    next_theme_description = mapped_column(String, default=None)

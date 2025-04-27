@@ -107,9 +107,15 @@ async def get_current_week(
             survey=json.dumps(survey),
             responses=[],
         )
+        if sotw.next_theme:
+            next_week.theme = sotw.next_theme
+            next_week.theme_description = sotw.next_theme_description
 
         # create the new current week
         current_week = crud.week.create(session=session, object_in=next_week)
+
+        # remove the theme from the sotw
+        crud.sotw.pop_theme_from_sotw(session=session, sotw_id=sotw_id)
 
         # user has not submitted for this new week
         submitted = False
@@ -122,8 +128,55 @@ async def get_current_week(
         next_results_release=current_week.next_results_release,
         survey=current_week.survey,
         submitted=submitted,
+        theme=current_week.theme or "",
+        theme_description=current_week.theme_description or "",
     )
 
+# @router.put("/{sotw_id}/add_theme",
+#             response_model=Union[schemas.Week, schemas.WeekErrorResponse])
+# async def add_theme(
+#     session: Session = Depends(deps.get_session),
+#     *,
+#     sotw_id: int,
+#     theme: str,
+#     current_user: User = Depends(deps.get_current_user),
+# ) -> schemas.Week:
+#     """
+#     Add a theme to the current week of the sotw.
+
+#     Args:
+#         sotw_id (int): ID of the sotw to add a theme to
+#         session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+#         theme (str): The theme to add to the current week.
+#         current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+#     Raises:
+#         HTTPException: 403 for unauthorized users.
+
+#     Returns:
+#         schemas.Week: The week object with the new theme added.
+#     """
+#     # get the sotw and check permissions
+#     sotw = crud.sotw.get(session=session, id=sotw_id)
+
+#     if sotw is None:
+#         raise HTTPException(
+#             status_code=404, detail=f"Sotw with given id {sotw_id} not found."
+#         )
+#     if current_user not in sotw.user_list:
+#         raise HTTPException(status_code=403, detail=f"Not authorized.")
+
+#     # query to find out what the current week is
+#     current_week = crud.week.get_current_week(session=session, sotw_id=sotw.id)
+
+#     if current_week is None:
+#         raise HTTPException(
+#             status_code=404,
+#             detail=f"Could not find a current week for sotw {sotw.id}.",
+#         )
+
+#     # add the theme to the current week
+#     return crud.week.add_theme_to_week(session=session, db_object=current_week, theme=theme)
 
 def create_week_zero(sotw: Sotw, session: Session):
     """

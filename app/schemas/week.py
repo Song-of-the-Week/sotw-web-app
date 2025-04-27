@@ -18,6 +18,8 @@ class WeekCreate(WeekBase):
     next_results_release: int
     responses: List[int] = []
     survey: str = ""
+    theme: str = None
+    theme_description: str = None
 
 
 # properties to receive via API update
@@ -42,6 +44,8 @@ class Week(WeekInDBBase):
     next_results_release: int
     survey: str
     submitted: bool
+    theme: str = ""
+    theme_description: str = ""
 
 
 class WeekErrorResponse(Base):
