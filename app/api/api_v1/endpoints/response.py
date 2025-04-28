@@ -108,6 +108,10 @@ async def post_survey_response(
             # delete the response
             crud.response.delete(session=session, id=response.id)
 
+    if sotw.owner_id != current_user.id:
+        payload.theme = None
+        payload.theme_description = None
+        logger.info(f"{current_user.username} is not the owner of the sotw, so theme and description are set to None")
     if week_num == 0:
         # get song info and create the song in the db
         song_name = f"{song['name']} - {song['artists'][0]['name']}"
@@ -122,6 +126,7 @@ async def post_survey_response(
         )
 
         next_song_obj = crud.song.create(session=session, object_in=song_in)
+    
 
         # create response object in db
         response_in = schemas.ResponseCreate(
@@ -129,6 +134,8 @@ async def post_survey_response(
             sotw_id=current_week.sotw_id,
             week_id=current_week.id,
             submitter_id=current_user.id,
+            theme=payload.theme,
+            theme_description=payload.theme_description,
         )
         response = crud.response.create(session=session, object_in=response_in)
 
@@ -175,6 +182,8 @@ async def post_survey_response(
             submitter_id=current_user.id,
             picked_song_1_id=payload.picked_song_1,
             picked_song_2_id=payload.picked_song_2,
+            theme=payload.theme,
+            theme_description=payload.theme_description,
         )
         response = crud.response.create(session=session, object_in=response_in)
 
@@ -288,5 +297,7 @@ async def get_survey_response(
         picked_song_2_id=str(response.picked_song_2_id),
         sotw_id=str(response.sotw_id),
         week_id=str(response.week_id),
+        theme=response.theme,
+        theme_description=response.theme_description,
     )
         

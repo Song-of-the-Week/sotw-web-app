@@ -17,5 +17,3 @@ class Week(Base):
     next_results_release: Mapped[float]
     survey: Mapped[str] = mapped_column(default="")
     responses: Mapped[List[Response]] = relationship(back_populates="week")
-    theme = mapped_column(String, default=None)
-    theme_description = mapped_column(String, default=None)

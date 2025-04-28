@@ -162,6 +162,8 @@ def test_post_response_success_week_n_no_repeat(client, current_week_new_week):
             },
         ],
         "next_song": "https://open.spotify.com/track/1auuYcOrua5hrsGCS7idun?si=f951bceb14204344",
+        "theme": "test_theme",
+        "theme_description": "test_theme_description",
     }
     response = client.post(f"{cfg.API_V1_STR}/response/1/1", data=json.dumps(payload))
     data = response.json()

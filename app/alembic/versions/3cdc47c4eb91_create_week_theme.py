@@ -20,24 +20,24 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.add_column(
-        "week",
+        "response",
         sa.Column("theme", sa.String(), nullable=True),
     )
     op.add_column(
-        "week",
+        "response",
         sa.Column("theme_description", sa.String(), nullable=True),
     )
     op.add_column(
-        "sotw",
-        sa.Column("next_theme", sa.String(), nullable=True),
+        "results",
+        sa.Column("theme", sa.String(), nullable=True),
     )
     op.add_column(
-        "sotw",
-        sa.Column("next_theme_description", sa.String(), nullable=True),
+        "results",
+        sa.Column("description", sa.String(), nullable=True),
     )
 
 def downgrade() -> None:
-    op.drop_column("week", "theme")
-    op.drop_column("week", "theme_description")
-    op.drop_column("sotw", "next_theme")
-    op.drop_column("sotw", "next_theme_description")
+    op.drop_column("response", "theme")
+    op.drop_column("response", "theme_description")
+    op.drop_column("results", "theme")
+    op.drop_column("results", "theme_description")

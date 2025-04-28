@@ -554,6 +554,8 @@ def _create_song_response(
     week,
     picked_song_1_id: int = None,
     picked_song_2_id: int = None,
+    theme: str = None,
+    theme_description: str = None,
 ):
     # add song
     song_in = schemas.SongCreate(
@@ -569,6 +571,8 @@ def _create_song_response(
         sotw_id=sotw.id,
         week_id=week.id,
         submitter_id=submitter_id,
+        theme=theme,
+        theme_description=theme_description,
     )
     if picked_song_1_id is not None and picked_song_2_id is not None:
         response_in.picked_song_1_id = picked_song_1_id
@@ -601,8 +605,6 @@ def sotw():
         results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
         results_timezone="America/New_York",
         owner_id=1,
-        next_theme="test theme",
-        next_theme_description="test theme description",
     )
     override_session.expire_all()
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
@@ -796,6 +798,8 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
                     {"id": "2", "name": "test2", "matched": False},
                     {"id": "3", "name": "test3", "matched": False},
                 ],
+                "theme": "THEME",
+                "theme_description": "THEME DESCRIPTION",
             }
         ),
     )
@@ -813,6 +817,8 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
         week=current_week,
         picked_song_1_id=2,
         picked_song_2_id=3,
+        theme="THEME",
+        theme_description="THEME DESCRIPTION",
     )
     # add user_song_matches
     _create_user_song_match(response=response_1, user_id=1, song_id=1, correct=True)

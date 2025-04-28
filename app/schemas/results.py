@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import ConfigDict
 
@@ -16,6 +16,8 @@ class ResultsCreate(ResultsBase):
     second_place: str
     all_songs: str
     guessing_data: str
+    theme: Optional[str] = None
+    theme_description: Optional[str] = None
 
 
 # properties to receive via API update
@@ -40,6 +42,8 @@ class Results(ResultsInDBBase):
     second_place: str
     all_songs: str
     guessing_data: str
+    theme: Optional[str] = None
+    theme_description: Optional[str] = None
 
 
 class ResultsErrorResponse(Base):

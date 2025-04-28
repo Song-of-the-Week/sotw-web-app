@@ -225,13 +225,14 @@ export default {
   mounted() {
     const vm = this;
 
+    console.log("WEEK");
+    console.log(vm.week);
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
     vm.submitted = vm.week.submitted;
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new window.bootstrap.Tooltip(tooltipTriggerEl)
     });
-    vm.updateTheme(vm.$route.params.sotwId, {"next_theme": "test", "next_theme_description": "test_descripiton"});
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
@@ -370,16 +371,6 @@ export default {
         .finally(() => {
           vm.loading = false;
         });
-    },
-    async updateTheme(sotwId, payload) {
-      const vm = this;
-      await api.methods
-      .apiPutSotwNextTheme(sotwId, payload)
-      .then((res) => {
-        if (res && res.status == 200) {
-          console.log("Theme updated successfully");
-        }
-      })
     },
     async getExistingResponses(sotw_id) {
       const vm = this;

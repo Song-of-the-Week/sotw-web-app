@@ -58,6 +58,10 @@ def test_get_results_success(client, current_week_new_week_new_results):
         == '{"1": {"name": "Doctor Worm - They Might Be Giants", "voters": ["test2", "test3"], "submitter": "test1", "spotify_id": "6OmApaLQPqHZL3iI78FOUR"}, "2": {"name": "Headlock - Snail Mail", "voters": ["test1", "test3"], "submitter": "test2", "spotify_id": "5mqceEgI5vhogd5pOAlwUO"}, "3": {"name": "Lithonia - Childish Gambino", "voters": ["test1", "test2"], "submitter": "test3", "spotify_id": "4JfpJrrGNXRj2yXm1fYV23"}}'
     )
     assert "guessing_data" in data.keys()
+    assert "theme" in data.keys()
+    assert data["theme"] == "THEME"
+    assert "theme_description" in data.keys()
+    assert data["theme_description"] == "THEME DESCRIPTION"
 
 
 def test_get_results_404_not_ready(client, current_week_new_week_new_results):

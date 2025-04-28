@@ -13,6 +13,8 @@ class ResponsePost(Base):
     user_song_matches: Optional[List[UserSongMatchBase]] = None
     next_song: str
     repeat_approved: Optional[bool] = False
+    theme: Optional[str] = None
+    theme_description: Optional[str] = None
 
 
 class ResponseResponse(Base):
@@ -31,6 +33,8 @@ class ResponseCreate(ResponseBase):
     sotw_id: int
     week_id: str
     submitter_id: int
+    theme: Optional[str] = None
+    theme_description: Optional[str] = None
 
 
 # properties to receive via API update
@@ -58,3 +62,5 @@ class Response(ResponseInDBBase):
     picked_song_2_id: str
     sotw_id: str
     week_id: str
+    theme: str
+    theme_description: str

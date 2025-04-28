@@ -20,19 +20,11 @@ class SotwCreate(SotwBase):
     owner_id: Optional[int] = None
     results_datetime: int
     results_timezone: str
-    next_theme: Optional[str] = None
-    next_theme_description: Optional[str] = None
 
 
 # properties to receive via API update
 class SotwUpdate(Base):
     name: Optional[str] = None
-    results_datetime: Optional[int] = None
-    results_timezone: Optional[str] = None
-
-class SotwUpdateTheme(Base):
-    next_theme: Optional[str] = None
-    next_theme_description: Optional[str] = None
 
 # properties shared by models stored in DB
 class SotwInDBBase(SotwBase):
