@@ -130,6 +130,41 @@
           </div>
         </div>
       </div>
+      <!-- Theme -->
+      <div v-if="userIsOwner" class="row" id="themeCard">
+        <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+          <div class="card px-0 mb-4" :class="{ invalid: !themeValid }">
+            <div class="card-header">
+              Add an optional theme
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col col-8 offset-2">
+                  <input
+                    class="form-control"
+                    id="themeInput"
+                    v-model="theme"
+                    @change="cacheResponse()"
+                    placeholder="Enter the name of the theme"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col col-8 offset-2">
+                  <textarea
+                    class="form-control"
+                    id="themeDescriptionInput"
+                    v-model="themeDescription"
+                    @change="cacheResponse()"
+                    rows="4"
+                    placeholder="Enter a theme description to be shown to the other participants."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Submit -->
       <div v-if="!user.spotify_linked" class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3 text-start">
@@ -205,11 +240,13 @@ export default {
       voteValid: true,
       matchValid: true,
       songValid: true,
+      themeValid: true,
       alertModal: null,
       submitted: false,
       loading: false,
       previousResponse: null,
       cachedResponseKey: null,
+      userIsOwner: false,
     };
   },
   computed: {
@@ -224,14 +261,15 @@ export default {
   },
   mounted() {
     const vm = this;
-
-    console.log("WEEK");
-    console.log(vm.week);
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
     vm.submitted = vm.week.submitted;
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new window.bootstrap.Tooltip(tooltipTriggerEl)
+    });
+    let sotwId = vm.week.sotw_id;
+    vm.userIsOwner = vm.user.sotw_list.some((sotw) => {
+      return sotw.id == sotwId && sotw.owner_id == vm.user.id;
     });
   },
   methods: {
@@ -279,6 +317,8 @@ export default {
               response: match.response_id,
             };
           });
+          vm.theme = vm.previousResponse.theme;
+          vm.themeDescription = vm.previousResponse.theme_description;
         }
       });
       vm.submitted = false;
@@ -319,9 +359,16 @@ export default {
         if (!vm.voteValid) {
           location.href = "#voteCard";
         }
+        console.log("VALIDATIOn")
+        console.log(vm.theme)
+        console.log(vm.themeDescription);
+        vm.themeValid = vm.themeDescription.length != 0 || vm.theme.length == 0;
+        if (!vm.themeValid) {
+          location.href = "#themeCard";
+        }
 
         // send form data to back end
-        if (vm.voteValid && vm.matchValid && vm.songValid) {
+        if (vm.voteValid && vm.matchValid && vm.songValid && vm.themeValid) {
           // construct the payload
           let payloadMatches = [];
           vm.userSongMatches.forEach((match) => {
@@ -335,6 +382,8 @@ export default {
             picked_song_2: vm.pickedSongs[1],
             user_song_matches: payloadMatches,
             next_song: vm.nextSong,
+            theme: vm.theme,
+            theme_description: vm.themeDescription,
             repeat_approved: repeatApproved,
           };
           // send valid form data to back end to evaluate form and add to database
@@ -391,7 +440,9 @@ export default {
         let responseToCache = {
           nextSong: vm.nextSong,
           pickedSongs: vm.pickedSongs,
-          userSongMatches: vm.userSongMatches
+          userSongMatches: vm.userSongMatches,
+          theme: vm.theme,
+          themeDescription: vm.themeDescription,
         }
         localStorage.setItem(vm.cachedResponseKey, JSON.stringify(responseToCache));
       });
@@ -414,6 +465,7 @@ export default {
       const vm = this;
       if (localStorage.getItem(vm.cachedResponseKey)) {
         const cachedResponse = JSON.parse(localStorage.getItem(vm.cachedResponseKey));
+        console.log(cachedResponse)
 
         vm.nextSong = cachedResponse.nextSong;
         vm.pickedSongs = cachedResponse.pickedSongs;
@@ -435,6 +487,9 @@ export default {
             response: match.response_id,
           };
         });
+        vm.theme = cachedResponse.theme;
+        vm.themeDescription = cachedResponse.themeDescription;
+        console.log(vm.theme)
       }
     }
   },
