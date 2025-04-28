@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 import HomeView from "@/views/HomeView.vue";
-import LoginRegisterModal from "@/components/LoginRegisterModal.vue";
-import InviteModal from "@/components/InviteModal.vue";
-import SotwCreationModal from "@/components/SotwCreationModal.vue";
+import config from "@/shared/config";
 
 const routes = [
   {
@@ -74,6 +72,20 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
+    beforeEnter: (to, from, next) => {
+      // Access the sotwId from route params
+      const sotwId = to.params.sotwId;
+
+      // Check if the sotwId exists in the user's sotw_list
+      const userSotws = store.getters.getUser.sotw_list; // Adjust based on your Vuex structure
+      const hasAccess = userSotws.some((sotw) => sotw.id === sotwId);
+
+      if (hasAccess) {
+        next(); // Proceed to the route
+      } else {
+        next({ name: "Home" }); // Redirect to Home if access is denied
+      }
+    },
   },
   {
     path: "/sotw/:sotwId/survey",
@@ -130,6 +142,14 @@ const routes = [
     },
   },
   {
+    path: "/sotw/:sotwId/members",
+    name: "members",
+    component: () => import("../views/SotwView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/about",
     name: "about",
     // route level code-splitting
@@ -171,7 +191,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(config.BASE_URL),
   routes,
 });
 

@@ -10,8 +10,3 @@ To run the application locally, run the following:
     make docker-build
     make docker-up
 ```
-
-To build the application for production, run the following:
-```bash
-    make ENV=prod docker-build
-```

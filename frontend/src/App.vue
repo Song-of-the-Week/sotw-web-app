@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 import store from "@/store/index.js";
 import Navbar from "./components/Navbar.vue";
 
@@ -24,10 +24,10 @@ export default {
     const vm = this;
 
     // see if an active sotw has been set already
-    const activeSotwId = localStorage.getItem("activeSotwId");
-    if (activeSotwId !== null && vm.isLoggedIn) {
-      vm.getSotw(activeSotwId);
-    }
+    // const activeSotwId = localStorage.getItem("activeSotwId");
+    // if (activeSotwId !== null && vm.isLoggedIn) {
+    //   vm.getSotw(activeSotwId);
+    // }
   },
   methods: {
     ...mapActions(["getSotw"]),

@@ -15,12 +15,10 @@ export default {
         .apiGetSotw(id)
         .then(async (res) => {
           await commit("setActiveSotw", res.data);
-        })
-        .then(async (res) => {
-          await dispatch("getWeek", id, { root: true });
+          await dispatch("getWeek", id, { root: true })
         })
         .catch((err) => {
-          localStorage.removeItem("activeSotwId");
+          // localStorage.removeItem("activeSotwId");
         });
     },
     async createSotw({ commit }, payload) {
@@ -33,6 +31,16 @@ export default {
           throw new Error(err.response.data.detail, { cause: err.response.status });
         });
     },
+    async updateSotw({ commit }, {id, payload}) {
+      await api.methods
+        .apiPutSotw(id, payload)
+        .then(async (res) => {
+          await commit("setActiveSotw", res.data);
+        })
+        .catch((err) => {
+          throw new Error(err.response.data.detail, { cause: err.response.status });
+        });
+    }
   },
   mutations: {
     setActiveSotw(state, sotw) {

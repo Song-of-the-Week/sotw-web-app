@@ -106,7 +106,7 @@ def test_update_user_unlink_spotify_success(client):
 
 
 def test_update_user_email_success(client):
-    # Change password
+    # Change email
     payload = {
         "email": "email@email.email",
     }

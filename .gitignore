@@ -3,6 +3,7 @@ client_secrets.json
 venv/
 
 .env
+.python-version
 .vscode/
 postgres/
 venv/
@@ -18,3 +19,6 @@ __pychache__/
 ./app/models/__pycache__
 
 test.db
+
+root.crt
+node_modules

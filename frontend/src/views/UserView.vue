@@ -9,14 +9,9 @@
           <div v-if="editingName" class="row mt-3">
             <div class="col-3">Name:</div>
             <div class="col-6 col-md-5">
-              <input
-                type="text"
-                class="form-control"
-                v-model="userName"
-                placeholder="Name"
-                aria-label="Name"
-                aria-describedby="basic-addon1"
-              />
+              <input type="text" class="form-control" v-model="userName" placeholder="Name" aria-label="Name"
+                aria-describedby="basic-addon1" />
+              <p v-if="!userNameValid" class="invalid">Name must be at lest two characters long.</p>
             </div>
             <div class="col-2 col-md-3">
               <button v-if="loadingName" type="button" class="btn btn-outline-warning btn-spinner">
@@ -24,7 +19,10 @@
                   <span class="visually-hidden">Loading...</span>
                 </div>
               </button>
-              <button v-else type="button" class="btn btn-outline-info" @click="changeName">Save</button>
+              <div v-else>
+                <button type="button" class="btn btn-outline-info me-1" @click="changeName">Save</button>
+                <button type="button" class="btn btn-outline-danger" @click="cancelChangeName">Cancel</button>
+              </div>
             </div>
           </div>
           <div v-else class="row mt-3">
@@ -39,14 +37,9 @@
           <div v-if="editingEmail" class="row mt-3">
             <div class="col-3">Email:</div>
             <div class="col-6 col-md-5">
-              <input
-                type="text"
-                class="form-control"
-                v-model="userEmail"
-                placeholder="Email"
-                aria-label="Email"
-                aria-describedby="basic-addon1"
-              />
+              <input type="text" class="form-control" v-model="userEmail" placeholder="Email" aria-label="Email"
+                aria-describedby="basic-addon1" />
+              <p v-if="!emailValid" class="invalid">Please provide a valid email address.</p>
             </div>
             <div class="col-2 col-md-3">
               <button v-if="loadingEmail" type="button" class="btn btn-outline-warning btn-spinner">
@@ -54,7 +47,10 @@
                   <span class="visually-hidden">Loading...</span>
                 </div>
               </button>
-              <button v-else type="button" class="btn btn-outline-info" @click="changeEmail">Save</button>
+              <div v-else>
+                <button type="button" class="btn btn-outline-info me-1" @click="changeEmail">Save</button>
+                <button type="button" class="btn btn-outline-danger" @click="cancelChangeEmail">Cancel</button>
+              </div>
             </div>
           </div>
           <div v-else class="row mt-3">
@@ -79,45 +75,31 @@
           </div>
           <div v-if="editingPassword" class="row mt-3">
             <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword400.length > 0 }"
-                >Current Password</label
-              >
-              <PasswordInput
-                id="currentPassword"
-                @input-password="
-                  (password) => {
-                    currentPassword = password;
-                  }
-                "
-              />
+              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword400.length > 0 }">Current
+                Password</label>
+              <PasswordInput id="currentPassword" @input-password="(password) => {
+                currentPassword = password;
+              }
+              " />
               <p v-if="changePassword400" class="invalid">{{ changePassword400 }}</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
               <label for="newPassword" class="form-label" :class="{ invalid: !newPasswordValid }">New Password</label>
-              <PasswordInput
-                id="newPassword"
-                @input-password="
-                  (password) => {
-                    newPassword = password;
-                    validateNewPassword();
-                  }
-                "
-              />
+              <PasswordInput id="newPassword" @input-password="(password) => {
+                newPassword = password;
+                validateNewPassword();
+              }
+              " />
               <p v-if="!newPasswordValid" class="invalid">Password must be at least 8 characters long.</p>
             </div>
             <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="newPasswordConfirm" class="form-label" :class="{ invalid: !newPasswordConfirmValid }"
-                >Confirm New Password</label
-              >
-              <PasswordInput
-                id="newPasswordConfirm"
-                @input-password="
-                  (password) => {
-                    newPasswordConfirm = password;
-                    validateNewPasswordConfirm();
-                  }
-                "
-              />
+              <label for="newPasswordConfirm" class="form-label" :class="{ invalid: !newPasswordConfirmValid }">Confirm
+                New Password</label>
+              <PasswordInput id="newPasswordConfirm" @input-password="(password) => {
+                newPasswordConfirm = password;
+                validateNewPasswordConfirm();
+              }
+              " />
               <p v-if="!newPasswordConfirmValid" class="invalid">Passwords must match.</p>
             </div>
             <div class="col-12 col-md-1 pt-md-0 pt-2rem pe-0">
@@ -146,7 +128,7 @@
       </div>
       <div class="row mt-3">
         <div class="col">
-          <h3>Sotws:</h3>
+          <h3>Your Competitions:</h3>
         </div>
       </div>
       <div v-if="user.sotw_list.length == 0" class="row mt-3">
@@ -171,14 +153,10 @@
       </div>
     </div>
   </div>
-  <AlertModal
-    header="Email Change Verification"
-    :message="
-      `You're almost there! Please verify your new email via the link that was just sent to ` +
-      userEmail +
-      ` to complete your email change. The verification link will expire in 10 minutes.`
-    "
-  ></AlertModal>
+  <AlertModal header="Email Change Verification" :message="`You're almost there! Please verify your new email via the link that was just sent to ` +
+    userEmail +
+    ` to complete your email change. The verification link will expire in 10 minutes.`
+    "></AlertModal>
 </template>
 
 <script>
@@ -209,6 +187,8 @@ export default {
       loadingName: false,
       loadingEmail: false,
       loadingPassword: false,
+      userNameValid: true,
+      emailValid: true,
       newPasswordValid: true,
       newPasswordConfirmValid: true,
       sotwList: [],
@@ -266,7 +246,7 @@ export default {
           client_id: res.data.client_id,
           response_type: "code",
           redirect_uri: config.SPOTIFY_CALLBACK_URI,
-          state: vm.user.email + "-" + vm.user.name,
+          state: vm.user.email + "-" + vm.user.name.replace(/\s+/g, '-'),
           scope: "playlist-modify-public",
         });
         document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
@@ -274,41 +254,60 @@ export default {
     },
     changeName() {
       const vm = this;
-      vm.loadingName = true;
-      vm.updateUser({ name: vm.userName })
-        .catch((err) => {
-          if (err.response.status == 500) {
-            vm.response500 = true;
-          } else {
-            console.log("ERROR", err);
-          }
-        })
-        .finally(() => {
-          vm.editingName = vm.loadingName = false;
-          vm.userName = "";
-        });
+
+      vm.userNameValid = vm.userName.length >= 2;
+
+      if (vm.userNameValid) {
+        vm.loadingName = true;
+        vm.updateUser({ name: vm.userName })
+          .catch((err) => {
+            if (err.response.status == 500) {
+              vm.response500 = true;
+            } else {
+              console.log("ERROR", err);
+            }
+          })
+          .finally(() => {
+            vm.editingName = vm.loadingName = false;
+            vm.userName = vm.user.name;
+          });
+      }
+    },
+    cancelChangeName() {
+      const vm = this;
+      vm.editingName = false;
     },
     changeEmail() {
       const vm = this;
-      if (vm.user.email == vm.userEmail) {
-        vm.editingEmail = vm.loadingEmail = false;
-        return;
-      }
-      vm.loadingEmail = true;
-      vm.updateUser({ email: vm.userEmail })
-        .then((_) => {
-          vm.alertModal.show();
-        })
-        .catch((err) => {
-          if (err.response.status == 500) {
-            vm.response500 = true;
-          } else {
-            console.log("ERROR", err);
-          }
-        })
-        .finally(() => {
+
+      vm.emailValid = vm.userEmail.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/);
+
+      if (vm.emailValid) {
+        if (vm.user.email == vm.userEmail) {
           vm.editingEmail = vm.loadingEmail = false;
-        });
+          return;
+        }
+        vm.loadingEmail = true;
+        vm.updateUser({ email: vm.userEmail })
+          .then((_) => {
+            vm.alertModal.show();
+          })
+          .catch((err) => {
+            if (err.response.status == 500) {
+              vm.response500 = true;
+            } else {
+              console.log("ERROR", err);
+            }
+          })
+          .finally(() => {
+            vm.editingEmail = vm.loadingEmail = false;
+            vm.userEmail = vm.user.email;
+          });
+      }
+    },
+    cancelChangeEmail() {
+      const vm = this;
+      vm.editingEmail = false;
     },
     changePassword() {
       const vm = this;
@@ -369,10 +368,12 @@ export default {
         vm.sotwList.push({
           id: sotw.id,
           name: sotw.name,
-          playlist_link: sotw.playlist_link,
+          owner_id: sotw.owner_id,
           share_link: shareLink,
           results:
             weekday[results.getDay()] + " at " + results.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          results_datetime: sotw.results_datetime,
+          results_timezone: sotw.results_timezone,
         });
       });
     },
@@ -392,17 +393,21 @@ export default {
     padding-top: 2rem !important;
   }
 }
+
 .pt-2rem {
   padding-top: 1rem;
 }
+
 .btn-spinner {
   width: 82.04px;
   height: 38px;
 }
+
 .btn-spinner-password {
   width: 59.81px;
   height: 38px;
 }
+
 .invalid {
   color: #d91313;
 }

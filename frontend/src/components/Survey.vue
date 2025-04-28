@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>Survey</h2>
-    <div v-if="week.submitted">
+    <div v-if="submitted">
       <div class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4">
@@ -50,22 +50,18 @@
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ invalid: !voteValid }">
             <div class="card-header">
-              Pick your top 2
-              <div v-if="!voteValid"><i class="bi bi-exclamation-circle"></i> Please pick 2 songs</div>
+              Pick Your Top 2 Songs
+              <div v-if="!voteValid"><i class="bi bi-exclamation-circle"></i> Please Pick Exactly 2 Songs</div>
             </div>
             <div class="card-body">
-              <ul class="list-group list-group-flush text-start" v-for="song in songs" :key="song.id">
+              <ul class="list-group list-group-flush text-start" v-for="song in votingSongs" :key="song.id">
                 <li class="list-group-item">
                   <div class="row">
                     <div class="col col-1 align-self-center">
-                      <input
-                        class="form-check-input me-3"
-                        type="checkbox"
-                        :value="song.id"
-                        v-model="pickedSongs"
+                      <input class="form-check-input me-3" type="checkbox" :value="song.id" v-model="pickedSongs"
                         :id="'vote-' + song.id"
                         :disabled="pickedSongs.length >= 2 && pickedSongs.indexOf(song.id) === -1"
-                      />
+                        @change="cacheResponse()" />
                     </div>
                     <div class="col">
                       <label class="form-check-label text-start" :for="'vote-' + song.id">{{ song.name }}</label>
@@ -95,28 +91,23 @@
                   </h5>
                 </li>
                 <li class="list-group-item dropdown">
-                  <button
-                    class="btn btn-secondary dropdown-toggle"
-                    type="button"
-                    :id="'match-' + matchedSong.id"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <span v-if="matchedSong.user === undefined">Choose</span
-                    ><span v-else>{{ matchedSong.user.name }}</span>
+                  <button class="btn btn-secondary dropdown-toggle" type="button" :id="'match-' + matchedSong.id"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <span v-if="matchedSong.user === undefined">Choose</span><span v-else>{{ matchedSong.user.name
+                      }}</span>
                   </button>
                   <ul class="dropdown-menu" :aria-labelledby="'match-' + matchedSong.id">
                     <li v-for="user in users" :key="user.id">
-                      <a
-                        class="dropdown-item"
-                        :class="{ 'text-muted': user.matched }"
-                        @click="matchUserSong(matchedSong, user)"
-                        >{{ user.name }}</a
-                      >
+                      <a class="dropdown-item" :class="{ 'text-muted': user.matched }"
+                        @click="matchUserSong(matchedSong, user)">{{ user.name }}</a>
                     </li>
                   </ul>
                 </li>
               </ul>
+              <button type="button" class="btn btn-outline-warning" @click="randomizeMatches()">Guess For Me</button>
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Randomly assign available users to unmatched songs." class="ms-2">
+                <i class="bi bi-info-circle"></i>
+              </span>
             </div>
           </div>
         </div>
@@ -132,7 +123,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="col col-8 offset-2">
-                  <input class="form-control" id="songInput" v-model="nextSong" />
+                  <input class="form-control" id="songInput" v-model="nextSong" @change="cacheResponse()" />
                 </div>
               </div>
             </div>
@@ -206,7 +197,7 @@ export default {
   },
   data() {
     return {
-      songs: [],
+      votingSongs: [],
       users: [],
       pickedSongs: [],
       userSongMatches: [],
@@ -217,18 +208,32 @@ export default {
       alertModal: null,
       submitted: false,
       loading: false,
+      previousResponse: null,
+      cachedResponseKey: null,
     };
   },
   computed: {
     ...mapGetters({ user: "getUser" }),
   },
+  beforeMount() {
+    const vm = this;
+    vm.getCurrentUser().then(() => {
+      vm.cachedResponseKey = "cachedResponse+" + vm.week.id + "+" + vm.user.id;
+      vm.fillCachedResponse();
+    });
+  },
   mounted() {
     const vm = this;
 
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
+    vm.submitted = vm.week.submitted;
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new window.bootstrap.Tooltip(tooltipTriggerEl)
+    });
   },
   methods: {
-    ...mapActions(["getWeek"]),
+    ...mapActions(["getCurrentUser"]),
     matchUserSong(song, user) {
       const vm = this;
       // remove the user from any other matches it has
@@ -243,9 +248,37 @@ export default {
       }
       song.user = user;
       song.user.matched = true;
+
+      // cache match on input
+      vm.cacheResponse();
     },
     edit() {
       const vm = this;
+      vm.getExistingResponses(vm.$route.params.sotwId).then(() => {
+        if (vm.previousResponse) {
+          vm.nextSong = vm.previousResponse.next_song;
+          vm.pickedSongs = [
+            vm.previousResponse.picked_song_1_id,
+            vm.previousResponse.picked_song_2_id,
+          ];
+          var survey = JSON.parse(vm.week.survey);
+          vm.users = [];
+          // update the userSongMatches with the previous response
+          vm.userSongMatches = vm.previousResponse.user_song_matches.map(match => {
+            let user = survey.users.find((user) => user.id == match.user_id);
+            let song = survey.songs.find((song) => song.id == match.song_id);
+            song.user = user;
+            song.user.matched = true;
+            vm.users.push(user);
+            return {
+              id: match.song_id.toString(),
+              song: song,
+              user: user,
+              response: match.response_id,
+            };
+          });
+        }
+      });
       vm.submitted = false;
     },
     async submit(repeatApproved = false) {
@@ -310,7 +343,6 @@ export default {
     async submitSurvey(sotwId, weekNum, payload) {
       const vm = this;
       vm.loading = true;
-      console.log(payload.repeat_approved);
       await api.methods
         .apiPostSurveyResponse(sotwId, weekNum, payload)
         .then((res) => {
@@ -325,6 +357,8 @@ export default {
               if (vm.alertModal._isShown) {
                 vm.alertModal.hide();
               }
+              // clear the cached response upon successful submission
+              localStorage.removeItem(vm.cachedResponseKey);
               location.href = "/sotw/" + sotwId;
             }
           }
@@ -336,6 +370,71 @@ export default {
           vm.loading = false;
         });
     },
+    async getExistingResponses(sotw_id) {
+      const vm = this;
+      await api.methods
+        .apiGetSotwResponse(sotw_id, vm.user.id)
+        .then((res) => {
+          if (res && res.status == 200) {
+            vm.previousResponse = res.data;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    cacheResponse() {
+      const vm = this;
+      vm.$nextTick(() => {
+        let responseToCache = {
+          nextSong: vm.nextSong,
+          pickedSongs: vm.pickedSongs,
+          userSongMatches: vm.userSongMatches
+        }
+        localStorage.setItem(vm.cachedResponseKey, JSON.stringify(responseToCache));
+      });
+    },
+    randomizeMatches() {
+      const vm = this;
+      let availableUsers = [...vm.users].filter(user => !vm.userSongMatches.some(match => match.user === user));
+      let availableSongs = [...vm.userSongMatches].filter(song => song.user === undefined);
+
+      availableSongs.forEach(song => {
+        if (availableUsers.length > 0) {
+          const randomIndex = Math.floor(Math.random() * availableUsers.length);
+          const user = availableUsers[randomIndex];
+          vm.matchUserSong(song, user);
+          availableUsers.splice(randomIndex, 1);
+        }
+      });
+    },
+    fillCachedResponse() {
+      const vm = this;
+      if (localStorage.getItem(vm.cachedResponseKey)) {
+        const cachedResponse = JSON.parse(localStorage.getItem(vm.cachedResponseKey));
+
+        vm.nextSong = cachedResponse.nextSong;
+        vm.pickedSongs = cachedResponse.pickedSongs;
+        // update the userSongMatches with the cached response
+        vm.userSongMatches = cachedResponse.userSongMatches.map(match => {
+          let user = match.user;
+          let song = match.song;
+          song.user = user;
+          if (song.user) {
+            song.user.matched = true;
+
+            let existingUser = vm.users.find((eUser) => eUser.id == user.id);
+            vm.users[vm.users.indexOf(existingUser)] = user;
+          }
+          return {
+            id: match.song.id.toString(),
+            song: song,
+            user: user,
+            response: match.response_id,
+          };
+        });
+      }
+    }
   },
   watch: {
     week: {
@@ -347,10 +446,12 @@ export default {
 
           vm.userSongMatches = [];
 
-          vm.songs = surveyJson.songs;
+          const songs = surveyJson.songs;
+
+          vm.votingSongs = songs.filter((song, i, self) => i === self.findIndex((s) => s.name === song.name));
           vm.users = surveyJson.users;
 
-          vm.songs.forEach((song) => {
+          songs.forEach((song) => {
             vm.userSongMatches.push({
               id: song.id,
               user: undefined,
@@ -371,18 +472,26 @@ export default {
   color: #d91313;
   border-color: #d91313;
 }
+
 .match-invalid {
   border-color: #d91313;
 }
+
 .match-item-invalid {
   color: #d91313;
 }
+
 .btn-spinner-submit {
   width: 76.36px;
   height: 38px;
 }
+
 .spinner-border {
   width: 1.4rem;
   height: 1.4rem;
+}
+
+.text-muted {
+  color: #60656a !important;
 }
 </style>

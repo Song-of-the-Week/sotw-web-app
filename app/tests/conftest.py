@@ -1,5 +1,5 @@
 from datetime import datetime
-from time import sleep
+import json
 from typing import Generator
 from unittest.mock import MagicMock
 
@@ -56,6 +56,7 @@ def override_get_spotify_client() -> MagicMock:
         {"id": "abc789", "external_urls": {"spotify": "www.example3.com"}},
         {"id": "xyz123", "external_urls": {"spotify": "www.example4.com"}},
     ]
+    mock.update_playlist_details.return_value = {}
     mock.add_songs_to_playlist.return_value = {}
     mock.get_track_info.return_value = {
         "album": {
@@ -511,7 +512,7 @@ def override_get_email_client() -> MagicMock:
     return mock
 
 
-@pytest.fixture()
+@pytest.fixture(scope="function")
 def client() -> Generator:
     with TestClient(app) as client:
         app.dependency_overrides[deps.get_spotify_client] = override_get_spotify_client
@@ -598,7 +599,29 @@ def sotw():
     sotw_in = schemas.SotwCreate(
         name="test",
         results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
+        results_timezone="America/New_York",
         owner_id=1,
+    )
+    override_session.expire_all()
+    sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
+    return sotw
+
+
+@pytest.fixture()
+def sotw_other_owner():
+    # create a new user and sotw that user 1 is not the owner of
+    user_in = schemas.UserCreate(
+        email="user@user.user",
+        name="test2",
+        is_superuser=False,
+        password="password",
+    )
+    user = crud.user.create(override_session, object_in=user_in)
+    sotw_in = schemas.SotwCreate(
+        name="test2",
+        results_datetime=datetime(1907, 3, 3, 8, 0).timestamp() * 1000,
+        results_timezone="America/New_York",
+        owner_id=user.id,
     )
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
     return sotw
@@ -616,6 +639,7 @@ def current_week(sotw):
         target_day=results_datetime.weekday(),
         target_hour=results_datetime.hour,
         target_minute=results_datetime.minute,
+        timezone="America/New_York",
     )
     first_week = schemas.WeekCreate(
         id=str(sotw.id) + "+12345678",
@@ -649,6 +673,7 @@ def current_week_not_enough_players(sotw):
             target_day=results_datetime.weekday(),
             target_hour=results_datetime.hour,
             target_minute=results_datetime.minute,
+            timezone="America/New_York",
         )
         - 604800000
     )
@@ -748,6 +773,7 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
             target_day=results_datetime.weekday(),
             target_hour=results_datetime.hour,
             target_minute=results_datetime.minute,
+            timezone="America/New_York",
         )
         - 604800000
     )
@@ -758,6 +784,20 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
         sotw_id=sotw.id,
         next_results_release=next_results_release,
         responses=[],
+        survey=json.dumps(
+            {
+                "songs": [
+                    {"id": "1", "name": "Doctor Worm - They Might Be Giants"},
+                    {"id": "2", "name": "Headlock - Snail Mail"},
+                    {"id": "3", "name": "Lithonia - Childish Gambino"},
+                ],
+                "users": [
+                    {"id": "1", "name": "test1", "matched": False},
+                    {"id": "2", "name": "test2", "matched": False},
+                    {"id": "3", "name": "test3", "matched": False},
+                ],
+            }
+        ),
     )
     # create the first week of this sotw
     current_week = crud.week.create(session=override_session, object_in=week_in)

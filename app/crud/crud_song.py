@@ -32,11 +32,17 @@ class CRUDSong(CRUDBase[Song, SongCreate, SongUpdate]):
             .all()
         )
 
-    def get_song_by_name(
-        self, session: Session, *, name: str, sotw_id: int, week_id: int
+    def get_songs_by_name(
+        self,
+        session: Session,
+        *,
+        name: str,
+        sotw_id: int,
+        week_id: int,
+        this_week: bool = False
     ) -> Song | None:
         """
-        Retrieves a song with the same name value as the one given.
+        Retrieves song(s) with the same name value as the one given.
 
         Args:
             session (Session): A SQLAlchemy Session object that is connected to the database.
@@ -45,19 +51,34 @@ class CRUDSong(CRUDBase[Song, SongCreate, SongUpdate]):
             week_id (int): The ID of the week to exclude from the search (only want songs from outside of the given week).
 
         Returns:
-            Song: A Song object from the db.
+            Song: Song object(s) from the db.
         """
         return (
-            session.query(Song)
-            .join(Response)
-            .filter(
-                and_(
-                    Song.name == name,
-                    Response.sotw_id == sotw_id,
-                    Response.week_id != week_id,
+            (
+                session.query(Song)
+                .join(Response)
+                .filter(
+                    and_(
+                        Song.name == name,
+                        Response.sotw_id == sotw_id,
+                        Response.week_id != week_id,
+                    )
                 )
+                .all()
             )
-            .first()
+            if not this_week
+            else (
+                session.query(Song)
+                .join(Response)
+                .filter(
+                    and_(
+                        Song.name == name,
+                        Response.sotw_id == sotw_id,
+                        Response.week_id == week_id,
+                    )
+                )
+                .all()
+            )
         )
 
 

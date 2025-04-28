@@ -46,6 +46,7 @@ def test_get_current_week_success_week_0(mock_datetime, client):
     payload = {
         "name": "test_sotw",
         "results_datetime": results_time,
+        "results_timezone": "America/New_York",
     }
     response = client.post(f"{cfg.API_V1_STR}/sotw/", data=json.dumps(payload))
     data = response.json()
@@ -125,7 +126,7 @@ def test_get_current_week_n_406_not_enough_responses(
     assert "message" in data.keys()
     assert (
         data["message"]
-        == "Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on 3 players to submit."
+        == "Please make sure everyone has submitted their surveys for the week. Looks like we're still waiting on 3 players to submit: test1, test2, and test3"
     )
 
 

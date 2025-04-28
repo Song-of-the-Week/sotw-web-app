@@ -1,12 +1,6 @@
 <template>
-  <div
-    class="modal fade"
-    id="sotwCreationModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelby="sotwCreationModal"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="sotwCreationModal" tabindex="-1" role="dialog" aria-labelby="sotwCreationModal"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -17,33 +11,20 @@
           <form>
             <div class="mb-3">
               <label for="sotwName" class="form-label" :class="{ invalid: !sotwNameValid }">Name</label>
-              <input
-                v-model="sotwName"
-                type="text"
-                class="form-control"
-                id="sotwName"
-                aria-describedby="sotwNameHelp"
-              />
+              <input v-model="sotwName" type="text" class="form-control" id="sotwName"
+                aria-describedby="sotwNameHelp" />
               <p v-if="!sotwNameValid" class="invalid">Name must be at least two characters long.</p>
             </div>
             <div>
               <label for="resultsDayTime" class="form-label">
                 Results Release Day and Time
-                <i
-                  class="bi bi-question-circle"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="This will be the day of the week and time of day at which the results and the next survey are released each week."
-                ></i>
+                <i class="bi bi-question-circle" data-bs-toggle="tooltip"
+                  data-bs-title="This will be the day of the week and time of day at which the results and the next survey are released each week."></i>
               </label>
-              <DayTimePicker
-                @input-day-time="
-                  (datetime) => {
-                    resultsDayTime = datetime;
-                  }
-                "
-                id="resultsDay"
-                aria-describedby="resultsDayHelp"
-              />
+              <DayTimePicker :resultsDayTime="resultsDayTime" :resultsTimezone="resultsTimezone" @input-day-time="(datetime) => {
+                resultsDayTime = datetime.date;
+                resultsTimezone = datetime.timezone;
+              }" id="resultsDay" aria-describedby="resultsDayHelp" />
             </div>
             <div v-if="createResponse400">
               <p class="invalid">{{ createResponse400 }}</p>
@@ -70,6 +51,7 @@
 </template>
 
 <script>
+import moment from "moment-timezone";
 import { mapActions, mapGetters } from "vuex";
 import store from "@/store/index";
 import DayTimePicker from "@/components/DayTimePicker.vue";
@@ -91,6 +73,7 @@ export default {
     return {
       sotwName: "",
       resultsDayTime: new Date(),
+      resultsTimezone: "America/New_York",
       sotwNameValid: true,
       createResponse400: null,
       createResponse500: false,
@@ -100,10 +83,17 @@ export default {
   mounted() {
     const vm = this;
 
+    // initialize tooltips
+    setTimeout(() => {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
+    }, 0);
+
     // clean up modal form data on modal close
     document.getElementById("sotwCreationModal").addEventListener("hidden.bs.modal", function (_) {
       vm.sotwName = "";
       vm.resultsDayTime = new Date();
+      vm.resultsTimezone = moment.tz.guess();
       vm.sotwNameValid = true;
       vm.createResponse400 = null;
       vm.createResponse500 = false;
@@ -111,6 +101,7 @@ export default {
 
       // go back to initial path
       vm.$router.push(vm.initialPath);
+      $(".modal-backdrop").remove();
     });
 
     // submit form on enter key hit
@@ -135,13 +126,14 @@ export default {
       vm.sotwNameValid = vm.sotwName.length > 0;
 
       if (vm.sotwNameValid) {
-        let payload = {
+        const payload = {
           name: vm.sotwName,
           results_datetime: vm.resultsDayTime.getTime(),
+          results_timezone: vm.resultsTimezone,
         };
         vm.createSotw(payload)
           .then((_) => {
-            localStorage.setItem("activeSotwId", vm.sotw.id);
+            // localStorage.setItem("activeSotwId", vm.sotw.id);
             // refresh the user to get the new sotw in the user
             vm.getCurrentUser();
             // close the modal
@@ -163,14 +155,6 @@ export default {
       vm.sotwCreationModal.hide();
     },
   },
-  watch: {
-    registering: function () {
-      setTimeout(() => {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
-      }, 0);
-    },
-  },
 };
 </script>
 
@@ -180,13 +164,16 @@ p {
   font-size: 0.84rem;
   margin: 0;
 }
+
 .invalid {
   color: #d91313;
 }
+
 .btn-spinner-create {
   width: 73.7px;
   height: 38px;
 }
+
 .spinner-border {
   width: 1.4rem;
   height: 1.4rem;

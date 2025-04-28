@@ -42,7 +42,10 @@ export default {
     },
     // SOTW
     apiPostSotw(payload) {
-      return axios.post(config.BASE_API_V1_URL + "sotw", payload);
+      return axios.post(config.BASE_API_V1_URL + "sotw/", payload);
+    },
+    apiPutSotw(id, payload) {
+      return axios.put(config.BASE_API_V1_URL + "sotw/" + id, payload);
     },
     apiGetSotw(id) {
       return axios.get(config.BASE_API_V1_URL + "sotw/" + id);
@@ -56,8 +59,14 @@ export default {
     apiGetSotwInviteJoin(shareToken) {
       return axios.get(config.BASE_API_V1_URL + "sotw/invite/join/" + shareToken);
     },
+    apiGetSotwMembers(sotwId) {
+      return axios.get(config.BASE_API_V1_URL + "sotw/" + sotwId + "/members");
+    },
     apiGetLeaveSotw(sotwId) {
       return axios.get(config.BASE_API_V1_URL + "sotw/" + sotwId + "/leave");
+    },
+    apiGetSotwResponse(sotwId, userId) {
+      return axios.get(config.BASE_API_V1_URL + "response/" + sotwId + "/" + userId);
     },
     // WEEK
     apiGetWeek(id) {

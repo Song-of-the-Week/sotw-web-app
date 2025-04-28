@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from loguru import logger
 
 from app.crud.crud_base import CRUDBase
+from app.models.response import Response
 from app.models.sotw import Sotw
 from app.models.user import User
 from app.schemas.user import UserCreate
@@ -91,6 +92,24 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         session.commit()
         session.refresh(db_object)
         return db_object
+
+    def get_submitted_users(self, session: Session, *, week_id: str) -> List[User]:
+        """
+        Gets all the user's who have submitted a response for the given week id
+
+        Args:
+            session (Session): A SQLAlchemy Session object that is connected to the database.
+            week_id (str): A week id string.
+
+        Returns:
+            List[User]: list of users who have submitted a response for the week with the given week id.
+        """
+        return (
+            session.query(User)
+            .join(Response, Response.submitter_id == User.id)
+            .filter(Response.week_id == week_id)
+            .all()
+        )
 
 
 user = CRUDUser(User)

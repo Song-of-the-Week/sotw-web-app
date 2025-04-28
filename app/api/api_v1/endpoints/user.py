@@ -99,6 +99,7 @@ async def update_user(
                     name=sotw.name,
                     owner_id=str(sotw.owner_id),
                     results_datetime=sotw.results_datetime,
+                    results_timezone=sotw.results_timezone,
                     soty_playlist_id=sotw.soty_playlist_id,
                     soty_playlist_link=sotw.soty_playlist_link,
                 )
@@ -133,6 +134,7 @@ async def update_user(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )
@@ -204,6 +206,7 @@ async def verify_email_change(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )
@@ -370,6 +373,7 @@ async def delete_user(
                 name=sotw.name,
                 owner_id=str(sotw.owner_id),
                 results_datetime=sotw.results_datetime,
+                results_timezone=sotw.results_timezone,
                 soty_playlist_id=sotw.soty_playlist_id,
                 soty_playlist_link=sotw.soty_playlist_link,
             )

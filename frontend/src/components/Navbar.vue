@@ -2,27 +2,15 @@
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <router-link class="navbar-brand ms-2" :to="`/`">Song of the Week</router-link>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div
-        class="offcanvas offcanvas-end"
-        tabindex="-1"
-        id="navbarSupportedContent"
-        aria-labelledby="navbarOffcanvasLgLabel"
-      >
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="navbarSupportedContent"
+        aria-labelledby="navbarOffcanvasLgLabel">
         <div class="offcanvas-header">
-          <router-link class="offcanvas-title navbar-brand" id="offcanvasNavbarLabel" :to="`/`"
-            ><span data-bs-dismiss="offcanvas">Song of the Week</span></router-link
-          >
+          <router-link class="offcanvas-title navbar-brand" id="offcanvasNavbarLabel" :to="`/`"><span
+              data-bs-dismiss="offcanvas">Song of the Week</span></router-link>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
@@ -31,22 +19,17 @@
               <router-link class="nav-link" :to="`/about`"><span data-bs-dismiss="offcanvas">About</span></router-link>
             </li>
             <li v-if="isLoggedIn" class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarResultsDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Sotw
+              <a class="nav-link dropdown-toggle" href="#" id="navbarResultsDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Competitions
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarResultsDropdown">
-                <li v-for="sotw in user.sotw_list">
-                  <router-link class="dropdown-item" :to="`/sotw/` + sotw.id"
-                    ><span data-bs-dismiss="offcanvas">{{ sotw.name }}</span></router-link
-                  >
-                </li>
+                <span data-bs-dismiss="offcanvas">
+                  <li v-for="sotw in user.sotw_list">
+                    <router-link class="dropdown-item" :to="`/sotw/` + sotw.id">{{
+                      sotw.name }}</router-link>
+                  </li>
+                </span>
               </ul>
             </li>
             <!-- <li class="nav-item">
@@ -61,13 +44,14 @@
           </ul>
           <div class="navbar-nav d-flex">
             <div class="nav-item mb-2 mb-md-0 me-md-2" v-if="isLoggedIn">
-              <router-link class="nav-link" :to="`/user`">My Profile</router-link>
+              <router-link class="nav-link" :to="`/user`"><span data-bs-dismiss="offcanvas">My
+                  Profile</span></router-link>
             </div>
             <div class="nav-item">
               <router-link v-if="isLoggedIn" :to="`/`">
                 <button class="btn btn-outline-success" @click="logoutUser()">Logout</button>
               </router-link>
-              <router-link v-else :to="`/login`">
+              <router-link v-else-if="!hideLoginButtonPaths.includes($route.path)" :to="`/login`">
                 <button class="btn btn-outline-success" @click="login()">Login</button>
               </router-link>
             </div>
@@ -78,13 +62,37 @@
   </nav>
   <!-- Modals -->
   <SpotifyModal></SpotifyModal>
-  <LoginRegisterModal
-    :registering="loginRegistering"
-    :login-register-modal="loginRegisterModal"
-    :initial-path="initialPath"
-  />
+  <LoginRegisterModal :registering="loginRegistering" :login-register-modal="loginRegisterModal"
+    :initial-path="initialPath" @initialize-modals="initializeModals()" />
   <InviteModal v-if="isLoggedIn" :invite-modal="inviteModal" />
   <SotwCreationModal v-if="isLoggedIn" :sotw-creation-modal="sotwCreationModal" :initial-path="initialPath" />
+  <!-- Toasts -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="spotifyLinkedToast" class="toast" role="alert" data-bs-delay='100000' aria-live="assertive"
+      aria-atomic="true">
+      <div class="toast-header text-bg-success">
+        <i class="bi bi-spotify me-2"></i>
+        <strong class="me-auto">Spotify Linked!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        You may now participate in a Song of the Week Competition.
+      </div>
+    </div>
+  </div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="spotifyNotLinkedToast" class="toast" role="alert" delay="5000" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header text-bg-danger">
+        <i class="bi bi-spotify me-2"></i>
+        <strong class="me-auto">Spotify Not Linked!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Something went wrong, your Spotify account was not linked.
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script>
@@ -110,6 +118,7 @@ export default {
       sotwCreationModal: null,
       spotifyModal: null,
       initialPath: "/",
+      hideLoginButtonPaths: ['/login', '/register', '/reset', '/'],
     };
   },
   computed: {
@@ -120,17 +129,22 @@ export default {
   },
   mounted() {
     const vm = this;
-
-    vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
-    if (vm.isLoggedIn) {
-      vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
-      vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
-      vm.spotifyModal = new window.bootstrap.Modal("#spotifyModal");
-      vm.getCurrentUser();
-    }
+    vm.initializeModals();
   },
   methods: {
     ...mapActions(["logout", "getCurrentUser", "getSotw"]),
+    initializeModals() {
+      const vm = this;
+      vm.$nextTick(() => {
+        vm.loginRegisterModal = new window.bootstrap.Modal("#loginModal");
+        if (vm.isLoggedIn) {
+          vm.inviteModal = new window.bootstrap.Modal("#inviteModal");
+          vm.sotwCreationModal = new window.bootstrap.Modal("#sotwCreationModal");
+          vm.spotifyModal = new window.bootstrap.Modal("#spotifyModal");
+          vm.getCurrentUser();
+        }
+      });
+    },
     login() {
       const vm = this;
       if (!vm.loginRegisterModal._isShown) {
@@ -156,7 +170,6 @@ export default {
     $route: {
       immediate: true,
       handler: function (newVal, oldVal) {
-        // console.log("WHAT", newVal.path.split("/")[2]);
         const vm = this;
 
         if (
@@ -189,21 +202,20 @@ export default {
               }
             }
           }
-          if (vm.inviteModal && newVal.meta.inviteModal) {
-            if (!vm.inviteModal._isShown) {
-              vm.inviteModal.show();
-            }
+          if (vm.inviteModal && newVal.meta.inviteModal && vm.user && !vm.inviteModal._isShown) {
+            vm.inviteModal.show();
           }
-          if (vm.sotwCreationModal && newVal.meta.createModal) {
-            if (!vm.sotwCreationModal._isShown) {
-              vm.sotwCreationModal.show();
-            }
+          if (vm.sotwCreationModal && newVal.meta.createModal && !vm.sotwCreationModal._isShown) {
+            vm.sotwCreationModal.show();
           }
-          if (vm.spotifyModal && newVal.meta.spotifyModal) {
-            if (!vm.spotifyModal.__isShown) {
-              vm.spotifyModal.show();
-            }
+          if (vm.spotifyModal && newVal.meta.spotifyModal && !vm.spotifyModal.__isShown) {
+            vm.spotifyModal.show();
           }
+        }
+
+        // if spotify is unlinked, always show the spotify link modal
+        if (vm.isLoggedIn && !vm.user.spotify_linked && vm.spotifyModal && !vm.spotifyModal?.__isShown && !newVal.query.code && !newVal.query.state) {
+          vm.spotifyModal.show();
         }
       },
     },

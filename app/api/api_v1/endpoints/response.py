@@ -1,8 +1,10 @@
+import re
 from typing import Union
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from requests import HTTPError
+import requests
 from sqlalchemy.orm.session import Session
 from loguru import logger
 
@@ -79,6 +81,16 @@ async def post_survey_response(
     # validate the spotify link
     next_song_track_id = payload.next_song.split("/")[-1].split("?")[0]
     try:
+        if "//spotify.link/" in payload.next_song:
+            response = requests.get(payload.next_song)
+            html_str = str(response.content)
+            match = re.search(
+                r"https://open.spotify.com/track/([a-zA-Z0-9]+)", html_str
+            )
+            if match:
+                next_song_track_id = match.group(1)
+            else:
+                next_song_track_id = None
         song = spotify_client.get_track_info(
             next_song_track_id, session, current_user.id
         )
@@ -134,11 +146,13 @@ async def post_survey_response(
 
         # determine if this song has been submitted before:
         if (
-            crud.song.get_song_by_name(
-                session=session,
-                name=song_name,
-                sotw_id=sotw.id,
-                week_id=current_week.id,
+            len(
+                crud.song.get_songs_by_name(
+                    session=session,
+                    name=song_name,
+                    sotw_id=sotw.id,
+                    week_id=current_week.id,
+                )
             )
             and not payload.repeat_approved
         ):
@@ -167,17 +181,29 @@ async def post_survey_response(
         # create user song matches
         number_correct_matches = 0
         for match in payload.user_song_matches:
-            song = crud.song.get(session=session, id=match.song_id)
+            song = crud.song.get(session=session, id=int(match.song_id))
             # the payload has some sort of error if the song can't be found
             if not song:
                 raise HTTPException(
                     status_code=400,
                     detail=f"There's something wrong with your request. A song with the given id {match.song_id} does not exist.",
                 )
+
+            previous_week = crud.week.get_week_by_number(
+                session=session, week_num=current_week.week_num - 1, sotw_id=sotw.id
+            )
+            songs = crud.song.get_songs_by_name(
+                session=session,
+                name=song.name,
+                sotw_id=sotw.id,
+                week_id=previous_week.id,
+                this_week=True,
+            )
+            song_submitter_ids = [song.submitter_id for song in songs]
             user_song_match_in = schemas.UserSongMatchCreate(
-                song_id=match.song_id,
-                user_id=match.user_id,
-                correct_guess=match.user_id == song.submitter_id,
+                song_id=int(match.song_id),
+                user_id=int(match.user_id),
+                correct_guess=match.user_id in song_submitter_ids,
                 response_id=response.id,
             )
             number_correct_matches += 1 if user_song_match_in.correct_guess else 0
@@ -200,3 +226,67 @@ async def post_survey_response(
 
         # return a response with the current week
         return schemas.ResponseResponse(repeat=False, valid=True)
+    
+@router.get(
+    "/{sotw_id}/{user_id}",
+    response_model=schemas.Response,
+)
+async def get_survey_response(
+    session: Session = Depends(deps.get_session),
+    *,
+    sotw_id: int,
+    user_id: int,
+    current_user: User = Depends(deps.get_current_user),
+): 
+    """
+    Get the response for the given user and SOTW for the current week.
+
+    Args:
+        session (Session, optional): A SQLAlchemy Session object that is connected to the database. Defaults to Depends(deps.get_session).
+        sotw_id (int): ID of the sotw to query
+        user_id (int): ID of the user to query
+        current_user (User, optional): Currently logged in user. Dependency ensures they are logged in.
+
+    Raises:
+        HTTPException: 403 for unauthorized users
+
+    Returns:
+        schemas.Results: The results for the given sotw and week num.
+    """
+    if user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view this response")
+    current_week = crud.week.get_current_week(session=session, sotw_id=sotw_id)
+
+    response = crud.response.get_by_sotw_and_submitter(
+        sotw_id=sotw_id, submitter_id=user_id, week_id=current_week.id, session=session
+    )
+
+    # it is possible that the user has not submitted a response yet
+    # in which case we return a response with no data instead of an error
+    if response is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Response not found for this user in this sotw.",
+        )
+
+
+    stringified_matches = [
+        schemas.UserSongMatch(
+            user_id=str(match.user_id),
+            song_id=str(match.song_id),
+            correct_guess=match.correct_guess,
+            response_id=str(match.response_id)
+        )
+        for match in response.user_song_matches
+    ]
+    return schemas.Response(
+        submitter_id=str(response.submitter_id),
+        user_song_matches=stringified_matches,
+        number_correct_matches=response.number_correct_matches,
+        next_song=response.next_song.spotify_link,
+        picked_song_1_id=str(response.picked_song_1_id),
+        picked_song_2_id=str(response.picked_song_2_id),
+        sotw_id=str(response.sotw_id),
+        week_id=str(response.week_id),
+    )
+        

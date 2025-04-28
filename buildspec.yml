@@ -1,0 +1,60 @@
+version: 0.2
+
+env:
+  parameter-store:
+    FRONTEND_REPOSITORY_URI: "/ecr/frontend/uri"
+    API_REPOSITORY_URI: "/ecr/api/uri"
+    PROXY_REPOSITORY_URI: "/ecr/nginx/uri"
+    VITE_HOSTNAME: "/pipeline/vite-hostname"
+    VITE_API_HOSTNAME: "/pipeline/vite-api-hostname"
+    VITE_SPOTIFY_CALLBACK_URI: "/pipeline/vite-spotify-callback-uri"
+  variables:
+    ENV: "prod"
+
+phases:
+  pre_build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo Building commit $COMMIT_HASH
+      - git log
+      - |
+        if [ "$ENV" == "dev" ]; then
+          IMAGE_TAG=$COMMIT_HASH
+        else
+          IMAGE_TAG=$(git describe --tags --match "v*.*.*" $CODEBUILD_RESOLVED_SOURCE_VERSION)
+        fi
+  build:
+    commands:
+      - echo Build started at $(date)
+      - echo Building the Docker image...
+      - make ENV=prod VITE_HOSTNAME=$VITE_HOSTNAME VITE_API_HOSTNAME=$VITE_API_HOSTNAME VITE_SPOTIFY_CALLBACK_URI=$VITE_SPOTIFY_CALLBACK_URI docker-build
+      - echo Tagging images with version $IMAGE_TAG and latest
+      - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-frontend $FRONTEND_REPOSITORY_URI:latest
+      - docker tag sotw-api $API_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-api $API_REPOSITORY_URI:latest
+      - docker tag sotw-nginx $PROXY_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag sotw-nginx $PROXY_REPOSITORY_URI:latest  
+  post_build:
+    commands:
+      - echo Build completed at $(date)
+      - echo Pushing sotw-frontend Docker images...
+      - docker push $FRONTEND_REPOSITORY_URI:latest
+      - docker push $FRONTEND_REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing sotw-api Docker images...
+      - docker push $API_REPOSITORY_URI:latest
+      - docker push $API_REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing sotw-nginx Docker images...
+      - docker push $PROXY_REPOSITORY_URI:latest
+      - docker push $PROXY_REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"frontend","imageUri":"%s"},{"name":"api","imageUri":"%s"},{"name":"nginx","imageUri":"%s"}]' $FRONTEND_REPOSITORY_URI:$IMAGE_TAG $API_REPOSITORY_URI:$IMAGE_TAG $PROXY_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - aws ssm put-parameter --name /ecs/frontend/image-version --value $IMAGE_TAG --type "String" --overwrite
+      - aws ssm put-parameter --name /ecs/api/image-version --value $IMAGE_TAG --type "String" --overwrite
+      - aws ssm put-parameter --name /ecs/nginx/image-version --value $IMAGE_TAG --type "String" --overwrite
+artifacts:
+    files: imagedefinitions.json

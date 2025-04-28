@@ -1,13 +1,27 @@
 <template>
   <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelby="inviteModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div v-if="response400" class="modal-content">
+      <div v-if="loadingRes" class="modal-content text-center">
         <div class="modal-header">
-          <h5 class="modal-title">Looks like the link you used is no longer valid.</h5>
+          <h5 class="modal-title">Loading...</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>Please ask the person you got the invite link from to generate a new one for you.</p>
+          <div class="spinner-border mt-5" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+      <div v-else-if="response400 != null" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">You were unable to join this Song of the Week competition.</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ response400 }}</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -49,7 +63,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <div>
-            <button v-if="loading" type="button" class="btn btn-primary btn-spinner-register">
+            <button v-if="loadingJoin" type="button" class="btn btn-primary btn-spinner-register">
               <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
@@ -75,8 +89,9 @@ export default {
   data() {
     return {
       sotwRes: { already_in: false },
-      loading: false,
-      response400: false,
+      loadingJoin: false,
+      loadingRes: true,
+      response400: null,
       response500: false,
     };
   },
@@ -90,8 +105,10 @@ export default {
 
     document.getElementById("inviteModal").addEventListener("hidden.bs.modal", function (_) {
       vm.sotwRes = { already_in: false };
-      vm.loading = false;
-      vm.response400 = vm.response500 = false;
+      vm.loadingJoin = false;
+      vm.loadingRes = true;
+      vm.response400 = null;
+      vm.response500 = false;
     });
   },
   methods: {
@@ -105,29 +122,31 @@ export default {
       const vm = this;
 
       // join the sotw via api
-      vm.loading = true;
+      vm.loadingJoin = true;
       await api.methods
         .apiGetSotwInviteJoin(vm.$route.params.shareToken)
         .then((res) => {
           // set the active sotw
           let sotwId = res.data.id;
-          localStorage.setItem("activeSotwId", sotwId);
+          // localStorage.setItem("activeSotwId", sotwId);
           vm.getSotw(sotwId);
           // update the stored user in the front end
           vm.getCurrentUser();
           // close modal and redirect to the newly joined sotw
           vm.inviteModal.hide();
-          vm.$router.push("/sotw/" + localStorage.getItem("activeSotwId"));
+          vm.$router.push("/sotw/" + sotwId);
         })
         .catch((err) => {
           // error handling
-          if (err.response.status == 403) {
-            vm.response400 = true;
+          if (400 <= err.response.status < 500) {
+            vm.response400 = err.response.data.detail;
           } else if (err.response.status == 500) {
             vm.response500 = true;
           } else {
             console.error("ERROR:", err);
           }
+        }).finally(() => {
+          vm.loadingJoin = false;
         });
     },
     async getSotwName() {
@@ -136,7 +155,9 @@ export default {
       await api.methods
         .apiGetSotwInvitePending(vm.$route.params.shareToken)
         .then((res) => {
-          vm.sotwRes = res.data;
+          if (res && res.status == 200) {
+            vm.sotwRes = res.data;
+          }
         })
         .catch((err) => {
           // error handling
@@ -147,6 +168,9 @@ export default {
           } else {
             console.error("ERROR:", err);
           }
+        })
+        .finally(() => {
+          vm.loadingRes = false;
         });
     },
   },
@@ -159,14 +183,17 @@ p {
   font-size: 0.84rem;
   margin: 0;
 }
+
 .btn-spinner-register {
   width: 84.34px;
   height: 38px;
 }
+
 .btn-spinner-login {
   width: 66.3px;
   height: 38px;
 }
+
 .spinner-border {
   width: 1.4rem;
   height: 1.4rem;
