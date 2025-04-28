@@ -33,7 +33,7 @@ def upgrade() -> None:
     )
     op.add_column(
         "results",
-        sa.Column("description", sa.String(), nullable=True),
+        sa.Column("theme_description", sa.String(), nullable=True),
     )
 
 def downgrade() -> None:
