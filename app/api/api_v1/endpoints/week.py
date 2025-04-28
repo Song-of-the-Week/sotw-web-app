@@ -478,10 +478,20 @@ def create_weekly_playlist(
     Returns:
         A tuple with the responses from the current week and the playlist link for the new week's playlist
     """
+    theme = ""
+    theme_description = ""
+    for response in current_week.responses:
+        if response.submitter_id == sotw.owner_id:
+            theme = response.theme
+            theme_description = response.theme_description
     week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num + 1}"
+    if theme:
+        week_playlist_name += f" - {theme}"
     week_playlist_description = (
         f"Week {current_week.week_num + 1} for {sotw.name} Song of the Week."
     )
+    if theme_description:
+        week_playlist_description += f" Theme: {theme_description}"
     week_playlist = spotify_client.create_playlist(
         week_playlist_name, week_playlist_description, session, sotw.owner_id
     )
