@@ -62,5 +62,5 @@ class Response(ResponseInDBBase):
     picked_song_2_id: str
     sotw_id: str
     week_id: str
-    theme: str
-    theme_description: str
+    theme: Optional[str] = None
+    theme_description: Optional[str] = None
