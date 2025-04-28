@@ -1,5 +1,19 @@
 <template>
   <div class="container">
+  <!-- Theme Banner -->
+  <div v-if="displayTheme" class="row">
+    <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+      <div class="card border-info mb-4">
+        <div class="card-header bg-info text-white text-center">
+          <h2 class="mb-0">Themed Week</h2>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="card-title">{{ displayTheme }}</h3>
+          <p class="card-text">{{ displayThemeDescription }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
     <h2>Survey</h2>
     <div v-if="submitted">
       <div class="row">
@@ -359,9 +373,7 @@ export default {
         if (!vm.voteValid) {
           location.href = "#voteCard";
         }
-        console.log("VALIDATIOn")
-        console.log(vm.theme)
-        console.log(vm.themeDescription);
+
         vm.themeValid = vm.themeDescription.length != 0 || vm.theme.length == 0;
         if (!vm.themeValid) {
           location.href = "#themeCard";
@@ -507,6 +519,8 @@ export default {
 
           vm.votingSongs = songs.filter((song, i, self) => i === self.findIndex((s) => s.name === song.name));
           vm.users = surveyJson.users;
+          vm.displayTheme = surveyJson.theme;
+          vm.displayThemeDescription = surveyJson.theme_description;
 
           songs.forEach((song) => {
             vm.userSongMatches.push({
