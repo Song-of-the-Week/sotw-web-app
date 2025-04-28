@@ -374,11 +374,13 @@ export default {
           location.href = "#voteCard";
         }
 
-        vm.themeValid = vm.themeDescription.length != 0 || vm.theme.length == 0;
-        if (!vm.themeValid) {
-          location.href = "#themeCard";
-        }
+        if (vm.userIsOwner) {
+          vm.themeValid = vm.themeDescription.length != 0 || vm.theme.length == 0;
+          if (!vm.themeValid) {
+            location.href = "#themeCard";
+          }
 
+        }
         // send form data to back end
         if (vm.voteValid && vm.matchValid && vm.songValid && vm.themeValid) {
           // construct the payload
