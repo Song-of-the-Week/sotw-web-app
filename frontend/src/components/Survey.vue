@@ -105,9 +105,13 @@
                 </li>
               </ul>
               <button type="button" class="btn btn-outline-warning" @click="randomizeMatches()">Guess For Me</button>
-              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Randomly assign available users to unmatched songs." class="ms-2">
+              <button 
+                type="button" 
+                class="btn btn-sm btn-outline-info ms-2" 
+                data-bs-toggle="modal" 
+                data-bs-target="#infoModal">
                 <i class="bi bi-info-circle"></i>
-              </span>
+              </button>
             </div>
           </div>
         </div>
@@ -176,6 +180,19 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="infoModalLabel">What is "Guess for Me"?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <i>Guess for Me</i> randomly assigns available users to unmatched songs.
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -227,10 +244,6 @@ export default {
 
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
     vm.submitted = vm.week.submitted;
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new window.bootstrap.Tooltip(tooltipTriggerEl)
-    });
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
