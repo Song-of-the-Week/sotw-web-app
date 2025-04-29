@@ -157,7 +157,7 @@ async def get_current_user(
     )
 
 
-@router.post("/register", status_code=200, response_model=Union[Any, schemas.User])
+@router.post("/register", status_code=200, response_model=Union[schemas.User, Any])
 async def register(
     session: Session = Depends(deps.get_session),
     *,
