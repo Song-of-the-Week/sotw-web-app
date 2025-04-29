@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from loguru import logger
 from sqlalchemy.orm.session import Session
 
 from app import crud
@@ -478,19 +479,32 @@ def create_weekly_playlist(
     Returns:
         A tuple with the responses from the current week and the playlist link for the new week's playlist
     """
+    previous_week = crud.week.get_week_by_number(
+        session=session, week_num=current_week.week_num - 1, sotw_id=sotw.id
+    )
+    if not previous_week:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Could not find a previous week with the number {current_week.week_num - 1} for sotw {sotw.id}.",
+        )
     theme = ""
     theme_description = ""
-    for response in current_week.responses:
+    logger.info(f"Creating playlist for week {current_week.week_num + 1}")
+    for response in previous_week.responses:
+        logger.info(f"Response: {response}")
         if response.submitter_id == sotw.owner_id:
+            logger.info(f"Found theme: {response.theme}")
+            logger.info(f"Found theme description: {response.theme_description}")
             theme = response.theme
             theme_description = response.theme_description
+            break
     week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num + 1}"
-    if theme:
+    if theme != "":
         week_playlist_name += f" - {theme}"
     week_playlist_description = (
         f"Week {current_week.week_num + 1} for {sotw.name} Song of the Week."
     )
-    if theme_description:
+    if theme_description != "":
         week_playlist_description += f" Theme: {theme_description}"
     week_playlist = spotify_client.create_playlist(
         week_playlist_name, week_playlist_description, session, sotw.owner_id
