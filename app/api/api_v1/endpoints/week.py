@@ -258,7 +258,7 @@ def create_results(
     first_place_names, first_place_ids, second_place_names, second_place_ids = (
         calculate_first_second_place(all_songs)
     )
-    survey = json.loads(current_week.survey)
+    survey = json.loads(previous_week.survey)
 
     # create the results for the previous week
     results_in = schemas.ResultsCreate(
