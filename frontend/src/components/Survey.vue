@@ -1,20 +1,6 @@
 <template>
   <div class="container">
-  <!-- Theme Banner -->
-  <div v-if="displayTheme" class="row">
-    <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-      <div class="card border-info mb-4">
-        <div class="card-header bg-info text-white text-center">
-          <h2 class="mb-0">Themed Week</h2>
-        </div>
-        <div class="card-body text-center">
-          <h3 class="card-title">{{ displayTheme }}</h3>
-          <p class="card-text">{{ displayThemeDescription }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-    <h2>Survey</h2>
+
     <div v-if="submitted">
       <div class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
@@ -59,6 +45,20 @@
       </div>
     </div>
     <form v-else class="row form-horizontal justify-content-center" id="surveyForm" @submit.prevent="submit(false)">
+      <!-- Theme Banner -->
+      <div v-if="displayTheme" class="row">
+        <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+          <div class="card px-0 border-info mb-4">
+            <div class="card-header bg-info text-white text-center">
+              <h2 class="mb-0">Themed Week</h2>
+            </div>
+            <div class="card-body text-center">
+              <h3 class="card-title">{{ displayTheme }}</h3>
+              <p class="card-text">{{ displayThemeDescription }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Pick your top 2 -->
       <div v-if="!week.week_num == 0" class="row" id="voteCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
@@ -261,6 +261,8 @@ export default {
       previousResponse: null,
       cachedResponseKey: null,
       userIsOwner: false,
+      theme: "",
+      themeDescription: "",
     };
   },
   computed: {
@@ -375,7 +377,7 @@ export default {
         }
 
         if (vm.userIsOwner) {
-          vm.themeValid = vm.themeDescription.length != 0 || vm.theme.length == 0;
+          vm.themeValid = (vm.themeDescription.length != 0 && vm.theme.length != 0) || (vm.theme.length == 0 && vm.themeDescription.length == 0);
           if (!vm.themeValid) {
             location.href = "#themeCard";
           }
