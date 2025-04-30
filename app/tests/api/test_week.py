@@ -154,6 +154,8 @@ def test_get_current_week_success_week_n_new_week(client, current_week_new_week)
         or data["playlist_link"] == "www.example4.com"
     )
     assert "survey" in data.keys()
+    assert json.loads(data["survey"])["theme"] == "THEME"
+    assert json.loads(data["survey"])["theme_description"] == "THEME DESCRIPTION"
     assert "submitted" in data.keys()
     assert data["submitted"] == False
 

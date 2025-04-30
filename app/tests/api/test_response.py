@@ -330,6 +330,8 @@ def test_get_response_success(client, current_week_new_week_new_results):
     assert data["picked_song_1_id"] == "2"
     assert data["picked_song_2_id"] == "3"
     assert data["submitter_id"] == "1"
+    assert data["theme"] == "THEME"
+    assert data["theme_description"] == "THEME DESCRIPTION"
     assert (
         data["next_song"]
         == "https://open.spotify.com/track/6OmApaLQPqHZL3iI78FOUR?si=971c343da7fb4847"

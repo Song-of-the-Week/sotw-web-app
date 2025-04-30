@@ -744,6 +744,8 @@ def current_week_new_week(sotw, current_week_not_enough_responses):
         submitter_id=1,
         sotw=sotw,
         week=current_week_not_enough_responses,
+        theme="THEME",
+        theme_description="THEME DESCRIPTION",
     )
 
     _create_song_response(
