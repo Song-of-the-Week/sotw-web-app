@@ -48,11 +48,11 @@
       <!-- Theme Banner -->
       <div v-if="displayTheme" class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-          <div class="card px-0 border-info mb-4">
-            <div class="card-header bg-info text-white text-center">
+          <div class="card px-0 mb-4">
+            <div class="card-header theme-header text-center">
               <h2 class="mb-0">Themed Week</h2>
             </div>
-            <div class="card-body text-center">
+            <div class="card-body theme-body text-center">
               <h3 class="card-title">{{ displayTheme }}</h3>
               <p class="card-text">{{ displayThemeDescription }}</p>
             </div>
@@ -568,5 +568,13 @@ export default {
 
 .text-muted {
   color: #60656a !important;
+}
+
+.card-header.theme-header {
+  background-color: rgba(13, 109, 253, 0.500);
+}
+
+.card-body.theme-body {
+  background-color: rgba(13, 109, 253, 0.125);
 }
 </style>

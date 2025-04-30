@@ -7,20 +7,6 @@
       </div>
     </div>
     <div v-else-if="weekNum > 0">
-      <!-- Theme Banner -->
-      <div v-if="theme" class="row">
-        <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-          <div class="card px-0 mb-4">
-            <div class="card-header text-white text-center">
-              <h2 class="mb-0">Week {{ weekNum - 1 }} Theme</h2>
-            </div>
-            <div class="card-body text-center">
-              <h3 class="card-title">{{ theme }}</h3>
-              <p class="card-text">{{ themeDescription }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="row">
         <div class="col text-center">
           <h1 class="mb-5">Congratulations to our week {{ weekNum - 1 }} winners!</h1>
@@ -48,7 +34,21 @@
           </div>
         </div>
       </div>
-      <div class="row mt-5">
+      <div class="row">
+        <!-- Theme Banner -->
+        <div v-if="theme" class="row">
+          <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+            <div class="card px-0 mb-4">
+              <div class="card-header text-white text-center">
+                <h2 class="mb-0">Week {{ weekNum - 1 }} Theme</h2>
+              </div>
+              <div class="card-body text-center">
+                <h3 class="card-title">{{ theme }}</h3>
+                <p class="card-text">{{ themeDescription }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Chart Card -->
         <div class="row-md-4 mb-4">
           <div class="card h-100">
