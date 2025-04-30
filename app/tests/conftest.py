@@ -877,6 +877,110 @@ def current_week_new_week_new_results(sotw, current_week_new_week):
         object_in=schemas.ResponseUpdate(number_correct_matches=1),
     )
 
+@pytest.fixture()
+def current_week_new_week_new_results_themed_survey(sotw, current_week_new_week_new_results):
+        # create week with past results release
+    results_datetime = datetime(1907, 3, 3, 8, 0)
+    next_results_release = (
+        get_next_datetime(
+            target_day=results_datetime.weekday(),
+            target_hour=results_datetime.hour,
+            target_minute=results_datetime.minute,
+            timezone="America/New_York",
+        )
+        - 604800000
+    )
+    week_in = schemas.WeekCreate(
+        id=str(sotw.id) + "+1234567891",
+        week_num=2,
+        playlist_link="www.example.com",
+        sotw_id=sotw.id,
+        next_results_release=next_results_release,
+        responses=[],
+        survey=json.dumps(
+            {
+                "songs": [
+                    {"id": "4", "name": "Doctor Worm - They Might Be Giants"},
+                    {"id": "5", "name": "Headlock - Snail Mail"},
+                    {"id": "6", "name": "Lithonia - Childish Gambino"},
+                ],
+                "users": [
+                    {"id": "1", "name": "test1", "matched": False},
+                    {"id": "2", "name": "test2", "matched": False},
+                    {"id": "3", "name": "test3", "matched": False},
+                ],
+            }
+        ),
+    )
+    # create the first week of this sotw
+    current_week = crud.week.create(session=override_session, object_in=week_in)
+
+    # need to add three responses to the week
+    # add song and response
+    response_1 = _create_song_response(
+        spotify_id="asd",
+        name="North American Scum - LCD Soundsystem",
+        spotify_link="https://open.spotify.com/track/asd?si=971c343da7fb4847",
+        submitter_id=1,
+        sotw=sotw,
+        week=current_week,
+        picked_song_1_id=5,
+        picked_song_2_id=6,
+    )
+    # add user_song_matches
+    _create_user_song_match(response=response_1, user_id=1, song_id=4, correct=True)
+    _create_user_song_match(response=response_1, user_id=2, song_id=5, correct=True)
+    _create_user_song_match(response=response_1, user_id=3, song_id=6, correct=True)
+    # update response
+    crud.response.update(
+        session=override_session,
+        db_object=response_1,
+        object_in=schemas.ResponseUpdate(number_correct_matches=3),
+    )
+
+    # add song and response
+    response_2 = _create_song_response(
+        spotify_id="5mqceEgI5vhogd5pOAlwUO",
+        name="Avant Gardner - Courtney Barnett",
+        spotify_link="https://open.spotify.com/track/5mqceEgI5vhogd5pOAlwUO?si=e3562627d25e4957",
+        submitter_id=2,
+        sotw=sotw,
+        week=current_week,
+        picked_song_1_id=4,
+        picked_song_2_id=6,
+    )
+    # add user_song_matches
+    _create_user_song_match(response=response_2, user_id=1, song_id=6, correct=False)
+    _create_user_song_match(response=response_2, user_id=2, song_id=5, correct=True)
+    _create_user_song_match(response=response_2, user_id=3, song_id=4, correct=False)
+    # update response
+    crud.response.update(
+        session=override_session,
+        db_object=response_2,
+        object_in=schemas.ResponseUpdate(number_correct_matches=1),
+    )
+
+    # add song and response
+    response_3 = _create_song_response(
+        spotify_id="4JfpJrrGNXRj2yXm1fYV23",
+        name="The Less I Know the Better - Tame Impala",
+        spotify_link="https://open.spotify.com/track/4JfpJrrGNXRj2yXm1fYV23?si=4366647118a34603",
+        submitter_id=3,
+        sotw=sotw,
+        week=current_week,
+        picked_song_1_id=4,
+        picked_song_2_id=5,
+    )
+    # add user_song_matches
+    _create_user_song_match(response=response_3, user_id=1, song_id=4, correct=True)
+    _create_user_song_match(response=response_3, user_id=2, song_id=6, correct=False)
+    _create_user_song_match(response=response_3, user_id=3, song_id=5, correct=False)
+    # update response
+    crud.response.update(
+        session=override_session,
+        db_object=response_3,
+        object_in=schemas.ResponseUpdate(number_correct_matches=1),
+    )
 
 @pytest.fixture()
 def current_week_new_week_plus_1(sotw, current_week_new_week):

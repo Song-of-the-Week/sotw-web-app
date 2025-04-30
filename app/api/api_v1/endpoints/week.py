@@ -258,7 +258,7 @@ def create_results(
     first_place_names, first_place_ids, second_place_names, second_place_ids = (
         calculate_first_second_place(all_songs)
     )
-    survey = json.loads(current_week.survey)
+    survey = json.loads(previous_week.survey or "{}")
 
     # create the results for the previous week
     results_in = schemas.ResultsCreate(
@@ -274,8 +274,8 @@ def create_results(
                 reverse=True,
             )
         ),
-        theme=survey["theme"],
-        theme_description=survey["theme_description"],
+        theme=survey["theme"] if "theme" in survey else "",
+        theme_description=survey["theme_description"] if "theme_description" in survey else "",
     )
     crud.results.create(session=session, object_in=results_in)
 
