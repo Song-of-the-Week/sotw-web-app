@@ -481,7 +481,6 @@ export default {
       const vm = this;
       if (localStorage.getItem(vm.cachedResponseKey)) {
         const cachedResponse = JSON.parse(localStorage.getItem(vm.cachedResponseKey));
-        console.log(cachedResponse)
 
         vm.nextSong = cachedResponse.nextSong;
         vm.pickedSongs = cachedResponse.pickedSongs;
@@ -505,7 +504,6 @@ export default {
         });
         vm.theme = cachedResponse.theme;
         vm.themeDescription = cachedResponse.themeDescription;
-        console.log(vm.theme)
       }
     }
   },
