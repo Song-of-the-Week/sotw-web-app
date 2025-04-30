@@ -10,8 +10,8 @@
       <!-- Theme Banner -->
       <div v-if="theme" class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
-          <div class="card px-0 border-info mb-4">
-            <div class="card-header bg-info text-white text-center">
+          <div class="card px-0 mb-4">
+            <div class="card-header text-white text-center">
               <h2 class="mb-0">Week {{ weekNum - 1 }} Theme</h2>
             </div>
             <div class="card-body text-center">
