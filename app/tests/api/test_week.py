@@ -158,4 +158,3 @@ def test_get_current_week_success_week_n_new_week(client, current_week_new_week)
     assert json.loads(data["survey"])["theme_description"] == "THEME DESCRIPTION"
     assert "submitted" in data.keys()
     assert data["submitted"] == False
-

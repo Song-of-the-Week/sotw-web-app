@@ -631,6 +631,7 @@ def sotw_other_owner():
     sotw = crud.sotw.create(session=override_session, object_in=sotw_in)
     return sotw
 
+
 @pytest.fixture()
 def current_week(sotw):
     # add current_user to the created sotw
@@ -655,6 +656,7 @@ def current_week(sotw):
     )
     # create the first week of this sotw
     current_week = crud.week.create(session=override_session, object_in=first_week)
+
 
 @pytest.fixture()
 def current_week_not_enough_players(sotw):

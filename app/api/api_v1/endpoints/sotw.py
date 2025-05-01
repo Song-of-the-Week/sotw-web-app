@@ -104,6 +104,7 @@ async def create_sotw(
         soty_playlist_link=sotw.soty_playlist_link,
     )
 
+
 @router.put("/{sotw_id}", response_model=schemas.Sotw)
 async def update_sotw(
     session: Session = Depends(deps.get_session),

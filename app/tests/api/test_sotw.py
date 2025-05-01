@@ -105,7 +105,6 @@ def test_sotw_update_success(client):
     assert data["results_timezone"] == "test"
 
 
-
 def test_get_sotw_404(client):
     # When
     response = client.get(f"{cfg.API_V1_STR}/sotw/3")

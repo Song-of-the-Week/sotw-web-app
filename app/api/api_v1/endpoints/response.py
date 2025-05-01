@@ -174,6 +174,7 @@ async def post_survey_response(
         )
 
         next_song_obj = crud.song.create(session=session, object_in=song_in)
+
         # create response object in db
         response_in = schemas.ResponseCreate(
             next_song_id=next_song_obj.id,
