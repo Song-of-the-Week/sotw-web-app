@@ -653,7 +653,6 @@ def current_week(sotw):
         next_results_release=next_results_release,
         responses=[],
     )
-
     # create the first week of this sotw
     current_week = crud.week.create(session=override_session, object_in=first_week)
 

@@ -111,7 +111,6 @@ async def get_current_week(
         # create the new current week
         current_week = crud.week.create(session=session, object_in=next_week)
 
-
         # user has not submitted for this new week
         submitted = False
 
