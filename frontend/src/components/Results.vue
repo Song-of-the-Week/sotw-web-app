@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-
     <div v-if="errorMessage.length > 0">
       <div class="col">
         <h1>{{ errorMessage }}</h1>

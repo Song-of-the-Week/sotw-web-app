@@ -43,6 +43,7 @@ class Week(WeekInDBBase):
     survey: str
     submitted: bool
 
+
 class WeekErrorResponse(Base):
     week: Week
     status: int

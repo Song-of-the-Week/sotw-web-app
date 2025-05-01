@@ -653,6 +653,7 @@ def current_week(sotw):
         next_results_release=next_results_release,
         responses=[],
     )
+
     # create the first week of this sotw
     current_week = crud.week.create(session=override_session, object_in=first_week)
 
@@ -767,6 +768,7 @@ def current_week_new_week(sotw, current_week_not_enough_responses):
     )
 
     return current_week_not_enough_responses
+
 
 @pytest.fixture()
 def current_week_new_week_new_results(sotw, current_week_new_week):

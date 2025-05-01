@@ -30,4 +30,5 @@ class CRUDSotw(CRUDBase[Sotw, SotwCreate, SotwUpdate]):
 
         return db_object
 
+
 sotw = CRUDSotw(Sotw)
