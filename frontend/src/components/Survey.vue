@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-
     <div v-if="submitted">
       <div class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
@@ -146,31 +145,39 @@
       <div v-if="userIsOwner" class="row" id="themeCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ invalid: !themeValid }">
-            <div class="card-header">
-              Add an optional theme
-            </div>
-            <div class="card-body">
-              <div class="row mb-3">
-                <div class="col col-8 offset-2">
-                  <input
-                    class="form-control"
-                    id="themeInput"
-                    v-model="theme"
-                    @change="cacheResponse()"
-                    placeholder="Enter the name of the theme"
-                  />
-                </div>
-              </div>
-              <div class="row">
-                <div class="col col-8 offset-2">
-                  <textarea
-                    class="form-control"
-                    id="themeDescriptionInput"
-                    v-model="themeDescription"
-                    @change="cacheResponse()"
-                    rows="4"
-                    placeholder="Enter a theme description to be shown to the other participants."
-                  ></textarea>
+            <div class="accordion" id="aboutAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                    Add An Optional Theme
+                  </button>
+                </h2>
+                <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#themeAccordion">
+                  <div class="card-body">
+                    <div class="row mb-3">
+                      <div class="col col-8 offset-2">
+                        <input
+                          class="form-control"
+                          id="themeInput"
+                          v-model="theme"
+                          @change="cacheResponse()"
+                          placeholder="Enter the name of the theme"
+                        />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col col-8 offset-2">
+                        <textarea
+                          class="form-control"
+                          id="themeDescriptionInput"
+                          v-model="themeDescription"
+                          @change="cacheResponse()"
+                          rows="4"
+                          placeholder="Enter a theme description to be shown to the other participants."
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -265,6 +272,11 @@ export default {
   },
   computed: {
     ...mapGetters({ user: "getUser" }),
+    userIsOwner() {
+      return this.user.sotw_list.some((sotw) => {
+        return sotw.id == this.week.sotw_id && sotw.owner_id == this.user.id;
+      });
+    },
   },
   beforeMount() {
     const vm = this;
@@ -275,16 +287,13 @@ export default {
   },
   mounted() {
     const vm = this;
+
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
     vm.submitted = vm.week.submitted;
     setTimeout(() => {
       const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
       [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
     }, 0);
-    let sotwId = vm.week.sotw_id;
-    vm.userIsOwner = vm.user.sotw_list.some((sotw) => {
-      return sotw.id == sotwId && sotw.owner_id == vm.user.id;
-    });
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
