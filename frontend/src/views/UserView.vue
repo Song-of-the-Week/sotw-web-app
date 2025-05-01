@@ -5,150 +5,158 @@
       <br />
       <div class="row">
         <div class="col">
-          <h3>Account Info:</h3>
-          <div v-if="editingName" class="row mt-3">
-            <div class="col-3">Name:</div>
-            <div class="col-6 col-md-5">
-              <input type="text" class="form-control" v-model="userName" placeholder="Name" aria-label="Name"
-                aria-describedby="basic-addon1" />
-              <p v-if="!userNameValid" class="invalid">Name must be at lest two characters long.</p>
-            </div>
-            <div class="col-2 col-md-3">
-              <button v-if="loadingName" type="button" class="btn btn-outline-warning btn-spinner">
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
+          <div class="card px-0 mb-4">
+            <div class="card-header">Account Info:</div>
+            <div class="card-body">
+              <div v-if="editingName" class="row mt-3">
+                <div class="col-3">Name:</div>
+                <div class="col-5 col-md-4">
+                  <input type="text" class="form-control" v-model="userName" placeholder="Name" aria-label="Name"
+                    aria-describedby="basic-addon1" />
+                  <p v-if="!userNameValid" class="invalid">Name must be at lest two characters long.</p>
                 </div>
-              </button>
-              <div v-else>
-                <button type="button" class="btn btn-outline-info me-1" @click="changeName">Save</button>
-                <button type="button" class="btn btn-outline-danger" @click="cancelChangeName">Cancel</button>
+                <div class="col-2 col-md-3">
+                  <button v-if="loadingName" type="button" class="btn btn-outline-warning btn-spinner">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </button>
+                  <div v-else>
+                    <button type="button" class="btn btn-outline-info me-1" @click="changeName">Save</button>
+                    <button type="button" class="btn btn-outline-danger" @click="cancelChangeName">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="row mt-3">
+                <div class="col-3">Name:</div>
+                <div class="col-5 col-md-4 overflow-auto">
+                  {{ user.name }}
+                </div>
+                <div class="col-2 col-md-3">
+                  <button class="btn btn-outline-info" @click="editingName = true">Change</button>
+                </div>
+              </div>
+              <div v-if="editingEmail" class="row mt-3">
+                <div class="col-3">Email:</div>
+                <div class="col-5 col-md-4">
+                  <input type="text" class="form-control" v-model="userEmail" placeholder="Email" aria-label="Email"
+                    aria-describedby="basic-addon1" />
+                  <p v-if="!emailValid" class="invalid">Please provide a valid email address.</p>
+                </div>
+                <div class="col-2 col-md-3">
+                  <button v-if="loadingEmail" type="button" class="btn btn-outline-warning btn-spinner">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </button>
+                  <div v-else>
+                    <button type="button" class="btn btn-outline-info me-1" @click="changeEmail">Save</button>
+                    <button type="button" class="btn btn-outline-danger" @click="cancelChangeEmail">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="row mt-3">
+                <div class="col-3">Email:</div>
+                <div class="col-5 col-md-4 overflow-auto d-flex">
+                  {{ user.email }}
+                </div>
+                <div class="col-2">
+                  <button class="btn btn-outline-info" @click="editingEmail = true">Change</button>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-4">Spotify Account:</div>
+                <div v-if="user.spotify_linked" class="col-4 col-md-5">Linked ✅</div>
+                <div v-if="user.spotify_linked" class="col-2">
+                  <button class="btn btn-outline-danger" @click="unlinkSpotify()">Unlink</button>
+                </div>
+                <div v-if="!user.spotify_linked" class="col-6 col-md-5">Not Linked ❌</div>
+                <div v-if="!user.spotify_linked" class="col-2">
+                  <button class="btn btn-outline-success" @click="linkSpotify()">Link</button>
+                </div>
+              </div>
+              <div v-if="editingPassword" class="row mt-3">
+                <div class="col-12 pt-2 col-md-3 pt-md-0">
+                  <label for="currentPassword" class="form-label"
+                    :class="{ invalid: changePassword400.length > 0 }">Current
+                    Password</label>
+                  <PasswordInput id="currentPassword" @input-password="(password) => {
+                    currentPassword = password;
+                  }
+                  " />
+                  <p v-if="changePassword400" class="invalid">{{ changePassword400 }}</p>
+                </div>
+                <div class="col-12 pt-2 col-md-3 pt-md-0">
+                  <label for="newPassword" class="form-label" :class="{ invalid: !newPasswordValid }">New
+                    Password</label>
+                  <PasswordInput id="newPassword" @input-password="(password) => {
+                    newPassword = password;
+                    validateNewPassword();
+                  }
+                  " />
+                  <p v-if="!newPasswordValid" class="invalid">Password must be at least 8 characters long.</p>
+                </div>
+                <div class="col-12 pt-2 col-md-3 pt-md-0">
+                  <label for="newPasswordConfirm" class="form-label"
+                    :class="{ invalid: !newPasswordConfirmValid }">Confirm
+                    New Password</label>
+                  <PasswordInput id="newPasswordConfirm" @input-password="(password) => {
+                    newPasswordConfirm = password;
+                    validateNewPasswordConfirm();
+                  }
+                  " />
+                  <p v-if="!newPasswordConfirmValid" class="invalid">Passwords must match.</p>
+                </div>
+                <div class="col-12 col-md-1 pt-md-0 pt-2rem pe-0">
+                  <button v-if="loadingPassword" type="button" class="btn btn-outline-warning btn-spinner-password">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </button>
+                  <button v-else type="button" class="btn btn-outline-info" @click="changePassword">Save</button>
+                </div>
+                <div class="col-12 col-md-2 pt-md-0 pt-2rem ps-0">
+                  <button type="button" class="btn btn-outline-warning" @click="editingPassword = false">Cancel</button>
+                </div>
+              </div>
+              <div v-else class="row mt-3">
+                <div class="col-6">
+                  <button class="btn btn-outline-warning" @click="editingPassword = true">Change Password</button>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col">
+                  <p v-if="response500" class="invalid">Sorry! Something went wrong... Please contact an administrator.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          <div v-else class="row mt-3">
-            <div class="col-3">Name:</div>
-            <div class="col-6 col-md-5 overflow-auto">
-              {{ user.name }}
-            </div>
-            <div class="col-2 col-md-3">
-              <button class="btn btn-outline-info" @click="editingName = true">Change</button>
-            </div>
-          </div>
-          <div v-if="editingEmail" class="row mt-3">
-            <div class="col-3">Email:</div>
-            <div class="col-6 col-md-5">
-              <input type="text" class="form-control" v-model="userEmail" placeholder="Email" aria-label="Email"
-                aria-describedby="basic-addon1" />
-              <p v-if="!emailValid" class="invalid">Please provide a valid email address.</p>
-            </div>
-            <div class="col-2 col-md-3">
-              <button v-if="loadingEmail" type="button" class="btn btn-outline-warning btn-spinner">
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              </button>
-              <div v-else>
-                <button type="button" class="btn btn-outline-info me-1" @click="changeEmail">Save</button>
-                <button type="button" class="btn btn-outline-danger" @click="cancelChangeEmail">Cancel</button>
-              </div>
-            </div>
-          </div>
-          <div v-else class="row mt-3">
-            <div class="col-3">Email:</div>
-            <div class="col-6 col-md-5 overflow-auto">
-              {{ user.email }}
-            </div>
-            <div class="col-2">
-              <button class="btn btn-outline-info" @click="editingEmail = true">Change</button>
+        </div>
+      </div>
+      <div class="card px-0 mb-4">
+        <div class="card-header">Your Competitions:</div>
+        <div class="card-body overflow-auto">
+          <div v-if="user.sotw_list.length == 0" class="row mt-3">
+            <div class="col">
+              <p>
+                Looks like you're not a part of any Song of the Week competitions. Create a new competition or join an
+                existing one to participate!
+              </p>
             </div>
           </div>
           <div class="row mt-3">
-            <div class="col-3">Spotify Account:</div>
-            <div v-if="user.spotify_linked" class="col-6 col-md-5">Linked ✅</div>
-            <div v-if="user.spotify_linked" class="col-2">
-              <button class="btn btn-outline-danger" @click="unlinkSpotify()">Unlink</button>
-            </div>
-            <div v-if="!user.spotify_linked" class="col-6 col-md-5">Not Linked ❌</div>
-            <div v-if="!user.spotify_linked" class="col-2">
-              <button class="btn btn-outline-success" @click="linkSpotify()">Link</button>
-            </div>
-          </div>
-          <div v-if="editingPassword" class="row mt-3">
-            <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="currentPassword" class="form-label" :class="{ invalid: changePassword400.length > 0 }">Current
-                Password</label>
-              <PasswordInput id="currentPassword" @input-password="(password) => {
-                currentPassword = password;
-              }
-              " />
-              <p v-if="changePassword400" class="invalid">{{ changePassword400 }}</p>
-            </div>
-            <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="newPassword" class="form-label" :class="{ invalid: !newPasswordValid }">New Password</label>
-              <PasswordInput id="newPassword" @input-password="(password) => {
-                newPassword = password;
-                validateNewPassword();
-              }
-              " />
-              <p v-if="!newPasswordValid" class="invalid">Password must be at least 8 characters long.</p>
-            </div>
-            <div class="col-12 pt-2 col-md-3 pt-md-0">
-              <label for="newPasswordConfirm" class="form-label" :class="{ invalid: !newPasswordConfirmValid }">Confirm
-                New Password</label>
-              <PasswordInput id="newPasswordConfirm" @input-password="(password) => {
-                newPasswordConfirm = password;
-                validateNewPasswordConfirm();
-              }
-              " />
-              <p v-if="!newPasswordConfirmValid" class="invalid">Passwords must match.</p>
-            </div>
-            <div class="col-12 col-md-1 pt-md-0 pt-2rem pe-0">
-              <button v-if="loadingPassword" type="button" class="btn btn-outline-warning btn-spinner-password">
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              </button>
-              <button v-else type="button" class="btn btn-outline-info" @click="changePassword">Save</button>
-            </div>
-            <div class="col-12 col-md-2 pt-md-0 pt-2rem ps-0">
-              <button type="button" class="btn btn-outline-warning" @click="editingPassword = false">Cancel</button>
-            </div>
-          </div>
-          <div v-else class="row mt-3">
-            <div class="col-6">
-              <button class="btn btn-outline-warning" @click="editingPassword = true">Change Password</button>
-            </div>
-          </div>
-          <div class="row mt-2">
             <div class="col">
-              <p v-if="response500" class="invalid">Sorry! Something went wrong... Please contact an administrator.</p>
+              <SotwTable :sotwList="sotwList" @build-sotw-list="buildSotwList"></SotwTable>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col">
-          <h3>Your Competitions:</h3>
-        </div>
-      </div>
-      <div v-if="user.sotw_list.length == 0" class="row mt-3">
-        <div class="col">
-          <p>
-            Looks like you're not a part of any Song of the Week competitions. Create a new competition or join an
-            existing one to participate!
-          </p>
-        </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col">
-          <SotwTable :sotwList="sotwList" @build-sotw-list="buildSotwList"></SotwTable>
-        </div>
-      </div>
-      <div class="row mt-3 mb-3">
-        <div class="col">
-          <router-link to="/sotw/create">
-            <button class="btn btn-outline-success" @click="create()">Create</button>
-          </router-link>
+          <div class="row mt-3 mb-3">
+            <div class="col">
+              <router-link to="/sotw/create">
+                <button class="btn btn-outline-success" @click="create()">Create</button>
+              </router-link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

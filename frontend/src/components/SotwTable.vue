@@ -8,6 +8,7 @@
           <th scope="col" class="col-3">Invite Link</th>
           <th v-if="sotwList.some((sotw) => sotw.owner_id !== user.id)" scope="col" class="col-2">Leave</th>
           <th v-if="sotwList.some((sotw) => sotw.owner_id === user.id)" scope="col" class="col-2">Edit</th>
+          <th v-if="sotwList.some((sotw) => sotw.owner_id === user.id)" scope="col" class="col-2">Discord</th>
         </tr>
       </thead>
       <tbody>
@@ -60,8 +61,9 @@
               Generate Invite Link
             </button>
           </td>
-          <td  v-if="sotwList.some((sotw) => sotw.owner_id !== user.id)">
-            <button v-if="sotw.owner_id !== user.id" @click="showLeaveConfirm(sotw)" class="btn btn-outline-danger">Leave</button>
+          <td v-if="sotwList.some((sotw) => sotw.owner_id !== user.id)">
+            <button v-if="sotw.owner_id !== user.id" @click="showLeaveConfirm(sotw)"
+              class="btn btn-outline-danger">Leave</button>
           </td>
           <td v-if="sotw.owner_id === user.id">
             <div v-if="editing == sotw.id">
@@ -80,6 +82,13 @@
             </div>
             <div v-else>
               <button @click="edit(sotw)" class="btn btn-outline-info">Edit</button>
+            </div>
+          </td>
+          <td v-else>
+          </td>
+          <td v-if="sotw.owner_id === user.id" class="text-center">
+            <div>
+              <button @click="showDiscord(sotw)" class="btn btn-outline-info"><i class="bi bi-discord"></i></button>
             </div>
           </td>
           <td v-else>
@@ -160,6 +169,9 @@ export default {
           alert("There was an error generating your share link:\n" + err);
           console.error(err);
         });
+    },
+    showDiscord(sotw) {
+
     },
     async leaveSotw(sotwId) {
       const vm = this;

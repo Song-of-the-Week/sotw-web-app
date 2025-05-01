@@ -94,7 +94,7 @@
                   <button class="btn btn-secondary dropdown-toggle" type="button" :id="'match-' + matchedSong.id"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <span v-if="matchedSong.user === undefined">Choose</span><span v-else>{{ matchedSong.user.name
-                      }}</span>
+                    }}</span>
                   </button>
                   <ul class="dropdown-menu" :aria-labelledby="'match-' + matchedSong.id">
                     <li v-for="user in users" :key="user.id">
@@ -105,7 +105,8 @@
                 </li>
               </ul>
               <button type="button" class="btn btn-outline-warning" @click="randomizeMatches()">Guess For Me</button>
-              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Randomly assign available users to unmatched songs." class="ms-2">
+              <span data-bs-toggle="tooltip" data-bs-placement="top"
+                title="Randomly assign available users to unmatched songs." class="ms-2">
                 <i class="bi bi-info-circle"></i>
               </span>
             </div>
