@@ -105,7 +105,7 @@
                 </li>
               </ul>
               <button type="button" class="btn btn-outline-warning" @click="randomizeMatches()">Guess For Me</button>
-              <i class="bi bi-question-circle px-2" data-bs-toggle="tooltip" data-bs-title="Randomly assign available users to unmatched songs."></i>
+              <i class="bi bi-question-circle px-4" data-bs-toggle="tooltip" data-bs-title="Randomly assign available users to unmatched songs."></i>
             </div>
           </div>
         </div>
