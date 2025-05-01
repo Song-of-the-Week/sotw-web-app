@@ -94,7 +94,7 @@
                   <button class="btn btn-secondary dropdown-toggle" type="button" :id="'match-' + matchedSong.id"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <span v-if="matchedSong.user === undefined">Choose</span><span v-else>{{ matchedSong.user.name
-                    }}</span>
+                      }}</span>
                   </button>
                   <ul class="dropdown-menu" :aria-labelledby="'match-' + matchedSong.id">
                     <li v-for="user in users" :key="user.id">
@@ -105,10 +105,8 @@
                 </li>
               </ul>
               <button type="button" class="btn btn-outline-warning" @click="randomizeMatches()">Guess For Me</button>
-              <span data-bs-toggle="tooltip" data-bs-placement="top"
-                title="Randomly assign available users to unmatched songs." class="ms-2">
-                <i class="bi bi-info-circle"></i>
-              </span>
+              <i class="bi bi-question-circle px-2" data-bs-toggle="tooltip"
+                data-bs-title="Randomly assign available users to unmatched songs."></i>
             </div>
           </div>
         </div>
@@ -228,10 +226,10 @@ export default {
 
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
     vm.submitted = vm.week.submitted;
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new window.bootstrap.Tooltip(tooltipTriggerEl)
-    });
+    setTimeout(() => {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
+    }, 0);
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
