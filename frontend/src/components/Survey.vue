@@ -119,9 +119,7 @@
                 </li>
               </ul>
               <button type="button" class="btn btn-outline-warning" @click="randomizeMatches()">Guess For Me</button>
-              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Randomly assign available users to unmatched songs." class="ms-2">
-                <i class="bi bi-info-circle"></i>
-              </span>
+              <i class="bi bi-question-circle px-2" data-bs-toggle="tooltip" data-bs-title="Randomly assign available users to unmatched songs."></i>
             </div>
           </div>
         </div>
@@ -279,10 +277,10 @@ export default {
     const vm = this;
     vm.alertModal = new window.bootstrap.Modal("#alertModal");
     vm.submitted = vm.week.submitted;
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new window.bootstrap.Tooltip(tooltipTriggerEl)
-    });
+    setTimeout(() => {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].map((tooltipTriggerEl) => new window.bootstrap.Tooltip(tooltipTriggerEl));
+    }, 0);
     let sotwId = vm.week.sotw_id;
     vm.userIsOwner = vm.user.sotw_list.some((sotw) => {
       return sotw.id == sotwId && sotw.owner_id == vm.user.id;
