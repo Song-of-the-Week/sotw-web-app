@@ -494,14 +494,9 @@ def create_weekly_playlist(
                 theme = response.theme
                 theme_description = response.theme_description
                 break
-    week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num + 1}"
-    if theme != "":
-        week_playlist_name += f" - {theme}"
-    week_playlist_description = (
-        f"Week {current_week.week_num + 1} for {sotw.name} Song of the Week."
-    )
-    if theme_description != "":
-        week_playlist_description += f" Theme: {theme_description}"
+
+    week_playlist_name = f"{sotw.name} SOTW #{current_week.week_num + 1}{' - ' + theme if theme else ''}"
+    week_playlist_description = f"Week {current_week.week_num + 1} for {sotw.name} Song of the Week.{' Theme: ' + theme_description if theme_description else ''}"
     week_playlist = spotify_client.create_playlist(
         week_playlist_name, week_playlist_description, session, sotw.owner_id
     )
@@ -529,6 +524,7 @@ def create_survey(responses: list, sotw_owner_id: int):
 
     Args:
         responses (list): List of the current week's responses.
+        sotw_owner_id (int): ID of the sotw owner.
 
     Returns:
         A dictionary representing a survey for the new week.
