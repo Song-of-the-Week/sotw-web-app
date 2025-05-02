@@ -108,6 +108,17 @@ async def post_survey_response(
             # delete the response
             crud.response.delete(session=session, id=response.id)
 
+    theme = None
+    theme_description = None
+    if sotw.owner_id == current_user.id:
+        if payload.theme and not payload.theme_description or \
+            not payload.theme and payload.theme_description:
+            raise HTTPException(
+                status_code=403,
+                detail="Both theme and theme description must be provided.",
+            )
+        theme = payload.theme
+        theme_description = payload.theme_description
     if week_num == 0:
         # get song info and create the song in the db
         song_name = f"{song['name']} - {song['artists'][0]['name']}"
@@ -129,6 +140,8 @@ async def post_survey_response(
             sotw_id=current_week.sotw_id,
             week_id=current_week.id,
             submitter_id=current_user.id,
+            theme=theme,
+            theme_description=theme_description,
         )
         response = crud.response.create(session=session, object_in=response_in)
 
@@ -175,6 +188,8 @@ async def post_survey_response(
             submitter_id=current_user.id,
             picked_song_1_id=payload.picked_song_1,
             picked_song_2_id=payload.picked_song_2,
+            theme=theme,
+            theme_description=theme_description,
         )
         response = crud.response.create(session=session, object_in=response_in)
 
@@ -288,5 +303,7 @@ async def get_survey_response(
         picked_song_2_id=str(response.picked_song_2_id),
         sotw_id=str(response.sotw_id),
         week_id=str(response.week_id),
+        theme=response.theme,
+        theme_description=response.theme_description,
     )
         

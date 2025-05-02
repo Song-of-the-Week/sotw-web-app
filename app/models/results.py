@@ -20,3 +20,5 @@ class Results(Base):
     second_place: Mapped[str] = mapped_column(nullable=False)
     all_songs: Mapped[str] = mapped_column(String, default="", nullable=False)
     guessing_data: Mapped[str] = mapped_column(String, default="", nullable=False)
+    theme: Mapped[str] = mapped_column(nullable=True)
+    theme_description: Mapped[str] = mapped_column(nullable=True)

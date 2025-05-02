@@ -33,7 +33,21 @@
           </div>
         </div>
       </div>
-      <div class="row mt-5">
+      <div class="row">
+        <!-- Theme Banner -->
+        <div v-if="theme" class="row">
+          <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+            <div class="card px-0 mb-4">
+              <div class="card-header text-white text-center">
+                <h2 class="mb-0">Week {{ weekNum - 1 }} Theme</h2>
+              </div>
+              <div class="card-body text-center">
+                <h3 class="card-title">{{ theme }}</h3>
+                <p class="card-text">{{ themeDescription }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- Chart Card -->
         <div class="row-md-4 mb-4">
           <div class="card h-100">
@@ -168,6 +182,8 @@ export default {
       chartOptions: {},
       errorMessage: "",
       avg_num_correct_guesses: 0,
+      theme: "",
+      themeDescription: "",
     };
   },
   mounted() {
@@ -191,6 +207,8 @@ export default {
             vm.secondPlace = toRaw(JSON.parse(res.data.second_place));
             vm.allSongs = toRaw(JSON.parse(res.data.all_songs));
             vm.guessingData = toRaw(JSON.parse(res.data.guessing_data));
+            vm.theme = res.data.theme;
+            vm.themeDescription = res.data.theme_description;
             // get average guesses
             let total_correct_guesses = 0
             vm.guessingData.forEach(guesser => {

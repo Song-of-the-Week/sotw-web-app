@@ -80,4 +80,6 @@ async def get_results(
         second_place=results.second_place,
         all_songs=results.all_songs,
         guessing_data=results.guessing_data,
+        theme=results.theme,
+        theme_description=results.theme_description,
     )

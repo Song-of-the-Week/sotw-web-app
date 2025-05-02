@@ -162,6 +162,8 @@ def test_post_response_success_week_n_no_repeat(client, current_week_new_week):
             },
         ],
         "next_song": "https://open.spotify.com/track/1auuYcOrua5hrsGCS7idun?si=f951bceb14204344",
+        "theme": "test_theme",
+        "theme_description": "test_theme_description",
     }
     response = client.post(f"{cfg.API_V1_STR}/response/1/1", data=json.dumps(payload))
     data = response.json()
@@ -309,6 +311,72 @@ def test_post_response_success_week_n_replace_existing_response(
     assert "repeat" in data.keys()
     assert data["repeat"] == False
 
+def test_post_response_403_missing_theme_description(client, current_week_new_week):
+    # When
+    # kick off the new week
+    response = client.get(f"{cfg.API_V1_STR}/week/1/current_week")
+
+    # post a response
+    payload = {
+        "picked_song_1": 1,
+        "picked_song_2": 2,
+        "user_song_matches": [
+            {
+                "song_id": 1,
+                "user_id": 1,
+            },
+            {
+                "song_id": 2,
+                "user_id": 2,
+            },
+            {
+                "song_id": 3,
+                "user_id": 3,
+            },
+        ],
+        "next_song": "https://open.spotify.com/track/1auuYcOrua5hrsGCS7idun?si=f951bceb14204344",
+        "theme": "test_theme",
+    }
+    response = client.post(f"{cfg.API_V1_STR}/response/1/1", data=json.dumps(payload))
+    data = response.json()
+
+    # Then
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Both theme and theme description must be provided."
+
+def test_post_response_403_description_without_theme(client, current_week_new_week):
+    # When
+    # kick off the new week
+    response = client.get(f"{cfg.API_V1_STR}/week/1/current_week")
+
+    # post a response
+    payload = {
+        "picked_song_1": 1,
+        "picked_song_2": 2,
+        "user_song_matches": [
+            {
+                "song_id": 1,
+                "user_id": 1,
+            },
+            {
+                "song_id": 2,
+                "user_id": 2,
+            },
+            {
+                "song_id": 3,
+                "user_id": 3,
+            },
+        ],
+        "next_song": "https://open.spotify.com/track/1auuYcOrua5hrsGCS7idun?si=f951bceb14204344",
+        "theme_description": "test_theme_description",
+    }
+    response = client.post(f"{cfg.API_V1_STR}/response/1/1", data=json.dumps(payload))
+    data = response.json()
+
+    # Then
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Both theme and theme description must be provided."
+    
 
 def test_get_response_success(client, current_week_new_week_new_results):
     # When
@@ -328,11 +396,12 @@ def test_get_response_success(client, current_week_new_week_new_results):
     assert data["picked_song_1_id"] == "2"
     assert data["picked_song_2_id"] == "3"
     assert data["submitter_id"] == "1"
+    assert data["theme"] == "THEME"
+    assert data["theme_description"] == "THEME DESCRIPTION"
     assert (
         data["next_song"]
         == "https://open.spotify.com/track/6OmApaLQPqHZL3iI78FOUR?si=971c343da7fb4847"
     )
-
 
 def test_get_response_wrong_user(client, current_week_new_week_new_results):
     # When
