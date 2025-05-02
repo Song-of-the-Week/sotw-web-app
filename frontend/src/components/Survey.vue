@@ -142,18 +142,19 @@
         </div>
       </div>
       <!-- Theme -->
-      <div v-if="userIsOwner" class="row" id="themeCard">
+      <div v-if="userIsOwner" class="row" id="themeDiv">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
           <div class="card px-0 mb-4" :class="{ invalid: !themeValid }">
             <div class="accordion" id="aboutAccordion">
               <div class="accordion-item">
                 <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                  <button :class="{ invalid: !themeValid }" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
                     Add An Optional Theme
                   </button>
                 </h2>
                 <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#themeAccordion">
-                  <div class="card-body">
+                  <div class="card-body" id="themeCard">
+                    <div :class="{ invalid: !themeValid }" v-if="!themeValid"><i class="bi bi-exclamation-circle"></i> Please enter a theme and a description, or leave both blank.</div>
                     <div class="row mb-3">
                       <div class="col col-8 offset-2">
                         <input
@@ -265,7 +266,6 @@ export default {
       loading: false,
       previousResponse: null,
       cachedResponseKey: null,
-      userIsOwner: false,
       theme: "",
       themeDescription: "",
     };
@@ -351,11 +351,19 @@ export default {
       if (!vm.songValid) {
         location.href = "#songCard";
       }
+      if (vm.userIsOwner) {
+        vm.themeValid = (vm.themeDescription.length != 0 && vm.theme.length != 0) || (vm.theme.length == 0 && vm.themeDescription.length == 0);
+        if (!vm.themeValid) {
+          location.href = "#themeCard";
+        }
+      }
 
       if (vm.week.week_num == 0) {
-        if (vm.songValid) {
+        if (vm.songValid && vm.themeValid) {
           let payload = {
             next_song: vm.nextSong,
+            theme: vm.theme,
+            theme_description: vm.themeDescription,
           };
 
           vm.submitSurvey(vm.$route.params.sotwId, vm.week.week_num, payload);
@@ -381,13 +389,6 @@ export default {
           location.href = "#voteCard";
         }
 
-        if (vm.userIsOwner) {
-          vm.themeValid = (vm.themeDescription.length != 0 && vm.theme.length != 0) || (vm.theme.length == 0 && vm.themeDescription.length == 0);
-          if (!vm.themeValid) {
-            location.href = "#themeCard";
-          }
-
-        }
         // send form data to back end
         if (vm.voteValid && vm.matchValid && vm.songValid && vm.themeValid) {
           // construct the payload
