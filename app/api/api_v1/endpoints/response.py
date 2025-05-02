@@ -111,9 +111,14 @@ async def post_survey_response(
     theme = None
     theme_description = None
     if sotw.owner_id == current_user.id:
+        if payload.theme and not payload.theme_description or \
+            not payload.theme and payload.theme_description:
+            raise HTTPException(
+                status_code=403,
+                detail="Both theme and theme description must be provided.",
+            )
         theme = payload.theme
         theme_description = payload.theme_description
-        logger.info(f"{current_user.id} is not the owner of the sotw {sotw.id}, so theme and description are set to None")
     if week_num == 0:
         # get song info and create the song in the db
         song_name = f"{song['name']} - {song['artists'][0]['name']}"
