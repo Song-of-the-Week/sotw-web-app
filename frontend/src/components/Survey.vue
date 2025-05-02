@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <h2>Survey</h2>
     <div v-if="submitted">
       <div class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
@@ -45,6 +44,20 @@
       </div>
     </div>
     <form v-else class="row form-horizontal justify-content-center" id="surveyForm" @submit.prevent="submit(false)">
+      <!-- Theme Banner -->
+      <div v-if="displayTheme" class="row">
+        <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+          <div class="card px-0 mb-4">
+            <div class="card-header theme-header text-center">
+              <h2 class="mb-0">Themed Week</h2>
+            </div>
+            <div class="card-body theme-body text-center">
+              <h3 class="card-title">{{ displayTheme }}</h3>
+              <p class="card-text">{{ displayThemeDescription }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Pick your top 2 -->
       <div v-if="!week.week_num == 0" class="row" id="voteCard">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
@@ -128,6 +141,50 @@
           </div>
         </div>
       </div>
+      <!-- Theme -->
+      <div v-if="userIsOwner" class="row" id="themeDiv">
+        <div class="col col-10 col-sm-6 offset-1 offset-sm-3">
+          <div class="card px-0 mb-4" :class="{ invalid: !themeValid }">
+            <div class="accordion" id="aboutAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button :class="{ invalid: !themeValid }" class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                    Add An Optional Theme
+                  </button>
+                </h2>
+                <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#themeAccordion">
+                  <div class="card-body" id="themeCard">
+                    <div :class="{ invalid: !themeValid }" v-if="!themeValid"><i class="bi bi-exclamation-circle"></i> Please enter a theme and a description, or leave both blank.</div>
+                    <div class="row mb-3">
+                      <div class="col col-8 offset-2">
+                        <input
+                          class="form-control"
+                          id="themeInput"
+                          v-model="theme"
+                          @change="cacheResponse()"
+                          placeholder="Enter the name of the theme"
+                        />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col col-8 offset-2">
+                        <textarea
+                          class="form-control"
+                          id="themeDescriptionInput"
+                          v-model="themeDescription"
+                          @change="cacheResponse()"
+                          rows="4"
+                          placeholder="Enter a theme description to be shown to the other participants."
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Submit -->
       <div v-if="!user.spotify_linked" class="row">
         <div class="col col-10 col-sm-6 offset-1 offset-sm-3 text-start">
@@ -203,15 +260,21 @@ export default {
       voteValid: true,
       matchValid: true,
       songValid: true,
+      themeValid: true,
       alertModal: null,
       submitted: false,
       loading: false,
       previousResponse: null,
       cachedResponseKey: null,
+      theme: "",
+      themeDescription: "",
     };
   },
   computed: {
-    ...mapGetters({ user: "getUser" }),
+    ...mapGetters({ sotw: "getActiveSotw", user: "getUser" }),
+    userIsOwner() {
+      return this.sotw.owner_id == this.user.id;
+    },
   },
   beforeMount() {
     const vm = this;
@@ -275,6 +338,8 @@ export default {
               response: match.response_id,
             };
           });
+          vm.theme = vm.previousResponse.theme;
+          vm.themeDescription = vm.previousResponse.theme_description;
         }
       });
       vm.submitted = false;
@@ -286,11 +351,19 @@ export default {
       if (!vm.songValid) {
         location.href = "#songCard";
       }
+      if (vm.userIsOwner) {
+        vm.themeValid = (vm.themeDescription.length != 0 && vm.theme.length != 0) || (vm.theme.length == 0 && vm.themeDescription.length == 0);
+        if (!vm.themeValid) {
+          location.href = "#themeCard";
+        }
+      }
 
       if (vm.week.week_num == 0) {
-        if (vm.songValid) {
+        if (vm.songValid && vm.themeValid) {
           let payload = {
             next_song: vm.nextSong,
+            theme: vm.theme,
+            theme_description: vm.themeDescription,
           };
 
           vm.submitSurvey(vm.$route.params.sotwId, vm.week.week_num, payload);
@@ -317,7 +390,7 @@ export default {
         }
 
         // send form data to back end
-        if (vm.voteValid && vm.matchValid && vm.songValid) {
+        if (vm.voteValid && vm.matchValid && vm.songValid && vm.themeValid) {
           // construct the payload
           let payloadMatches = [];
           vm.userSongMatches.forEach((match) => {
@@ -331,6 +404,8 @@ export default {
             picked_song_2: vm.pickedSongs[1],
             user_song_matches: payloadMatches,
             next_song: vm.nextSong,
+            theme: vm.theme,
+            theme_description: vm.themeDescription,
             repeat_approved: repeatApproved,
           };
           // send valid form data to back end to evaluate form and add to database
@@ -387,7 +462,9 @@ export default {
         let responseToCache = {
           nextSong: vm.nextSong,
           pickedSongs: vm.pickedSongs,
-          userSongMatches: vm.userSongMatches
+          userSongMatches: vm.userSongMatches,
+          theme: vm.theme,
+          themeDescription: vm.themeDescription,
         }
         localStorage.setItem(vm.cachedResponseKey, JSON.stringify(responseToCache));
       });
@@ -431,6 +508,8 @@ export default {
             response: match.response_id,
           };
         });
+        vm.theme = cachedResponse.theme;
+        vm.themeDescription = cachedResponse.themeDescription;
       }
     }
   },
@@ -448,6 +527,8 @@ export default {
 
           vm.votingSongs = songs.filter((song, i, self) => i === self.findIndex((s) => s.name === song.name));
           vm.users = surveyJson.users;
+          vm.displayTheme = surveyJson.theme;
+          vm.displayThemeDescription = surveyJson.theme_description;
 
           songs.forEach((song) => {
             vm.userSongMatches.push({
@@ -491,5 +572,13 @@ export default {
 
 .text-muted {
   color: #60656a !important;
+}
+
+.card-header.theme-header {
+  background-color: rgba(13, 109, 253, 0.500);
+}
+
+.card-body.theme-body {
+  background-color: rgba(13, 109, 253, 0.125);
 }
 </style>
