@@ -32,3 +32,5 @@ class Response(Base):
     submitter = relationship(
         "User", foreign_keys=submitter_id, back_populates="responses"
     )
+    theme: Mapped[str] = mapped_column(nullable=True)
+    theme_description: Mapped[str] = mapped_column(nullable=True)
