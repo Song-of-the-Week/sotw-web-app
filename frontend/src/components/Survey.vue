@@ -271,11 +271,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ user: "getUser" }),
+    ...mapGetters({ sotw: "getActiveSotw", user: "getUser" }),
     userIsOwner() {
-      return this.user.sotw_list.some((sotw) => {
-        return sotw.id == this.week.sotw_id && sotw.owner_id == this.user.id;
-      });
+      return this.sotw.owner_id == this.user.id;
     },
   },
   beforeMount() {
