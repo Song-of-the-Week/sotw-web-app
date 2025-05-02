@@ -322,22 +322,24 @@ export default {
             vm.previousResponse.picked_song_1_id,
             vm.previousResponse.picked_song_2_id,
           ];
-          var survey = JSON.parse(vm.week.survey);
-          vm.users = [];
-          // update the userSongMatches with the previous response
-          vm.userSongMatches = vm.previousResponse.user_song_matches.map(match => {
-            let user = survey.users.find((user) => user.id == match.user_id);
-            let song = survey.songs.find((song) => song.id == match.song_id);
-            song.user = user;
-            song.user.matched = true;
-            vm.users.push(user);
-            return {
-              id: match.song_id.toString(),
-              song: song,
-              user: user,
-              response: match.response_id,
-            };
-          });
+          if (vm.week.survey) {
+            var survey = JSON.parse(vm.week.survey);
+            vm.users = [];
+            // update the userSongMatches with the previous response
+            vm.userSongMatches = vm.previousResponse.user_song_matches.map(match => {
+              let user = survey.users.find((user) => user.id == match.user_id);
+              let song = survey.songs.find((song) => song.id == match.song_id);
+              song.user = user;
+              song.user.matched = true;
+              vm.users.push(user);
+              return {
+                id: match.song_id.toString(),
+                song: song,
+                user: user,
+                response: match.response_id,
+              };
+            });
+          }
           vm.theme = vm.previousResponse.theme;
           vm.themeDescription = vm.previousResponse.theme_description;
         }
